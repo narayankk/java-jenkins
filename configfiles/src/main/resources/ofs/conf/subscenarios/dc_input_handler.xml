@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <scenario>
+    <property key="name">dc_input_handler subscenario for validating and setting scenario Input</property>
+    <property key="description">Scenario Input handler is a sub-scenario responsible to handle configured UI input of scenario.</property>
+    <property key="sub_scenario">true</property>
+    <property key="parent_access">RW</property>
+    <property key="namespace">dc-recv-ship-input-sub-proc</property>
+    <property key="exits">DONE,ERROR</property>
+    <property key="inputs">
+       bypassReader,configRfidOpOutput,readerEpc,configNonrfidOpOutput,
+       configReadOnOutput,configReadOffOutput,configNonrfidStartOutput,
+       configNonrfidStopOutput,configCriticalErrorOutput,confgNonCriticalErrorOutput,
+       configMaintenanceDoneOutput,configDevicePointForStart,configDevicePointEpcForEnd,
+       configDevicePoint7EpcForEnd,configDevicePoint5EpcForAntennaStatus,configDevicePoint6EpcForDeviceStatus,
+       stationId,configSessionStopOutput,configSessionStartOutput,configAccuracyMetOutput,configAccuracyNotMetOutput,configWrongItemOutput
+    </property>
+    <property key="outputs">
+      rfidOpOutput,endError,nonrfidOpOutput,readOffOutput,
+      nonrfidStartOutput,nonrfidStopOutput,criticalErrorOutput,nonCriticalErrorOutput,
+      maintenanceDoneOutput,devicePointForStart,devicePointEpcForEnd,devicePoint7EpcForEnd,
+      devicePoint5EpcForAntennaStatus,devicePoint6EpcForDeviceStatus,logicalState,sessionStartedOutput,sessionStopOutput,eventErrCode,errorDesc,origNode,readOnOutput,accuracyMetOutput,accuracyNotMetOutput,wrongItemOutput
+    </property>
+    
+    <process>
+  
+      <start name="Start">
+          <target exit="All Cases" name="StrForSessionStartOutput"></target>
+    </start>
+  <!-- modify the digitalIO Config -->
+  	<activity name="StrForAccuracyMetOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+              <target exit="done" name="StrForAccuracyNotMetOutput"/>
+              <target exit="error" name="EndInitStation"/>
+              <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+              <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configAccuracyMetOutput}</input>
+              <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+              <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.accuracyMetOutput}</output>
+              <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+  	<activity name="StrForAccuracyNotMetOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+              <target exit="done" name="StrForWrongItemOutput"/>
+              <target exit="error" name="EndInitStation"/>
+              <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+              <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configAccuracyNotMetOutput}</input>
+              <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+              <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.accuracyNotMetOutput}</output>
+              <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+	<activity name="StrForWrongItemOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForSessionStartOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configWrongItemOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.wrongItemOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>  
+        <activity name="StrForSessionStartOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForSessionStopOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configSessionStartOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.sessionStartedOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <activity name="StrForSessionStopOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForRFIDOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configSessionStopOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.sessionStopOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>        
+        <activity name="StrForRFIDOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForNonRFIDOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configRfidOpOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.rfidOpOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <activity name="StrForNonRFIDOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForReadOnOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configNonrfidOpOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.nonrfidOpOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <activity name="StrForReadOnOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForReadOffOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configReadOnOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.readOnOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <activity name="StrForReadOffOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForNonrfidStartOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configReadOffOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.readOffOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <activity name="StrForNonrfidStartOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForNonrfidStopOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configNonrfidStartOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.nonrfidStartOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+          <activity name="StrForNonrfidStopOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForCriticalErrorOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configNonrfidStopOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.nonrfidStopOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+          <activity name="StrForCriticalErrorOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForNonCriticalErrorOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configCriticalErrorOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.criticalErrorOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+          <activity name="StrForNonCriticalErrorOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForMaintenanceDoneOutput"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configNonCriticalErrorOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.nonCriticalErrorOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+          <activity name="StrForMaintenanceDoneOutput" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalOutputStr">
+            <target exit="done" name="StrForDevicePointForStart"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="digitalOutputPointsPattern" required="false">${process.configMaintenanceDoneOutput}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.maintenanceDoneOutput}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <!-- validation of input points -->
+        <activity name="StrForDevicePointForStart" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalInputStr">
+            <target exit="done" name="StrForDevicePointEpcForEnd"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="inputPointNumber" required="false">${process.configDevicePointForStart}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="deviceEpcAndInputPoint">${process.devicePointForStart}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <activity name="StrForDevicePointEpcForEnd" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalInputStr">
+            <target exit="done" name="StrForDevicePoint7EpcForEnd"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="inputPointNumber" required="false">${process.configDevicePointEpcForEnd}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="deviceEpcAndInputPoint">${process.devicePointEpcForEnd}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <activity name="StrForDevicePoint7EpcForEnd" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalInputStr">
+            <target exit="done" name="StrForDevicePoint5EpcForAntennaStatus"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="inputPointNumber" required="false">${process.configDevicePoint7EpcForEnd}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="deviceEpcAndInputPoint">${process.devicePoint7EpcForEnd}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <activity name="StrForDevicePoint5EpcForAntennaStatus" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalInputStr">
+            <target exit="done" name="StrForDevicePoint6EpcForDeviceStatus"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="inputPointNumber" required="false">${process.configDevicePoint5EpcForAntennaStatus}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="deviceEpcAndInputPoint">${process.devicePoint5EpcForAntennaStatus}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <activity name="StrForDevicePoint6EpcForDeviceStatus" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructDigitalInputStr">
+            <target exit="done" name="SetLogicalState"/>
+            <target exit="error" name="EndInitStation"/>
+            <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+            <input class="java.lang.String" constant="false" name="inputPointNumber" required="false">${process.configDevicePoint6EpcForDeviceStatus}</input>
+            <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+            <output class="java.lang.String" constant="false" name="deviceEpcAndInputPoint">${process.devicePoint6EpcForDeviceStatus}</output>
+            <output class="java.lang.String" constant="false" name="endError">${process.endError}</output>
+        </activity>
+        <activity name="EndInitStation" resource="class:com.oatsystems.solutions.apparel.primitives.InitializeStation">
+          <target exit="done" name="ERROR"/>
+          <target exit="error" name="ERROR"/>
+          <input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+          <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.criticalErrorOutput}</input>
+          <input class="java.lang.String" constant="false" name="endError" required="false">${process.endError}</input>
+        </activity>
+     <activity name="SetLogicalState" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+      <target exit="done" name="DONE"></target>
+      <target exit="error" name="ERROR"></target>
+      <input class="java.lang.Object" constant="false" name="inArg0" required="false">ScenarioInitialized</input>
+      <output class="java.lang.Object" constant="false" name="outArg0">${process.logicalState}</output>
+      <input class="java.lang.String" constant="false" name="inArg1" required="false">NO_ERROR</input>
+      <output class="java.lang.String" constant="false" name="outArg1">${process.eventErrCode}</output>
+      <input class="java.lang.String" constant="false" name="inArg2" required="false">NO_DESC</input>
+      <output class="java.lang.String" constant="false" name="outArg2">${process.errorDesc}</output>
+      <input class="java.lang.String" constant="false" name="inArg3" required="false">NO_ORIG_NODE</input>
+      <output class="java.lang.String" constant="false" name="outArg3">${process.origNode}</output>
+    </activity>
+
+        <!-- End of validation of input points -->
+        <end name="ERROR"></end>
+       <end name="DONE"></end>
+	    
+    </process>
+	
+    <config/>
+	
+    <display/>
+</scenario>

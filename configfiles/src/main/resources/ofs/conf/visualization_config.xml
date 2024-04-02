@@ -1,0 +1,10 @@
+<ZoneConfiguration>
+  <Maps baseFileUrl="" baseHttpUrl=""/>
+  <Zones/>
+  <Navigation/>
+  <ZoneConfig>
+    <UIStatus/>
+    <BusinessLocationHierarchy/>
+    <RPMapping/>
+  </ZoneConfig>
+</ZoneConfiguration>

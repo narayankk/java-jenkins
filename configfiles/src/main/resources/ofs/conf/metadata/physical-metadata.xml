@@ -1,0 +1,1103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="Physical">
+  <table name="ems_unit">
+    <entity type="EMSUnit" is-abstract="true" child-locator-key="unit_type">
+      <label>EMS units configuration</label>
+      <description>EMS units configuration</description>
+      <property key="name" column-name="name" is-mandatory="true">
+        <label>Name</label>
+        <description>The name of the EMS unit</description>
+        <type-definition>oat:UnitName</type-definition>
+      </property>
+      <property key="description" column-name="description" is-mandatory="false">
+        <label>Description</label>
+        <description>An optional description for the EMS unit</description>
+        <type-definition>oat:Description</type-definition>
+      </property>
+      <property key="unit_type" column-name="unit_type" is-mandatory="false">
+        <label>Unit type</label>
+        <description>Unit type</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="queue" is-default="true">queue</option>
+          <option value="logger">logger</option>
+          <option value="filter">filter</option>
+          <option value="dynamicUnit">dynamic unit</option>
+          <option value="adapter">adapter</option>
+        </select>
+      </property>
+      <property key="sequence_number" column-name="sequence_number" is-mandatory="false">
+        <label>Sequence Number</label>
+        <description>Sequence Number</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+    </entity>
+    <entity type="Queue" extends="EMSUnit" locator-value="queue">
+      <label>Queue Configuration</label>
+      <description>Queue Configuration</description>
+      <property key="name" column-name="name" is-mandatory="true">
+        <label>Name</label>
+        <description>The name of the EMS unit</description>
+        <type-definition>oat:QueueName</type-definition>
+      </property>
+      <property key="mode" is-mandatory="false">
+        <label>Queue Mode</label>
+        <description>Queue Mode</description>
+        <type-definition>oat:NoSpacesArgString</type-definition>
+        <select is-bound="true">
+          <option value="asynchronous" is-default="true">asynchronous</option>
+          <option value="categorized">categorized</option>
+          <option value="synchronous">synchronous</option>
+        </select>
+      </property>
+      <property key="size" column-name="queue_size" is-mandatory="true">
+        <label>Queue Size</label>
+        <description>Queue Size</description>
+        <type-definition>oat:EMSQueueSize</type-definition>
+      </property>
+      <property key="scope">
+        <label>Queue Scope</label>
+        <description>Queue scope</description>
+        <type-definition>oat:NoSpacesArgString</type-definition>
+        <select is-bound="true">
+          <option value="private">private</option>
+          <option value="public" is-default="true">public</option>
+        </select>
+      </property>
+      <property key="type" column-name="queue_type" is-mandatory="true">
+        <label>Queue Type</label>
+        <description>Queue Type</description>
+        <type-definition>oat:NoSpacesArgString</type-definition>
+        <select is-bound="true">
+          <option value="opaque">opaque</option>
+          <option value="transparent" is-default="true">transparent</option>
+        </select>
+      </property>
+      <property key="customClassName" column-name="class_name" is-mandatory="false">
+        <label>Custom Class Name</label>
+        <description>Class name only if the queue type is custom</description>
+        <type-definition>oat:JavaClass</type-definition>
+      </property>
+    </entity>
+    <entity type="Filter" extends="EMSUnit" is-abstract="true" locator-value="filter" child-locator-key="filter_type">
+      <label>Filter Configuration</label>
+      <description>Filter Configuration</description>
+      <property key="args" column-name="args" is-mandatory="false">
+        <label>Filter Arguments</label>
+        <description>The arguments to the filter</description>
+        <type-definition>oat:Arguments</type-definition>
+      </property>
+      <property key="filter_type" is-mandatory="true">
+        <label>Filte type</label>
+        <description>Type of filter to create</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="true">
+          <option value="CustomFilter">Custom Filter</option>
+          <option value="memdb_status_filter">Status Filter</option>
+          <option value="default_event_filter" is-default="true">Default Event Filter</option>
+          <option value="to_epc_filter">To EPC Filter</option>
+          <option value="location_filter">Location Filter</option>
+          <option value="read_smoother">Read Smoother</option>
+          <option value="association_filter">Association Filter</option>
+          <option value="noise_filter">Noise Filter</option>
+          <option value="epc_to_ems_event_convertor">EPC to EMS Event Converter</option>
+          <option value="epc_convertor">EPC Converter</option>
+          <option value="epc_map_filter">EPC Map Filter</option>
+          <option value="db_filter">DB Filter</option>
+          <option value="network_filter">Network Filter</option>
+          <option value="savant_filter">Savant Filter</option>
+          <option value="system_filter">System Filter</option>
+          <option value="device_filter">Device Filter</option>
+          <option value="inventory_filter">Inventory Filter</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="CustomFilter" extends="Filter" locator-value="CustomFilter">
+      <label>Custom Filter Configuration</label>
+      <description>Custom Filter Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>oat:JavaClass</type-definition>
+      </property>
+      <property key="num_of_outputs" is-mandatory="true">
+        <label>Number of HiddenQueue Outputs</label>
+        <description>Number of HiddenQueue Outputs</description>
+        <type-definition>oat:EMSUnitNumOutputs</type-definition>
+      </property>
+    </entity>
+    <entity type="MemDBStatusFilter" extends="Filter" locator-value="memdb_status_filter">
+      <label>Mem DB Status Filter Configuration</label>
+      <description>Mem DB Status Filter Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.physical.StatusFilter" is-default="true">com.oatsystems.ems.physical.StatusFilter</option>
+        </select>
+      </property>
+      <property key="hidden_queues" is-mandatory="false">
+        <label>Hidden Queues</label>
+        <description>List of Hidden Queues for the filter</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="Device_Monitoring_Events" is-default="true">Device_Monitoring_Events</option>
+        </select>
+      </property>
+      <property key="table_name" is-mandatory="true">
+        <label>Table Name</label>
+        <description>Table Name</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="reader" is-default="true">reader</option>
+        </select>
+      </property>
+      <property key="epc_field" is-mandatory="true">
+        <label>EPC Field</label>
+        <description>EPC Field</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="epc" is-default="true">epc</option>
+        </select>
+      </property>
+      <property key="status_field" is-mandatory="true">
+        <label>Status Field</label>
+        <description>Status Field</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="is_online" is-default="true">is_online</option>
+        </select>
+      </property>
+      <property key="use_monitoring" is-mandatory="true">
+        <label>Use Monitoring</label>
+        <description>Use Monitoring</description>
+        <type-definition>xsd:boolean</type-definition>
+        <select is-bound="false">
+          <option value="true" is-default="true">true</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="DefaultEventFilter" extends="Filter" locator-value="default_event_filter">
+      <label>Default Event Filter Configuration</label>
+      <description>Default Event Filter Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="org.autoidcenter.ems.filter.DefaultEventFilter" is-default="true">org.autoidcenter.ems.filter.DefaultEventFilter</option>
+        </select>
+      </property>
+      <property key="hidden_queues" is-mandatory="false">
+        <label>Hidden Queues</label>
+        <description>List of Hidden Queues for the filter</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="Filtered_Events" is-default="true">Filtered_Events</option>
+        </select>
+      </property>
+      <property key="event_type" is-mandatory="false">
+        <label>Event Type</label>
+        <description>Event Type</description>
+        <type-definition>oat:RegExp</type-definition>
+      </property>
+      <property key="epc" is-mandatory="false">
+        <label>Regular expression match on the EPC</label>
+        <description>If provided, this regular expression will be used to match the EPC of incoming events</description>
+        <type-definition>oat:RegExp</type-definition>
+      </property>
+      <property key="reader_epc" is-mandatory="false">
+        <label>Regular expression match on the Reader EPC</label>
+        <description>If provided, this regular expression will be used to match the reader EPC of incoming events</description>
+        <type-definition>oat:RegExp</type-definition>
+      </property>
+      <property key="reading_type" is-mandatory="false">
+        <label>Regular expression match on the Reading Type</label>
+        <description>If provided, this regular expression will be used to match the reading type of incoming events</description>
+        <type-definition>oat:RegExp</type-definition>
+      </property>
+      <property key="reading_value" is-mandatory="false">
+        <label>Regular expression match on the Reading Value</label>
+        <description>If provided, this regular expression will be used to match the reading value of incoming events</description>
+        <type-definition>oat:RegExp</type-definition>
+      </property>
+      <property key="status_message" is-mandatory="false">
+        <label>Regular expression match on the Status Message</label>
+        <description>If provided, this regular expression will be used to match the status messages of the incoming events</description>
+        <type-definition>oat:RegExp</type-definition>
+      </property>
+    </entity>
+    <entity type="ToEpcFilter" extends="Filter" locator-value="to_epc_filter">
+      <label>To EPC Filter Configuration</label>
+      <description>To EPC Filter Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.physical.ToEPCFilter" is-default="true">com.oatsystems.ems.physical.ToEPCFilter</option>
+        </select>
+      </property>
+      <property key="hidden_queues" is-mandatory="false">
+        <label>Hidden Queues</label>
+        <description>List of Hidden Queues for the filter</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="Padded_EPC_Events" is-default="true">Padded_EPC_Events</option>
+        </select>
+      </property>
+      <property key="epc_prefix" is-mandatory="true">
+        <label>EPC prefix</label>
+        <description>The hexadecimal prefix to be prependended to tag identifiers</description>
+        <type-definition>oat:EPCPrefix</type-definition>
+      </property>
+    </entity>
+    <entity type="LocationFilter" extends="Filter" locator-value="location_filter">
+      <label>Location Filter Configuration</label>
+      <description>Location Filter Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.physical.LocationFilter" is-default="true">com.oatsystems.ems.physical.LocationFilter</option>
+        </select>
+      </property>
+      <property key="hidden_queues" is-mandatory="false">
+        <label>Hidden Queues</label>
+        <description>List of Hidden Queues for the filter</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="Add_Events, Remove_Events" is-default="true">Add_Events, Remove_Events</option>
+        </select>
+      </property>
+      <property key="db_conn_prefix" is-mandatory="true">
+        <label>Database connection prefix</label>
+        <description>Database connection prefix</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="senseware" is-default="true">senseware</option>
+        </select>
+      </property>
+      <property key="db_location_table" is-mandatory="true">
+        <label>Location table name</label>
+        <description>Table name where the locations are stored</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="location" is-default="true">location</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="ReadSmoother" extends="Filter" locator-value="read_smoother">
+      <label>Read Smoother Configuration</label>
+      <description>Read Smoother Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.physical.ReadSmoother" is-default="true">com.oatsystems.ems.physical.ReadSmoother</option>
+        </select>
+      </property>
+      <property key="hidden_queues" is-mandatory="false">
+        <label>Hidden Queues</label>
+        <description>List of Hidden Queues for the filter</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="Add_Events, Remove_Events" is-default="true">Add_Events</option>
+        </select>
+      </property>
+      <property key="db_conn_prefix" is-mandatory="true">
+        <label>Database connection prefix</label>
+        <description>Database connection prefix</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="senseware" is-default="true">senseware</option>
+        </select>
+      </property>
+      <property key="default_time_threshold" is-mandatory="true">
+        <label>Default time threshold (in millis)</label>
+        <description>The time of tag absence in milliseconds that triggers a remove event</description>
+        <type-definition>oat:TimeThreshold</type-definition>
+      </property>
+      <property key="default_loop_threshold" is-mandatory="false">
+        <label>Default loop threshold</label>
+        <description>The number of reader passes for which a tag should be absent to trigger a remove event</description>
+        <type-definition>oat:LoopThreshold</type-definition>
+      </property>
+      <property key="pass_default_time_threshold" is-mandatory="false">
+        <label>Alternate time threshold</label>
+        <description>An alternate time threshold that has to be satisfied before a remove event is sent, unless the alternate loop threshold is satisfied</description>
+        <type-definition>oat:TimeThreshold</type-definition>
+      </property>
+      <property key="pass_default_loop_threshold" is-mandatory="false">
+        <label>Alternate loop threshold</label>
+        <description>An alternate loop threshold that has to be satisfied before a remove event is sent, unless the alternate time threshold is satisfied</description>
+        <type-definition>oat:LoopThreshold</type-definition>
+      </property>
+      <property key="poll_time" is-mandatory="true">
+        <label>Time between cleanup operations (in millis)</label>
+        <description>The background process that cleans up absent tags to send remove events is scheduled at the given frequency</description>
+        <type-definition>oat:DurationInMemMillis</type-definition>
+      </property>
+    </entity>
+    <entity type="AssociationFilter" extends="Filter" locator-value="association_filter">
+      <label>Association Filter Configuration</label>
+      <description>Association Filter Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.logical.AssociationFilter2" is-default="true">com.oatsystems.ems.logical.AssociationFilter2</option>
+        </select>
+      </property>
+      <property key="hidden_queues" is-mandatory="false">
+        <label>Hidden Queues</label>
+        <description>List of Hidden Queues for the filter</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="Association_Events" is-default="true">Association_Events</option>
+        </select>
+      </property>
+      <property key="db_conn_prefix" is-mandatory="true">
+        <label>Database connection prefix</label>
+        <description>Database connection prefix</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="senseware" is-default="true">senseware</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="NoiseFilter" extends="Filter" locator-value="noise_filter">
+      <label>Noise Filter Configuration</label>
+      <description>Noise Filter Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.physical.NoiseFilter" is-default="true">com.oatsystems.ems.physical.NoiseFilter</option>
+        </select>
+      </property>
+      <property key="hidden_queues" is-mandatory="false">
+        <label>Hidden Queues</label>
+        <description>List of Hidden Queues for the filter</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="Add_Events, Remove_Events" is-default="true">Add_Events</option>
+        </select>
+      </property>
+      <property key="positive_noise_threshold" is-mandatory="true">
+        <label>Positive noise threshold (in millis)</label>
+        <description>Time to wait, in milliseconds, before sending a tag addition through. If a removal is detected, the tag addition event will be dropped</description>
+        <type-definition>oat:DurationInMemMillis</type-definition>
+      </property>
+      <property key="negative_noise_threshold" is-mandatory="true">
+        <label>Negative noise threshold (in millis)</label>
+        <description>Time to wait, in milliseconds, before sending a tag removal through. If an addition is detected, the tag removal event will be dropped</description>
+        <type-definition>oat:DurationInMemMillis</type-definition>
+      </property>
+      <property key="buffer_size" is-mandatory="true">
+        <label>Maximum events to buffer</label>
+        <description>The maximum number of events to buffer for noise filtering</description>
+        <type-definition>oat:NoiseFilterBufferSize</type-definition>
+      </property>
+    </entity>
+    <entity type="EPCToEMSEventConvertor" extends="Filter" locator-value="epc_to_ems_event_convertor">
+      <label>EPCToEMSEventConvertor</label>
+      <description>EPCToEMSEventConvertor</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.physical.EPCToEMSEventConverter" is-default="true">com.oatsystems.ems.physical.EPCToEMSEventConverter</option>
+        </select>
+      </property>
+      <property key="hidden_queues" is-mandatory="false">
+        <label>Hidden Queues</label>
+        <description>List of Hidden Queues for the filter</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="Add_And_Remove_Events" is-default="true">Add_Remove_Events</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="EPCConvertor" extends="Filter" locator-value="epc_convertor">
+      <label>EPC convertor</label>
+      <description>EPC convertor</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.physical.EPCConvertor" is-default="true">com.oatsystems.ems.physical.EPCConvertor</option>
+        </select>
+      </property>
+      <property key="hidden_queues" is-mandatory="false">
+        <label>Hidden Queues</label>
+        <description>List of Hidden Queues for the filter</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="EPC_Events" is-default="true">EPC_Events</option>
+        </select>
+      </property>
+      <property key="conversion_map_table" is-mandatory="true">
+        <label>Mapping table name</label>
+        <description>The table with mapping information from tag IDs to EPCs</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="epc_conversion_map" is-default="true">epc_conversion_map</option>
+        </select>
+      </property>
+      <property key="db_conn_prefix" is-mandatory="true">
+        <label>DB Connection Prefix</label>
+        <description>DB Connection Prefix</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="senseware" is-default="true">senseware</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="InventoryFilter" extends="Filter" locator-value="inventory_filter">
+      <label>Inventory Filter</label>
+      <description>Inventory filter</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.logical.InventoryFilter" is-default="true">com.oatsystems.ems.logical.InventoryFilter</option>
+        </select>
+      </property>
+      <property key="db_conn_prefix" is-mandatory="true">
+        <label>Database connection prefix</label>
+        <description>Database connection prefix</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="senseware" is-default="true">senseware</option>
+        </select>
+      </property>
+      <property key="reset_inventory" is-mandatory="false">
+        <label>EPCs of locations for which to reset inventory</label>
+        <description>Reset inventory at locations that have these EPCs</description>
+        <type-definition>oat:ResetInventory</type-definition>
+      </property>
+      <property key="hidden_queues" is-mandatory="false">
+        <label>Hidden Queues</label>
+        <description>List of Hidden Queues for the filter</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="Inventory_Events" is-default="true">Inventory_Events</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="DBFilter" extends="Filter" locator-value="db_filter">
+      <label>DB Filter Configuration</label>
+      <description>DB Filter Configuration</description>
+      <property key="class_name" column-name="class_name">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.monitoring.DBFilter" is-default="true">com.oatsystems.monitoring.DBFilter</option>
+        </select>
+      </property>
+      <property key="type" is-mandatory="false">
+        <label>Type</label>
+        <description>Type</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="db_filter" is-default="true">db_filter</option>
+        </select>
+      </property>
+      <property key="log_time" is-mandatory="false">
+        <label>log_time</label>
+        <description>log_time</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="threshold_time" is-mandatory="false">
+        <label>threshold_time</label>
+        <description>threshold_time</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="timeout" is-mandatory="false">
+        <label>timeout</label>
+        <description>timeout</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+    </entity>
+    <entity type="NetworkFilter" extends="Filter" locator-value="network_filter">
+      <label>System Filter Configuration</label>
+      <description>System Filter Configuration</description>
+      <property key="class_name" column-name="class_name">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.monitoring.NetworkFilter" is-default="true">com.oatsystems.monitoring.NetworkFilter</option>
+        </select>
+      </property>
+      <!--
+      <property key="type" is-mandatory="false">
+      <label>Type</label>
+      <description>Type</description>
+      <type-definition>xsd:string</type-definition>
+      <select is-bound="false">
+      <option value="network_filter" is-default="true">network_filter</option>
+      </select>
+      </property>
+      -->
+      <property key="log_time" is-mandatory="false">
+        <label>log_time</label>
+        <description>log_time</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="threshold_time" is-mandatory="false">
+        <label>threshold_time</label>
+        <description>threshold_time</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="packet_loss_threshold" is-mandatory="false">
+        <label>packet_loss_threshold</label>
+        <description>packet_loss_threshold</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+    </entity>
+    <entity type="SavantFilter" extends="Filter" locator-value="savant_filter">
+      <label>System Filter Configuration</label>
+      <description>System Filter Configuration</description>
+      <property key="class_name" column-name="class_name">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.monitoring.SavantFilter" is-default="true">com.oatsystems.monitoring.SavantFilter</option>
+        </select>
+      </property>
+      <!--
+      <property key="type" is-mandatory="false">
+      <label>Type</label>
+      <description>Type</description>
+      <type-definition>xsd:string</type-definition>
+      <select is-bound="false">
+      <option value="savant_filter" is-default="true">savant_filter</option>
+      </select>
+      </property>
+      -->
+      <property key="log_time" is-mandatory="false">
+        <label>log_time</label>
+        <description>log_time</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="threshold_time" is-mandatory="false">
+        <label>threshold_time</label>
+        <description>threshold_time</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="timeout" is-mandatory="false">
+        <label>timeout</label>
+        <description>timeout</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+    </entity>
+    <entity type="DeviceFilter" extends="Filter" locator-value="device_filter">
+      <label>System Filter Configuration</label>
+      <description>System Filter Configuration</description>
+      <property key="class_name" column-name="class_name">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.monitoring.DeviceFilter" is-default="true">com.oatsystems.monitoring.DeviceFilter</option>
+        </select>
+      </property>
+      <!--
+      <property key="type" is-mandatory="false">
+      <label>Type</label>
+      <description>Type</description>
+      <type-definition>xsd:string</type-definition>
+      <select is-bound="false">
+      <option value="device_filter" is-default="true">device_filter</option>
+      </select>
+      </property>
+      -->
+      <property key="threshold_time" is-mandatory="false">
+        <label>threshold_time</label>
+        <description>threshold_time</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+    </entity>
+    <entity type="SystemFilter" extends="Filter" locator-value="system_filter">
+      <label>System Filter Configuration</label>
+      <description>System Filter Configuration</description>
+      <property key="class_name" column-name="class_name">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.monitoring.SystemFilter" is-default="true">com.oatsystems.monitoring.SystemFilter</option>
+        </select>
+      </property>
+      <!--
+      <property key="type" is-mandatory="false">
+      <label>Type</label>
+      <description>Type</description>
+      <type-definition>xsd:string</type-definition>
+      <select is-bound="false">
+      <option value="system_filter" is-default="true">system_filter</option>
+      </select>
+      </property>
+      -->
+      <property key="log_time" is-mandatory="false">
+        <label>log_time</label>
+        <description>log_time</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="threshold_time" is-mandatory="false">
+        <label>threshold_time</label>
+        <description>threshold_time</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="cpu_threshold" is-mandatory="false">
+        <label>cpu_threshold</label>
+        <description>cpu_threshold</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="mem_threshold" is-mandatory="false">
+        <label>mem_threshold</label>
+        <description>mem_threshold</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="db_space_req" is-mandatory="false">
+        <label>db_space_req</label>
+        <description>db_space_req</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="app_space_req" is-mandatory="false">
+        <label>app_space_req</label>
+        <description>app_space_req</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+    </entity>
+    <!--
+    Please enter the entities refering at all other filters fallowing the example of LocationFilter.
+    The properties of these entities will be the key/value pairs that will form arguments of the filter.
+    The concatenation of these arguments is the value of args property of Filter entity.
+    -->
+    <entity type="Logger" extends="EMSUnit" is-abstract="true" locator-value="logger" child-locator-key="logger_type">
+      <label>Logger Configuration</label>
+      <description>Logger Configuration</description>
+      <property key="args" column-name="args" is-mandatory="false">
+        <label>Logger Arguments</label>
+        <description>The arguments that the class implementing this logger will take</description>
+        <type-definition>oat:Arguments</type-definition>
+      </property>
+      <property key="logger_type" is-mandatory="true">
+        <label>Logger type</label>
+        <description>Type of logger to create</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="EMSEventConsoleLogger">EMS Event Console Logger</option>
+          <option value="EMSEventDBLogger">EMS Event DB Logger</option>
+          <option value="ConsoleLogger" is-default="true">Console Logger</option>
+          <option value="DBEventLogger">DB Event Logger</option>
+          <option value="EMSEventFileLogger">EMS Event File Logger</option>
+          <!--            <option value="esm_event_filter_logger">EMS Event Filter Logger</option>  -->
+          <option value="FileLogger">File Logger</option>
+          <option value="InventoryLogger">Inventory Logger</option>
+          <option value="SNMPLogger">SNMP Logger</option>
+          <option value="MonitoringLogger">Monitoring Logger</option>
+          <option value="ObjectProductLogger">Object Product Logger</option>
+          <option value="DigitalInputLogger">Digital Input Logger</option>
+          <option value="MiddlewareAPILogger">Physical API Logger</option>
+          <option value="StatisticsFileLogger">Statistics File Logger</option>
+          <option value="CustomLogger">Custom Logger</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="DigitalInputLogger" extends="Logger" locator-value="DigitalInputLogger">
+      <label>Digital Input Logger Configuration</label>
+      <description>Digital Input Logger Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>oat:JavaClass</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.physical.dio.DigitalInputLogger" is-default="true">com.oatsystems.ems.physical.dio.DigitalInputLogger</option>
+        </select>
+      </property>
+      <property key="db_conn_prefix" is-mandatory="false">
+        <label>db connection prefix</label>
+        <description>db connection prefix</description>
+        <type-definition>oat:NoSpacesArgString</type-definition>
+        <select>
+          <option value="senseware" is-default="true">senseware</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="MiddlewareAPILogger" extends="Logger" locator-value="MiddlewareAPILogger">
+      <label>Physical API Logger Configuration</label>
+      <description>Physical API Logger Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>oat:JavaClass</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.service.dquery.notification.MiddlewareAPILogger" is-default="true">com.oatsystems.service.dquery.notification.MiddlewareAPILogger</option>
+        </select>
+      </property>
+      <property key="db_conn_prefix" is-mandatory="false">
+        <label>db connection prefix</label>
+        <description>db connection prefix</description>
+        <type-definition>oat:NoSpacesArgString</type-definition>
+        <select>
+          <option value="senseware" is-default="true">senseware</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="StatisticsFileLogger" extends="Logger" locator-value="StatisticsFileLogger">
+      <label>Statistics File Logger Configuration</label>
+      <description>Statistics File Logger Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>oat:JavaClass</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.logger.StatisticsFileLogger" is-default="true">com.oatsystems.ems.logger.StatisticsFileLogger</option>
+        </select>
+      </property>
+      <property key="file_name" is-mandatory="false">
+        <label>File Name</label>
+        <description>The name of the file where data will be logged. The file will be placed in the Senseware log directory.</description>
+        <type-definition>oat:DirOrFile</type-definition>
+      </property>
+    </entity>
+    <entity type="MonitoringLogger" extends="Logger" locator-value="MonitoringLogger">
+      <label>Monitoring Logger Configuration</label>
+      <description>Monitoring Logger Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>oat:JavaClass</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.monitoring.MonitoringLogger" is-default="true">com.oatsystems.monitoring.MonitoringLogger</option>
+        </select>
+      </property>
+      <property key="db_conn_prefix" is-mandatory="false">
+        <label>db connection prefix</label>
+        <description>db connection prefix</description>
+        <type-definition>oat:NoSpacesArgString</type-definition>
+      </property>
+    </entity>
+    <entity type="EMSEventDBLogger" extends="Logger" locator-value="EMSEventDBLogger">
+      <label>EMS Event DB Logger Configuration</label>
+      <description>EMS Event DB Logger Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>oat:JavaClass</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.logger.EMSEventDBLogger" is-default="true">com.oatsystems.ems.logger.EMSEventDBLogger</option>
+        </select>
+      </property>
+      <property key="db_conn_prefix" is-mandatory="true">
+        <label>db connection prefix</label>
+        <description>db connection prefix</description>
+        <type-definition>oat:NoSpacesArgString</type-definition>
+        <select is-bound="false">
+          <option value="senseware" is-default="true">senseware</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="FileLogger" extends="Logger" locator-value="FileLogger">
+      <label>File Logger Configuration</label>
+      <description>File Logger Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>oat:JavaClass</type-definition>
+        <select is-bound="false">
+          <option value="com.oatsystems.ems.logger.FileLogger" is-default="true">com.oatsystems.ems.logger.FileLogger</option>
+        </select>
+      </property>
+      <property key="file_name" is-mandatory="true">
+        <label>File Name</label>
+        <description>The name of the file where data will be logged. The file will be placed in the Senseware log directory.</description>
+        <type-definition>oat:DirOrFile</type-definition>
+      </property>
+    </entity>
+    <entity type="CustomLogger" extends="Logger" locator-value="CustomLogger">
+      <label>Custom Logger Configuration</label>
+      <description>Custom Logger Configuration</description>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>oat:JavaClass</type-definition>
+      </property>
+    </entity>
+    <entity type="DynamicUnit" extends="EMSUnit" locator-value="dynamicUnit">
+      <label>Dynamic Unit Configuration</label>
+      <description>Dynamic Unit Configuration</description>
+      <property key="args" column-name="args" is-mandatory="false">
+        <label>Dynamic Unit Arguments</label>
+        <description>The arguments that the class implementing this dynamic unit will take</description>
+        <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>oat:JavaClass</type-definition>
+      </property>
+    </entity>
+    <entity type="AdapterUnit" extends="EMSUnit" locator-value="adapter">
+      <label>Adapter Configuration</label>
+      <description>Adapter Configuration</description>
+      <property key="args" column-name="args" is-mandatory="false">
+        <label>adapter Arguments</label>
+        <description>The arguments that the class implementing this adapter will take</description>
+        <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="class_name" column-name="class_name" is-mandatory="true">
+        <label>Class Name</label>
+        <description>The full name of the class that implements EMS unit</description>
+        <type-definition>oat:JavaClass</type-definition>
+      </property>
+    </entity>
+  </table>
+  <table name="ems_output">
+    <entity type="EMSOutput">
+      <label>EMS unit output</label>
+      <description>EMS Unit Output</description>
+      <property key="name" column-name="output_name" is-mandatory="false">
+        <label>Output Name</label>
+        <description>The name of the ems unit</description>
+        <type-definition>oat:UnitName</type-definition>
+      </property>
+      <property key="eventType" column-name="event_type" is-mandatory="false">
+        <label>Event Type</label>
+        <description>Event Type</description>
+        <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="sequence_number" column-name="sequence_number" is-mandatory="false">
+        <label>Output Sequence Number</label>
+        <description>The sequence of this output in the outputs list of the ems unit</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+    </entity>
+  </table>
+  <table name="location">
+    <entity type="Location">
+      <label>Location configuration</label>
+      <description>Location configuration</description>
+      <property key="location_id" column-name="epc" is-mandatory="false" is-visible="false">
+        <label>Location EPC</label>
+        <description>A unique Electronic Product Code for the location</description>
+        <type-definition>oat:EPC</type-definition>
+      </property>
+      <property key="retailer" is-mandatory="false" is-visible="true">
+        <label>Retailer</label>
+        <description>Retailer</description>
+        <type-definition>oat:UddmeString</type-definition>
+      </property>
+      <property key="IsDefaultBLForParent" is-mandatory="false" is-visible="true">
+        <label>IsDefaultBLForParent</label>
+        <description>IsDefaultBLForParent</description>
+        <type-definition>oat:UddmeString</type-definition>
+        <select is-bound="true">
+          <option value="YES">YES</option>
+          <option value="NO">NO</option>
+        </select>
+      </property>
+      <property key="Brand" is-mandatory="false" is-visible="true">
+        <label>Brand</label>
+        <description>Brand</description>
+        <type-definition>oat:UddmeString</type-definition>
+        <select is-bound="true">
+          <option value="Brand">Brand</option>
+        </select>
+      </property>
+      <property key="IsSite" is-mandatory="false" is-visible="true">
+        <label>IsSite</label>
+        <description>IsSite</description>
+        <type-definition>oat:UddmeString</type-definition>
+        <select is-bound="true">
+          <option value="YES">YES</option>
+          <option value="NO">NO</option>
+        </select>
+      </property>
+      <property key="IsCycleCountLocation" is-mandatory="false" is-visible="true">
+        <label>IsCycleCountLocation</label>
+        <description>IsCycleCountLocation</description>
+        <type-definition>oat:UddmeString</type-definition>
+        <select is-bound="true">
+          <option value="YES">YES</option>
+          <option value="NO">NO</option>
+        </select>
+      </property>
+      <property key="description" column-name="description" is-mandatory="true">
+        <label>Description</label>
+        <description>Description</description>
+        <type-definition>oat:LocationName</type-definition>
+      </property>
+      <property key="category" column-name="category" is-mandatory="true">
+        <label>Location Category</label>
+        <description>Location category</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="default_category" is-default="true">default category</option>
+        </select>
+      </property>
+      <property key="type" column-name="type" is-mandatory="false">
+        <label>Location type</label>
+        <description>Location type</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="false">
+          <option value="Invisible Location">Invisible Location</option>
+          <option value="Storage Location">Storage Location</option>
+          <option value="Supply Chain Node" is-default="true">Supply Chain Node</option>
+          <option value="Transit Location">Transit Location</option>
+        </select>
+      </property>
+      <property key="location_type" column-name="location_type" is-mandatory="false">
+        <label>EPCIS Location type</label>
+        <description>EPCIS profile defined location type</description>
+        <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="gln" column-name="gln" is-mandatory="false">
+        <label>Location gln</label>
+        <description>Global Location Number</description>
+        <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="sslt_code" column-name="sslt_code" is-mandatory="false">
+        <label>Sub Site Location Type Code</label>
+        <description>Sub Site Location Type Code</description>
+        <type-definition>xsd:int</type-definition>
+      </property>
+      <property key="sle" column-name="sle" is-mandatory="false">
+        <label>Site Location Extension</label>
+        <description>Site Location Extension</description>
+        <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="epcis_id" column-name="epcis_id" is-mandatory="false">
+        <label>EPCIS Location Identifier</label>
+        <description>EPCIS Location Identifier</description>
+        <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="loc_subtype" column-name="loc_subtype" is-mandatory="false">
+        <label>Location sub type</label>
+        <description>Location sub type</description>
+        <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="site_number" column-name="site_number" is-mandatory="false">
+        <label>Site Number</label>
+        <description>Site Number</description>
+        <type-definition>oat:UddmeString</type-definition>
+      </property>
+      <property key="allow_children" is-mandatory="false">
+        <label>Allow Children</label>
+        <description>Allow Children</description>
+        <type-definition>xsd:boolean</type-definition>
+      </property>
+      <property key="displayname" is-mandatory="false">
+        <label>Display Name</label>
+        <description>Display Name</description>
+        <type-definition>oat:UddmeString</type-definition>
+      </property>
+      <property key="address" is-mandatory="false">
+        <label>Location Address</label>
+        <description>Store Location Address</description>
+        <type-definition>oat:UddmeString</type-definition>
+      </property>
+      <property key="currency" is-mandatory="false">
+        <label>Location Currency</label>
+        <description>Location Currency</description>
+        <type-definition>oat:UddmeString</type-definition>
+      </property>
+      <property key="timezone" is-mandatory="false">
+        <label>Time zone</label>
+        <description>Store time zone</description>
+        <type-definition>oat:UddmeString</type-definition>
+      </property>
+      <property key="posPriority" is-mandatory="false">
+        <label>POS Priority</label>
+        <description>Priority of location for POS</description>
+        <type-definition>oat:UddmeString</type-definition>
+      </property>
+    </entity>
+  </table>
+  <table name="device">
+    <entity type="DeviceNode" is-abstract="true" child-locator-key="DeviceNodeType">
+      <label>Device Node Configuration</label>
+      <description>Abstract Device Node Configuration</description>
+      <property key="DeviceId" column-name="epc" is-mandatory="true" is-visible="false">
+        <label>Antenna EPC</label>
+        <description>Antenna EPC</description>
+        <type-definition>oat:EPC</type-definition>
+      </property>
+      <property key="Description" column-name="description" is-mandatory="false">
+        <label>Description</label>
+        <description>Description</description>
+        <type-definition>oat:Description</type-definition>
+      </property>
+      <!--
+      <property key="DeviceNodeName" column-name="dms_device_node_name" is-mandatory="true">
+      <label>Antenna Name</label>
+      <description>Antenna Name</description>
+      <type-definition>oat:SmallString</type-definition>
+      </property>
+      -->
+      <property key="DeviceNodeType" is-mandatory="true" is-visible="false">
+        <label>Device node type</label>
+        <description>For now only RFDeviceNode types are used.</description>
+        <type-definition>oat:SmallString</type-definition>
+        <select is-bound="false">
+          <option value="RFDeviceNode" is-default="true">RFDeviceNode</option>
+          <option value="WiFiAccessPointDeviceNode">WiFiAccessPointDeviceNode</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="RFDeviceNode" is-abstract="true" extends="DeviceNode" locator-value="RFDeviceNode" child-locator-key="RFNodeType">
+      <label>RFReader Device Node Configuration</label>
+      <description>Abstract RFReader Device Node Configuration</description>
+      <property key="RFNodeType" is-mandatory="true">
+        <label>RF Device node type</label>
+        <description>The reader for which this antenna is defined</description>
+        <type-definition>xsd:string</type-definition>
+        <select is-bound="true">
+          <option value="DK Agent Device DeviceNode">DK Agent Device DeviceNode</option>
+        </select>
+      </property>
+    </entity>
+    <entity type="DKAgentDeviceDeviceNode" extends="RFDeviceNode" locator-value="DK Agent Device DeviceNode">
+      <label>DK Agent Device DeviceNode Configuration</label>
+      <description>DK Agent Device DeviceNode Configuration</description>
+      <property key="AntennaId" is-mandatory="true">
+        <label>Antenna ID</label>
+        <description>Antenna number</description>
+        <type-definition>xsd:int</type-definition>
+        <select is-bound="true">
+          <option value="1" is-default="true">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </property>
+      <property key="TimeThreshold" is-mandatory="false">
+        <label>Time Threshold</label>
+        <description>The time threshold should exceed 100 milliseconds</description>
+        <type-definition>oat:TimeThreshold</type-definition>
+      </property>
+      <property key="LoopThreshold" is-mandatory="false">
+        <label>Loop Threshold</label>
+        <description>The loop threshold should exceed -1</description>
+        <type-definition>oat:LoopThreshold</type-definition>
+      </property>
+    </entity>
+  </table>
+</meta-data>
+

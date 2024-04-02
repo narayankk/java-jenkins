@@ -1,0 +1,1018 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+  <table name="dms_device">
+    <entity type="DMSDevice" is-abstract="true" child-locator-key="DeviceCategory">
+      <label>Abstract Device Configuration</label>
+      <description>Abstract Device Configuration</description>
+      
+      <property key="DeviceName" column-name="name" is-mandatory="true">
+    <label>Device Name</label>
+    <description>Device name</description>
+    <type-definition>oat:DeviceName</type-definition>
+      </property>
+      
+      <property key="Description" is-mandatory="false">
+    <label>Device description</label>
+    <description>Describes the device</description>
+    <type-definition>oat:Description</type-definition>
+      </property>
+      <property key="DeviceCategory" column-name="category" is-mandatory="true">
+    <label>Device category</label>
+    <description>Device category</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="rf_reader" is-default="true">RF Reader</option>
+      <option value="digital_io_device">Digital IO Device</option>
+      <option value="printer">Printer</option>
+      <option value="barcode_scanner">Barcode Scanner</option>
+      <option value="applicator">Applicator</option>
+      <option value="rtls">Active Tag System</option>
+    </select>
+      </property>
+      <property key="can_be_changed" is-mandatory="false">
+    <label>Can this device be edited through ui?</label>
+    <description>If the value is false it means that there is something about the configuration of this device that makes it not possible to be changed through UI. The value of this property can be false only of it is hand edited in CMS.xml</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="true" is-default="true">true</option>
+      <option value="false">false</option>
+    </select>
+      </property>
+      <property key="Enable" is-mandatory="false">
+    <label>Enable</label>
+    <description>If enabled, the Device will establish connection with the device. If disabled, the device will close existing connection.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="true" is-default="true">true</option>
+      <option value="false">false</option>
+    </select>
+      </property>
+
+      <property key="EdgeID" is-mandatory="false">
+    <label>The ID of the ThinEdge platform to be deployed to.</label>
+    <description>If the value is not null, it indicates the ID of the ThinEdge platform.</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+    </entity>
+
+    <!-- hack -->
+
+    <entity type="Printer" locator-value="printer" is-abstract="true" extends="DMSDevice" child-locator-key="DeviceType">
+      <label>Printer Configuration</label>
+      <description>Just a hack to allow UI to desplay this considered RF device as a non RF device</description>
+      <property key="DeviceType" column-name="type" is-mandatory="true">
+    <label>Device type</label>
+    <description>Selects specific model of the device.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="Zebra Printer Z4M" is-default="true">Zebra Printer Z4M</option>
+    </select>
+      </property>
+    </entity>
+
+    <entity type="Applicator" locator-value="applicator" is-abstract="true" extends="DMSDevice" child-locator-key="DeviceType">
+      <label>Applicator Configuration</label>
+      <description>Applicator Configuration</description>
+      <property key="DeviceId" column-name="epc" is-mandatory="true">
+    <label>Device EPC</label>
+    <description>Device EPC</description>
+    <type-definition>oat:EPC</type-definition>
+      </property>
+      <property key="DisplayName" is-mandatory="false">
+    <label>Name used for logging</label>
+    <description>Display Name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="DeviceType" column-name="type" is-mandatory="true">
+    <label>Device type</label>
+    <description>Selects specific model of the device.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+    </select>
+      </property>
+    </entity>
+
+    <entity type="BarcodeScanner" locator-value="barcode_scanner" is-abstract="true" extends="DMSDevice" child-locator-key="DeviceType">
+      <label>Barcode Scanner Configuration</label>
+      <description>Barcode scanner Configuration</description>
+      <property key="DeviceId" column-name="epc" is-mandatory="true">
+    <label>Device EPC</label>
+    <description>Device EPC</description>
+    <type-definition>oat:EPC</type-definition>
+      </property>
+      <property key="DisplayName" is-mandatory="false">
+    <label>Name used for logging</label>
+    <description>Display Name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="DeviceType" column-name="type" is-mandatory="true">
+    <label>Device type</label>
+    <description>Selects specific model of the device.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+    </select>
+      </property>
+    </entity>
+
+    <entity type="RTLS" locator-value="rtls" extends="DMSDevice" is-abstract="true" child-locator-key="DeviceType">
+      <label>RTLS</label>
+      <description>Active Tag System Configuration</description>
+      <property key="DeviceId" column-name="epc" is-mandatory="true">
+        <label>Device EPC</label>
+        <description>Device EPC</description>
+        <type-definition>oat:EPC</type-definition>
+      </property>
+      <property key="DisplayName" is-mandatory="false">
+        <label>Name used for logging</label>
+        <description>Display Name</description>
+        <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="DeviceType" column-name="type" is-mandatory="true">
+        <label>Device type</label>
+        <description>Selects specific model of the device.</description>
+        <type-definition>oat:SmallString</type-definition>
+        <select is-bound="true"/>
+      </property>
+    </entity>
+    
+    <entity type="DigitalIODevice" locator-value="digital_io_device" is-abstract="true" extends="DMSDevice" child-locator-key="DeviceType">
+      <label>Digital IO Device Configuration</label>
+      <description>Digital IO Device Configuration</description>
+      <property key="DeviceId" column-name="epc" is-mandatory="true">
+    <label>Device EPC</label>
+    <description>Device EPC</description>
+    <type-definition>oat:EPC</type-definition>
+      </property>
+      <property key="DisplayName" is-mandatory="false">
+    <label>Name used for logging</label>
+    <description>Display Name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="DefaultTimeOut" is-mandatory="false">
+    <label>Default Time-Out</label>
+    <description>Default command time-out value is used unless command specific time-out value defined.</description>
+    <type-definition>oat:TimeoutMillis</type-definition>
+    <select is-bound="false">
+      <option value="2000" is-default="true">2000</option>
+    </select>
+      </property>
+      <property key="DeviceType" column-name="type" is-mandatory="true">
+    <label>Device type</label>
+    <description>Selects specific model of the device.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+    </select>
+      </property>
+      <property key="supports_notification" is-mandatory="false">
+    <label>Supports Notification</label>
+    <description>True if the device can send notification messages</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="false" is-default="true">false</option>
+      <option value="true">true</option>
+    </select>
+      </property>    
+    </entity>
+
+    <entity type="RFReader" locator-value="rf_reader" is-abstract="true" extends="DMSDevice" child-locator-key="DeviceType">
+      <label>RF Reader Configuration</label>
+      <description>RF Reader Configuration</description>
+      <property key="DeviceId" column-name="epc" is-mandatory="false">
+    <label>Device Id</label>
+    <description>Device Id</description>
+    <type-definition>oat:EPC</type-definition>
+      </property>
+      <property key="DisplayName" is-mandatory="false">
+    <label>Name used for logging</label>
+    <description>Display Name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="DefaultTimeOut" is-mandatory="false">
+    <label>Default Time-Out</label>
+    <description>Default command time-out value is used unless command specific time-out value defined.</description>
+    <type-definition>oat:TimeoutMillis</type-definition>
+    <select is-bound="false">
+      <option value="2000" is-default="true">2000</option>
+    </select>
+      </property>
+      <property key="RealDeviceName" is-mandatory="false">
+    <label>Device Real Name</label>
+    <description>Device Real Name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="DeviceType" column-name="type" is-mandatory="true">
+    <label>Device type</label>
+    <description>Selects specific model of the device.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="DK Agent Device">DK Agent Device</option>
+    </select>
+      </property>
+
+    </entity>
+
+    <entity type="DKAgentDevice" locator-value="DK Agent Device" extends="RFReader">
+      <label>DK Agent Device Configuration</label>
+      <description>DK Agent Device Configuration</description>
+      <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+    <label>Maximum number of antennas</label>
+    <description>Maximum number of antennas for a DK Agent device</description>
+    <type-definition>xsd:int</type-definition>
+    <select is-bound="true">
+      <option value="4" is-default="true">4</option>
+    </select>
+      </property>
+      <property key="DeviceModel" is-mandatory="true">
+    <label>Device Model </label>
+    <description>The actual device type modelled by this DK Agent Device</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="io.Arcom" is-default="true">Arcom Digital IO</option>
+    </select>
+      </property>
+      <property key="InputPorts" is-mandatory="false">
+    <label>Digital Input Ports</label>
+    <description>Digital Input Ports in the device</description>
+    <type-definition>oat:RegExp</type-definition>
+    <select is-bound="false">
+      <option value="0,1,2,3,4,5,6,7" is-default="true">0,1,2,3,4,5,6,7</option>
+    </select>
+      </property>
+      <property key="OutputPorts" is-mandatory="false">
+    <label>Digital Output Ports</label>
+    <description>Digital Output Ports in the device</description>
+    <type-definition>oat:RegExp</type-definition>
+    <select is-bound="false">
+      <option value="0,1,2,3,4,5,6,7" is-default="true">0,1,2,3,4,5,6,7</option>
+    </select>
+      </property>
+    </entity>
+  </table>
+
+  <table name="dms_data_channel">
+    <entity type="DataChannel" is-abstract="true" child-locator-key="DeviceType">
+      <label>Data Channel Configuration</label>
+      <description>Data Channel Configuration</description>
+      <property key="channel_name" column-name="name" is-mandatory="false">
+    <label>Channel Name</label>
+    <description>Channel Name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="DeviceCategory" column-name="category" is-mandatory="true">
+    <label>Data Channel Category</label>
+    <description>Data Channel Category</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="data_channel" is-default="true">Data Channel</option>
+    </select>
+      </property>
+      <property key="SocketTimeOut" is-mandatory="false">
+    <label>Socket Time Out</label>
+    <description>SocketTimeOut is added to command time-out and is set prior to read() call on the Socket, which will block for only this amount of time. Integer 0 - 1000000; default 2000.</description>
+    <type-definition>oat:SocketTimeOut</type-definition>
+    <select is-bound="false">
+      <option value="2000" is-default="true">2000</option>
+    </select>
+      </property>
+      <property key="SendBufferSize" is-mandatory="false">
+    <label>Send Buffer Size</label>
+    <description>Integer 100 - 60000; default 2000. Send biffer size option is used by the platforms networking code as a hint for the size to set the underlying network I/O.</description>
+    <type-definition>oat:DMSBufferSize</type-definition>
+    <select is-bound="false">
+      <option value="2000" is-default="true">2000</option>
+    </select>
+      </property>
+      <property key="ReceiveBufferSize" is-mandatory="false">
+    <label>Receive Buffer Size</label>
+    <description>Integer 100 - 60000; default 2000. Size of the receive buffer used for input. Increasing the receive buffer size can increase the performance of network I/O for high-volume connection, while decreasing it can help reduce the backlog of incoming data.</description>
+    <type-definition>oat:DMSBufferSize</type-definition>
+    <select is-bound="false">
+      <option value="2000" is-default="true">2000</option>
+    </select>
+      </property>
+      <property key="ReuseAddress" is-mandatory="false">
+    <label>Reuse Address</label>
+    <description>When a TCP connection is closed the connection may remain in a timeout state for a period of time after the connection is closed. Enabling ReuseAddress prior to binding the socket using bind(SocketAddress) allows the socket to be bound even though a previous connection is in a timeout state.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="True" is-default="true">True</option>
+      <option value="False">False</option>
+    </select>
+      </property>
+      <property key="FrameReceiveBufferSize" is-mandatory="false">
+    <label>Frame Receive Buffer Size</label>
+    <description>Integer 0 - 10000; default 300. Size of the receive buffer used to hold unclaimed frames. If size exceeded all frames are removed from the buffer.</description>
+    <type-definition>oat:FrameBufferSize</type-definition>
+    <select is-bound="false">
+      <option value="300" is-default="true">300</option>
+    </select>
+      </property>
+      <property key="DeviceType" column-name="type" is-mandatory="true">
+    <label>Data Channel Type</label>
+    <description>Data Channel Type</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="TCP/IP Synchronous Client" is-default="true">TCP/IP Synchronous Client</option>
+      <option value="TCP/IP Discovery Client">TCP/IP Discovery Client</option>
+      <option value="TCP/IP Synchronous Server">TCP/IP Synchronous Server</option>
+      <option value="UDP Notification Channel">UDP Notification Channel</option>
+    </select>
+      </property>
+    </entity>
+
+    <entity type="UDPNotificationChannel" extends="DataChannel" locator-value="UDP Notification Channel">
+      <label>UDP Notification Channel Configuration</label>
+      <description>UDP Notification Channel Configuration</description>
+      <property key="Port" is-mandatory="true">
+    <label>Port number</label>
+    <description>Notification channel port number.</description>
+    <type-definition>oat:Port1</type-definition>
+      </property>
+    </entity>
+
+    <entity type="TCPClientDataChannel" extends="DataChannel" locator-value="TCP/IP Synchronous Client">
+      <label>TCP Client Data Channel Configuration</label>
+      <description>TCP Client Data Channel Configuration</description>
+      <property key="Port" is-mandatory="true">
+    <label>Port number</label>
+    <description>IP Port number. If the device is Alien, port number has to be 23. If The device is ThingMagic, the port number has to be 8080. EMS has aa default port number 10001, but the port number tha the device uses to listen can be changed. For Matrics, Feig. AWID use the port number that is configured on the Moxa box connected to the reader.</description>
+    <type-definition>oat:Port</type-definition>
+      </property>
+      <property key="Address" is-mandatory="true">
+    <label>Host IP Address</label>
+    <description>IP Address</description>
+    <type-definition>oat:Host</type-definition>
+      </property>
+      <property key="SocketLingerTime" is-mandatory="false">
+    <label>Socket Linger Time</label>
+    <description>Enable SocketLinger  with the specified linger time in seconds (affects socket close). Integer -1 - MAX (platform specific). Default -1 - disable.</description>
+    <type-definition>oat:SocketLingerTime</type-definition>
+    <select is-bound="false">
+      <option value="-1" is-default="true">-1</option>
+    </select>
+      </property>
+      <property key="KeepAlive" is-mandatory="false">
+    <label>Keep Alive</label>
+    <description>Whether or not to have socket keep alive turned on.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="True" is-default="true">True</option>
+      <option value="False">False</option>
+    </select>
+      </property>
+      <property key="TcpIpNoDelay" is-mandatory="false">
+    <label>TCP/IP no delay</label>
+    <description>Enables Nagles algorithm, to minimize network traffic through buffering.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="False" is-default="true">False</option>
+      <option value="True">True</option>
+    </select>
+      </property>
+    </entity>
+
+ <entity type="TCPClientDiscoveryDataChannel" extends="DataChannel" locator-value="TCP/IP Discovery Client">
+      <label>TCP Client Discovery Data Channel Configuration</label>
+      <description>TCP Client Discovery Data Channel Configuration</description>
+      <property key="Port" is-mandatory="true">
+    <label>Port number</label>
+    <description>IP Port number </description>
+    <type-definition>oat:Port</type-definition>
+      </property>
+      <property key="Address" is-mandatory="true">
+    <label>Host discovery name</label>
+    <description>IP Address, This field will be used for discovery of the reader</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="SocketLingerTime" is-mandatory="false">
+    <label>Socket Linger Time</label>
+    <description>Enable SocketLinger  with the specified linger time in seconds (affects socket close). Integer -1 - MAX (platform specific). Default -1 - disable.</description>
+    <type-definition>oat:SocketLingerTime</type-definition>
+    <select is-bound="false">
+      <option value="-1" is-default="true">-1</option>
+    </select>
+      </property>
+      <property key="KeepAlive" is-mandatory="false">
+    <label>Keep Alive</label>
+    <description>Whether or not to have socket keep alive turned on.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="True" is-default="true">True</option>
+      <option value="False">False</option>
+    </select>
+      </property>
+      <property key="TcpIpNoDelay" is-mandatory="false">
+    <label>TCP/IP no delay</label>
+    <description>Enables Nagles algorithm, to minimize network traffic through buffering.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="False" is-default="true">False</option>
+      <option value="True">True</option>
+    </select>
+      </property>
+    </entity>
+
+
+    <entity type="TCPServerDataChannel" extends="DataChannel" locator-value="TCP/IP Synchronous Server">
+      <label>TCP Server Data Channel Configuration</label>
+      <description>TCP Server Data Channel Configuration</description>
+      <property key="Port" is-mandatory="true">
+    <label>Port number</label>
+    <description>IP Port number. If the device is Alien, port number has to be 23. If The device is ThingMagic, the port number has to be 8080. EMS has aa default port number 10001, but the port number tha the device uses to listen can be changed. For Matrics, Feig. AWID use the port number that is configured on the Moxa box connected to the reader.</description>
+    <type-definition>oat:Port</type-definition>
+      </property>
+      <property key="SocketLingerTime" is-mandatory="false">
+    <label>Socket Linger Time</label>
+    <description>Enable SocketLinger  with the specified linger time in seconds (affects socket close). Integer -1 - MAX (platform specific). Default -1 - disable.</description>
+    <type-definition>oat:SocketLingerTime</type-definition>
+    <select is-bound="false">
+      <option value="-1" is-default="true">-1</option>
+    </select>
+      </property>
+      <property key="KeepAlive" is-mandatory="false">
+    <label>KeepAlive</label>
+    <description>Whether or not to have socket keep alive turned on.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="True" is-default="true">True</option>
+      <option value="False">False</option>
+    </select>
+      </property>
+      <property key="TcpIpNoDelay" is-mandatory="false">
+    <label>TCP/IP no delay</label>
+    <description>Enables Nagles algorithm, to minimize network traffic through buffering.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="False" is-default="true">False</option>
+      <option value="True">True</option>
+    </select>
+      </property>
+    </entity>
+
+  </table>
+  <table name="dms_resource">
+    <entity type="Resource">
+      <label>Resource</label>
+      <description>Resource to be scheduled</description>
+      <property key="resource_name" column-name="name" is-mandatory="false">
+    <label>Resource Name</label>
+    <description>Resource Name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+    </entity>
+  </table>
+  <table name="dms_constraint">
+    <entity type="Constraint">
+      <label>Constraint</label>
+      <description>Resources that can not be scheduled together</description>
+      <property key="constraint_name" column-name="name" is-mandatory="true">
+    <label>Constraint Name</label>
+    <description>Constraint Name</description>
+    <type-definition>oat:UnitName</type-definition>
+      </property>
+    </entity>
+  </table>
+  <table name="dms_constraint_resource">
+    <entity type="ConstraintResource">
+      <label>ConstraintResource</label>
+      <description>Resource belonging to a constraint</description>
+      <property key="constraint_resource_name" column-name="name" is-mandatory="false">
+    <label>Constraint Resource Name</label>
+    <description>The device node name of this constraint</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+    </entity>
+  </table>
+  <table name="dms_task">
+    <entity type="Task">
+      <label>Task</label>
+      <description>Task</description>
+      <property key="task_name" column-name="name" is-mandatory="false">
+    <label>Task Name</label>
+    <description>Task Name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="Frequency" is-mandatory="false">
+    <label>Time Between Reads</label>
+    <description>Frequency with which the task is executed in ms. Integer between 0 and 1000000000</description>
+    <type-definition>oat:Frequency</type-definition>
+    <select is-bound="false">
+      <option value="2000" is-default="true">2000</option>
+    </select>
+      </property>
+      <property key="LatencyThreshold" is-mandatory="false">
+    <label>Latency Threshold</label>
+    <description>Latency Threshold. If task is not executed within LatencyThreshold, its effective priority will increase until it is executed. </description>
+    <type-definition>oat:LatencyThreshold</type-definition>
+    <select is-bound="false">
+      <option value="8000" is-default="true">8000</option>
+    </select>
+      </property>
+      <property key="Priority" is-mandatory="false">
+    <label>Priority</label>
+    <description>Task Priority</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="NORMAL" is-default="true">NORMAL</option>
+      <option value="MINIMUM">MINIMUM</option>
+      <option value="MAXIMUM">MAXIMUM</option>
+    </select>
+      </property>
+    </entity>
+  </table>
+  <table name="dms_task_resource">
+    <entity type="TaskResource">
+      <label>TaskResource</label>
+      <description>Resource belonging to the task</description>
+      <property key="task_resource_name" column-name="name" is-mandatory="false">
+    <label>Task Resource Name</label>
+    <description>Resource belonging to a task </description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+    </entity>
+  </table>
+  <table name="dms_adapter">
+    <entity type="Adapter" is-abstract="true" child-locator-key="AdapterType">
+      <label>Adapter</label>
+      <description>Adapter</description>
+      <property key="adapter_name" column-name="name" is-mandatory="false">
+    <label>Adapter Name</label>
+    <description>Task Name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="AdapterType" column-name="type" is-mandatory="true">
+    <label>AdapterType</label>
+    <description>Adapter type</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="TagReader" is-default="true">Tag Reader</option>
+      <option value="NotificationTagReader">Notification Tag Reader</option>
+      <option value="CombinedTagReader">Notification and Polling Tag Reader</option>
+      <option value="ReadAlgorithm">Read Algorithm</option>
+      <option value="TagCache">Tag Cache</option>
+      <option value="WriteAlgorithm">Write Algorithm</option>
+      <option value="DioAdapter">Dio Adapter </option>
+      <option value="OpcAdapter">Opc Adapter</option>
+      <option value="BarcodeScannerAdapter">Barcode Scanner Adapter</option>
+    </select>
+      </property>
+    </entity>
+
+    <entity type="WriteAlgorithm" extends="Adapter" locator-value="WtiteAlgorithm">
+      <label>Write Algorithm</label>
+      <description>component that takes care of the way write operation is executed.</description>
+    </entity>
+
+    <entity type="TagReader" extends="Adapter" locator-value="TagReader">
+      <label>Tag Reader Adapter</label>
+      <description>Tag Reader Adapter provides high level abstraction of RF Reader Devices</description>
+      <property key="ems_queue_to_log" column-name="ems_queue_to_log" is-mandatory="false">
+    <label>Queue Name</label>
+    <description>Queue Name where the outputs of this adapter go.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="false">
+      <option value="main_queue" is-default="true">main_queue</option>
+    </select>
+      </property>
+      <property key="Active" is-mandatory="false">
+    <label>Enable/Disable the TagReader</label>
+    <description>If enabled, the TagReader will start to read data from the reader nodes associated with it. If disabled, the TagReader will stop reading.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="true" is-default="true">true</option>
+      <option value="false">false</option>
+    </select>
+      </property>
+    </entity>
+
+    <entity type="NotificationTagReader" extends="Adapter" locator-value="NotificationTagReader">
+      <label>Notificatoin Adapter</label>
+      <description>Notification Adapter provides high level abstraction of RF Reader Devices</description>
+      <property key="ems_queue_to_log" column-name="ems_queue_to_log" is-mandatory="false">
+    <label>Queue Name</label>
+    <description>Queue Name where the outputs of this adapter go.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="false">
+      <option value="main_queue" is-default="true">main_queue</option>
+    </select>
+      </property>
+      <property key="Active" is-mandatory="false">
+    <label>Enable/Disable the TagReader</label>
+    <description>If enabled, the TagReader will start to read data from the reader nodes associated with it. If disabled, the TagReader will stop reading.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="true" is-default="false">true</option>
+      <option value="false" is-default="true">false</option>
+    </select>
+      </property>
+    </entity>
+
+    <entity type="CombinedTagReader" extends="Adapter" locator-value="CombinedTagReader">
+      <label>Polling and Notification Adapter</label>
+      <description>Notification Adapter provides high level abstraction of RF Reader Devices</description>
+      <property key="ems_queue_to_log" column-name="ems_queue_to_log" is-mandatory="false">
+    <label>Queue Name</label>
+    <description>Queue Name where the outputs of this adapter go.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="false">
+      <option value="main_queue" is-default="true">main_queue</option>
+    </select>
+      </property>
+      <property key="Active" is-mandatory="false">
+    <label>Enable/Disable the TagReader</label>
+    <description>If enabled, the TagReader will start to read data from the reader nodes associated with it. If disabled, the TagReader will stop reading.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="true" is-default="false">true</option>
+      <option value="false" is-default="true">false</option>
+    </select>
+      </property>
+    </entity>
+
+    <entity type="ReadAlgorithm" extends="Adapter" locator-value="ReadAlgorithm">
+      <label>Read Algorithm</label>
+      <description>Read Algorithm is a configurable component that allows to customize the way read operation is executed</description>
+      <property key="ReadAllNodesAtOnce" is-mandatory="false">
+    <label>Read from all antennas at once</label>
+    <description>If enabled and reader allows reading from multiple nodes at the same time, each read command will be executed from all nodes specified in the TagReader adapter configuration.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="No">No</option>
+      <option value="Yes" is-default="true">Yes</option>
+    </select>
+      </property>
+      <property key="MinimumReads" is-mandatory="false">
+    <label>Minimum Reads</label>
+    <description>Minimum number of times to read.</description>
+    <type-definition>oat:Int0_10000</type-definition>
+    <select is-bound="false">
+      <option value="1" is-default="true">1</option>
+    </select>
+      </property>
+      <property key="MaximumReads" is-mandatory="false">
+    <label>Maximum Reads</label>
+    <description>Maximum number of times to read; each read after Minimum Reads satisfied will be executed only if Add/Remove condition is true.</description>
+    <type-definition>oat:Int0_10000</type-definition>
+    <select is-bound="false">
+      <option value="1" is-default="true">1</option>
+    </select>
+      </property>
+      <property key="MinimumDuration" is-mandatory="false">
+    <label>Minimum Duration</label>
+    <description>Minimum amount of time spend reading.</description>
+    <type-definition>oat:Int0_60000</type-definition>
+    <select is-bound="false">
+      <option value="500" is-default="true">500 ms</option>
+    </select>
+      </property>
+      <property key="MaximumDuration" is-mandatory="false">
+    <label>Maximum Duration</label>
+    <description>Maximum amount of time spend reading.</description>
+    <type-definition>oat:Int0_60000</type-definition>
+    <select is-bound="false">
+      <option value="500" is-default="true">500 ms</option>
+    </select>
+      </property>
+      <property key="MinimumCondition" is-mandatory="false">
+    <label>Minimum Condition</label>
+    <description>Determines how number of reads and duration are used.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="OR" is-default="true">OR</option>
+      <option value="AND">AND</option>
+    </select>
+      </property>
+      <property key="MaximumCondition" is-mandatory="false">
+    <label>Maximum Condition</label>
+    <description>Determines how number of reads and duration are used.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="OR" is-default="true">OR</option>
+      <option value="AND">Yes</option>
+    </select>
+      </property>
+      <property key="ContinueCondition" is-mandatory="false">
+    <label>Continue Condition</label>
+    <description>Determines how number of reads and duration are used.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="OR" is-default="true">OR</option>
+      <option value="AND">AND</option>
+    </select>
+      </property>
+      <property key="ContinueIfAddedTagsGt" is-mandatory="false">
+    <label>Continue if added tags is greater then</label>
+    <description>Continue if number of tags added since last read is greater than this value.</description>
+    <type-definition>oat:Int0_10000</type-definition>
+      </property>
+      <property key="StopIfRemovedTagsGt" is-mandatory="false">
+    <label>Stop if removed tags is greater then</label>
+    <description>Stop if number of tags removed since last read is greater than this value.</description>
+    <type-definition>oat:Int0_10000</type-definition>
+      </property>
+      <property key="IsSystemField" is-mandatory="false">
+    <label>Is system field</label>
+    <description>Detremines wether the read Tag Field is Sytem Field or not.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="No" is-default="true">No</option>
+      <option value="Yes">Yes</option>
+    </select>
+      </property>
+      <property key="IsTagIdFragment" is-mandatory="false">
+    <label>Is tag id fragment</label>
+    <description>Determines if the read Tag Field is fragment of Tag Id.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="No" is-default="true">No</option>
+      <option value="Yes">Yes</option>
+    </select>
+      </property>
+      <property key="Offset" is-mandatory="false">
+    <label>Offset</label>
+    <description>Determines offset in user memory to read from in bits.</description>
+    <type-definition>oat:Int0_60000</type-definition>
+      </property>
+      <property key="Size" is-mandatory="false">
+    <label>Size</label>
+    <description>Number of bits to read from Tag user memory.</description>
+    <type-definition>oat:Int0_60000</type-definition>
+    <select is-bound="false">
+      <option value="96" is-default="true">96</option>
+    </select>
+      </property>
+      <property key="FieldName" is-mandatory="false">
+    <label>Field Name</label>
+    <description>Name of the field to be read.</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+    </entity>
+
+    <entity type="TagCache" extends="Adapter" locator-value="TagCache">
+      <label>Tag Cache Adapter</label>
+      <description>Tag Cache adapter stores RF data from user area of the tags to optimize reading performance.</description>
+      <property key="MaximumSize" is-mandatory="false">
+    <label>Maximum Size</label>
+    <description>Limit maximum number of tags that cache can hold. List used items will be removed first.</description>
+    <type-definition>oat:MaximumCacheSize</type-definition>
+    <select is-bound="false">
+      <option value="100" is-default="true">100</option>
+    </select>
+      </property>
+    </entity>
+
+    <entity type="OpcAdapter" extends="Adapter" locator-value="OpcAdapter">
+      <label>Opc Adapter</label>
+      <description>Adapter used for Opc Server devices.</description>
+      <property key="FeedbackQueueName" is-mandatory="false">
+    <label>Feedback Queue Name</label>
+    <description>Name of the EMS queue adapter will use to receive feedback requests.</description>
+    <type-definition>oat:NoSpacesArgString</type-definition>
+    <select is-bound="false">
+      <option value="main_queue" is-default="true">main_queue</option>
+    </select>
+      </property>
+      <property key="DigitalInputQueueName" is-mandatory="false">
+    <label>DigitalInput Queue Name</label>
+    <description>Name of the EMS queue adapter will use to send events from input sources.</description>
+    <type-definition>oat:NoSpacesArgString</type-definition>
+    <select is-bound="false">
+      <option value="main_queue" is-default="true">main_queue</option>
+    </select>
+      </property>
+      <property key="StatusLogQueueName" is-mandatory="false">
+    <label>StatusLog Queue Name</label>
+    <description>Name of the EMS queue adapter will use to send device status events (ONLINE/OFFLINE).</description>
+    <type-definition>oat:NoSpacesArgString</type-definition>
+    <select is-bound="false">
+      <option value="main_queue" is-default="true">main_queue</option>
+    </select>
+      </property>
+    </entity>
+
+    <entity type="DioAdapter" extends="Adapter" locator-value="DioAdapter">
+      <label>Dio Adapter</label>
+      <description>Adapter used for Digital IO devices.</description>
+      <property key="FeedbackQueueName" is-mandatory="false">
+    <label>Feedback Queue Name</label>
+    <description>Name of the EMS queue adapter will use to receive feedback requests.</description>
+    <type-definition>oat:NoSpacesArgString</type-definition>
+    <select is-bound="false">
+      <option value="main_queue" is-default="true">main_queue</option>
+    </select>
+      </property>
+      <property key="DigitalInputQueueName" is-mandatory="false">
+    <label>DigitalInput Queue Name</label>
+    <description>Name of the EMS queue adapter will use to send events from input sources.</description>
+    <type-definition>oat:NoSpacesArgString</type-definition>
+    <select is-bound="false">
+      <option value="main_queue" is-default="true">main_queue</option>
+    </select>
+      </property>
+      <property key="StatusLogQueueName" is-mandatory="false">
+    <label>StatusLog Queue Name</label>
+    <description>Name of the EMS queue adapter will use to send device status events (ONLINE/OFFLINE).</description>
+    <type-definition>oat:NoSpacesArgString</type-definition>
+    <select is-bound="false">
+      <option value="main_queue" is-default="true">main_queue</option>
+    </select>
+      </property>
+    </entity>
+
+    <entity type="BarcodeScannerAdapter" extends="Adapter" locator-value="BarcodeScannerAdapter">
+      <label>Barcode Scanner Adapter</label>
+      <description>Adapter used for Barcode Scanner devices.</description>
+      <property key="BarcodeQueueName" is-mandatory="false">
+    <label>Queue Name</label>
+    <description>Queue Name where the outputs of this adapter goes.</description>
+    <type-definition>oat:NoSpacesArgString</type-definition>
+    <select is-bound="false">
+      <option value="main_queue" is-default="true">main_queue</option>
+    </select>
+      </property>
+    </entity>
+
+  </table>
+
+  <table name="dms_adapter_reader">
+    <entity type="AdapterReader">
+      <label>Adapter Reader</label>
+      <description>Adapter associated to a reader</description>
+      <property key="reader_name" column-name="name" is-mandatory="false">
+    <label>Reader Name</label>
+    <description>The device node name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+    </entity>
+  </table>
+
+  <table name="dms_adapter_feedback">
+    <entity type="Feedback">
+      <label>Adapter Feedback</label>
+      <description>Feedback </description>
+      <property key="Name" is-mandatory="true">
+    <label>Feedback Name</label>
+    <description>Name used by Senseware components to refer to this feedback message.</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="Label" is-mandatory="false">
+    <label>Feedback Lable</label>
+    <description>The same label value can be assigned to 2 or more feedbacks. Application can retrieve all feedbacks with the same label.</description>
+    <type-definition>oat:Description</type-definition>
+      </property>
+      <property key="FeedbackType" column-name="type" is-mandatory="true">
+    <label>Feedback Type</label>
+    <description>Depending on the type feedback will produce blinking, steady on or off signal.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="On">On_Off</option>
+      <option value="Off">Off</option>
+      <option value="Blink" is-default="true">Blink</option>
+    </select>
+      </property>
+      <property key="PointNumber" column-name="point" is-mandatory="true">
+    <label>Point Number</label>
+    <description>The point number to be configured as it is set on the SNAP. The maximum is equal to maximum number of point the device supports.</description>
+    <type-definition>oat:PointNumber</type-definition>
+      </property>
+      <property key="FirstState" is-mandatory="false">
+    <label>The state the point is on initially</label>
+    <description>For 'blink' feedback type. First output state of the sequence of outputs.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="On" is-default="true">On</option>
+      <option value="Off">Off</option>
+    </select>
+      </property>
+      <property key="OutputIntervalSequence" is-mandatory="false">
+    <label>Output Interval Sequence</label>
+    <description>Comma-separated list of non-negative integer values. Each number is the interval of the current output state. </description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="false">
+      <option value="500,500,500,500,500" is-default="true">500,500,500,500,500</option>
+    </select>
+      </property>
+      <property key="MinimumActiveTime" is-mandatory="false">
+    <label>Minimum Active Time</label>
+    <description>Minimum time this feedback must be active. After elapsed feedback time exceeds this value feedback can be aborted to allow execution of next feedback.</description>
+    <type-definition>oat:MinimumActiveTime</type-definition>
+    <select is-bound="false">
+      <option value="5000" is-default="true">5000</option>
+    </select>
+      </property>
+    </entity>
+  </table>
+
+  <table name="dms_adapter_input">
+    <entity type="DigitalInputSource">
+      <label>Digital Input Source</label>
+      <description>Feedback </description>
+      <property key="Name" is-mandatory="true">
+    <label>Feedback Name</label>
+    <description>Name used by Senseware components to refer to this input source.</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="Label" is-mandatory="false">
+    <label>Digital Input Source Lable</label>
+    <description>The same label value can be assigned to 2 or more input sources. Application can retrieve all input sources with the same label.</description>
+    <type-definition>oat:Description</type-definition>
+      </property>
+      <property key="InputEventType" column-name="type" is-mandatory="true">
+    <label>Input Event Type</label>
+    <description>If value is 'On' only Off to On signal changes will be send, including initial 'On'. If initial state is 'Off' no event notification will be sent. 'On and Off' notifies of all input events.</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="On and Off" is-default="true">On and Off</option>
+      <option value="On">On</option>
+      <option value="Off">Off</option>
+
+    </select>
+      </property>
+      <property key="PointNumber" column-name="point" is-mandatory="true">
+    <label>Point Number</label>
+    <description>The point number to be configured as it is set on the SNAP. The maximum is equal to maximum number of point the device supports.</description>
+    <type-definition>oat:PointNumber</type-definition>
+      </property>
+    </entity>
+  </table>
+
+  <table name="ms_action">
+    <entity type="Action">
+      <label>Action Description</label>
+      <description>Description of actions to take when a point goes on or off</description>
+      <property key="name" column-name="name" is-mandatory="false" is-visible="false">
+    <label>Action Name</label>
+    <description>Action name</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+      <property key="polarity" column-name="polarity" is-mandatory="true">
+    <label>Polarity on high value</label>
+    <description>Polarity on high value</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="high_on" is-default="true">high_on</option>
+      <option value="high_off">high_off</option>
+    </select>
+      </property>
+      <property key="on_initial_delay" column-name="on_initial_delay" is-mandatory="true">
+    <label>Initial Delay on ON Action</label>
+    <description>The period of time in milliseconds until the next action will be started</description>
+    <type-definition>oat:InitialDellay</type-definition>
+    <select is-bound="false">
+      <option value="0" is-default="true">0</option>
+    </select>
+      </property>
+      <property key="off_initial_delay" column-name="off_initial_delay" is-mandatory="true">
+    <label>Initial Delay on OFF Action</label>
+    <description>The period of time in milliseconds until the next action will be started</description>
+    <type-definition>oat:InitialDellay</type-definition>
+    <select is-bound="false">
+      <option value="0" is-default="true">0</option>
+    </select>
+      </property>
+      <property key="on_action_type" column-name="on_action_type" is-mandatory="true">
+    <label>Action</label>
+    <description>The action to be taken when to point goes ON</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="enable" is-default="true">enable</option>
+      <option value="disable">disable</option>
+      <option value="notify">notify</option>
+      <option value="no_action">no action</option>
+    </select>
+      </property>
+      <property key="on_action_time" column-name="on_action_time" is-mandatory="true">
+    <label>Action time</label>
+    <description>The time that the action taken when the point goes ON should last</description>
+    <type-definition>oat:ActionTime</type-definition>
+      </property>
+      <property key="off_action_type" column-name="off_action_type" is-mandatory="true">
+    <label>Action</label>
+    <description>The action to be taken when to point goes OFF</description>
+    <type-definition>oat:SmallString</type-definition>
+    <select is-bound="true">
+      <option value="enable" is-default="true">enable</option>
+      <option value="disable">disable</option>
+      <option value="notify">notify</option>
+      <option value="no_action">no action</option>
+    </select>
+      </property>
+    </entity>
+  </table>
+
+  <table name="ms_action_target">
+    <entity type="Target">
+      <label>Target</label>
+      <description>The target on which the actions will take place</description>
+      <property key="name" column-name="name" is-mandatory="false" is-visible="false">
+    <label>Target Name</label>
+    <description>The name of the target</description>
+    <type-definition>oat:SmallString</type-definition>
+      </property>
+    </entity>
+  </table>
+
+</meta-data>

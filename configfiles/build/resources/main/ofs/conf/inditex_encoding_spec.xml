@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BulkEncoding>
+
+	<!--  version location and size -->
+	<VersionField>
+		<StartBit>1</StartBit>
+		<EndBit>5</EndBit>
+	</VersionField>
+
+	<!--  reference field location, 6 bit reference field for all tags -->
+	<ReferenceField>
+		<StartBit>59</StartBit>
+		<EndBit>64</EndBit>
+	</ReferenceField>
+
+	<Version number="1">
+		<!--  serial number location and size (in words, 16 bits). -->
+		<SerialField>
+			<StartWord>5</StartWord>
+			<EndWord>6</EndWord>
+		</SerialField>
+
+		<!--  encode data field, data for the epcEncodeSubstring -->
+		<EncodeData>
+			<StartWord>1</StartWord>
+			<EndWord>4</EndWord>
+		</EncodeData>
+	</Version>
+
+</BulkEncoding>

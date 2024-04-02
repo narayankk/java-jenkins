@@ -1,0 +1,2122 @@
+<!-- If GUID column population logic for tables: manufacturer,product_epc_prefix, content, content_li, pml-property,pml_property_group 
+ gets modified in the future, make sure the respective triggers in oatdb_oracle_triggers.sql and oatdb_sqlserver_triggers.sql also get modified accordingly -->
+  <table name="logical_property_group">
+    <column name="property_group_id" type="NUMERIC">
+      <primary-key sequence="logical_property_group_seq"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="logical_property">
+    <column name="property_id" type="NUMERIC">
+      <primary-key sequence="logical_property_seq"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_key" type="VARCHAR">
+    </column>
+    <column name="property_value" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="pml_property_group" migratable="false">
+    <column name="property_group_id" type="NUMERIC">
+      <primary-key sequence="pml_property_group_seq"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="pml_property" migratable="false">
+    <column name="property_id" type="NUMERIC">
+      <primary-key sequence="pml_property_seq"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_key" type="VARCHAR">
+    </column>
+    <column name="property_value" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="obj_binding_term_reason">
+    <column name="obj_binding_term_reason_id" type="NUMERIC">
+      <primary-key sequence="obj_binding_term_reason_seq"/>
+    </column>
+    <column name="reason" type="VARCHAR">
+      <!-- UPDATE obj_binding_term_reason SET guid = reason -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="object_product_method">
+    <column name="object_product_method_id" type="NUMERIC">
+      <primary-key sequence="object_product_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <!-- UPDATE object_product_method SET guid = method -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="manufacturer" migratable="false">
+    <column name="manufacturer_id" type="NUMERIC">
+      <primary-key sequence="manufacturer_seq"/>
+    </column>
+    <column name="internal_identifier" type="VARCHAR">
+    </column>
+    <column name="external_identifier" type="VARCHAR">
+      <!-- UPDATE manufacturer SET guid = external_identifier -->
+      <globally-unique-key/>
+    </column>
+    <column name="manufacturer_name" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="external_identifier"/>
+  </table>
+
+  <table name="product" migratable="false">
+    <column name="product_id" type="NUMERIC">
+      <primary-key sequence="product_seq"/>
+    </column>
+    <column name="manufacturer_id" type="NUMERIC">
+      <foreign-key table="manufacturer" column="manufacturer_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_name" type="VARCHAR">
+      <!-- UPDATE product SET guid = product_name -->
+      <!-- <globally-unique-key/> -->
+    </column>
+    <column name="internal_identifier" type="VARCHAR">
+    </column>
+    <column name="external_identifier" type="VARCHAR">
+    </column>
+    <column name="sku" type="VARCHAR">
+    </column>
+    <column name="upc_ean_number" type="VARCHAR">
+    </column>
+    <column name="packing_type" type="VARCHAR">
+    </column>
+    <column name="uom" type="VARCHAR">
+    </column>
+    <column name="style_code" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid">
+      <guid-key name="sku"/>
+      <guid-key name="|" is-column="false"/>
+      <guid-key name="uom"/>
+      <guid-key name="|" is-column="false"/>
+      <guid-key name="style_code"/>
+    </guid-column>
+  </table>
+
+  <table name="assn_relation">
+    <column name="assn_relation_id" type="NUMERIC">
+      <primary-key sequence="assn_relation_seq"/>
+    </column>
+    <column name="relation" type="VARCHAR">
+      <!-- UPDATE assn_relation SET guid = relation -->
+      <globally-unique-key/>
+    </column>
+    <column name="parent_is_object" type="BOOLEAN">
+    </column>
+    <column name="parent_is_location" type="BOOLEAN">
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="assn_method">
+    <column name="assn_method_id" type="NUMERIC">
+      <primary-key sequence="assn_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <!-- UPDATE assn_method SET guid = method -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="object" migratable="false">
+    <column name="object_id" type="NUMERIC">
+      <primary-key sequence="object_seq"/>
+    </column>
+    <column name="epc" type="VARCHAR">
+      <!-- UPDATE object SET guid = epc -->
+      <globally-unique-key/>
+    </column>
+    <column name="epc_uri" type="VARCHAR">
+    </column>
+    <column name="epc_product_info_id" type="NUMERIC">
+      <foreign-key table="epc_product_info" column="epc_product_info_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="epc_serial_number" type="NUMERIC">
+    </column>
+    <column name="creation_ts" type="TIMESTAMP">
+    </column>
+    <column name="is_free" type="BOOLEAN">
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="lifecycle_number" type="NUMERIC">
+    </column>
+
+    <!-- from earlier object_product -->
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_product_start_method_id" type="NUMERIC">
+      <foreign-key table="object_product_method" column="object_product_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_product_start_ts" type="TIMESTAMP">
+    </column>
+    <!-- end object_product columns -->
+
+    <!-- from earlier latest_object_assn -->
+    <column name="assn_relation_id" type="NUMERIC">
+      <foreign-key table="assn_relation" column="assn_relation_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="assn_start_method_id" type="NUMERIC">
+      <foreign-key table="assn_method" column="assn_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="parent_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="parent_object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="true" is-primary-key="false"/>
+    </column>
+    <column name="assn_start_ts" type="TIMESTAMP">
+    </column>
+    <column name="start_assn_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <!-- end latest_object_assn columns -->
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+  
+
+  <table name="assn_exception_type">
+    <column name="assn_exception_type_id" type="NUMERIC">
+      <primary-key sequence="assn_exception_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <!-- UPDATE assn_exception_type SET guid = type -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+
+ <!-- added -->
+ <table name="process_type">
+      <column name="process_type_id" type="NUMERIC">
+            <primary-key sequence="process_type_seq"/>
+          </column>
+          <column name="type" type="VARCHAR">
+	        <!-- UPDATE process_type SET guid = type -->
+	        <globally-unique-key/>
+	      </column>
+	      <column name="description" type="VARCHAR">
+	      </column>
+	      <column name="property_group_id" type="NUMERIC">
+	        <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+	      </column>
+	      <deleted-column name="deleted"/>
+	      <state-column name="state"/>
+	      <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+  
+<!-- added -->
+  <table name="process_status">
+        <column name="process_status_id" type="NUMERIC">
+              <primary-key sequence="process_status_seq"/>
+            </column>
+                <column name="status" type="VARCHAR">
+  	        <!-- UPDATE process_type SET guid = type -->
+  	        <globally-unique-key/>
+  	      </column>
+  	      <column name="description" type="VARCHAR">
+  	      </column>
+  	      <column name="is_success" type="BOOLEAN">
+    	  </column>
+  	      <column name="property_group_id" type="NUMERIC">
+  	        <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+  	      </column>
+  	      <deleted-column name="deleted"/>
+  	      <state-column name="state"/>
+  	      <last-update-state-column name="last_update_state"/>
+      <guid-column name="status"/>
+  </table>
+
+<!-- added -->
+  <table name="process" migratable="false">
+    <column name="process_id" type="NUMERIC">
+          <primary-key sequence="process_seq"/>
+        </column>
+        <column name="object_id" type="NUMERIC">
+          <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+        </column>
+        <column name="location_id" type="NUMERIC">
+          <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+        </column>
+        <column name="process_status_id" type="NUMERIC">
+          <foreign-key table="process_status" column="process_status_id" update-later="false" is-primary-key="false"/>
+        </column>
+        <column name="process_type_id" type="NUMERIC">
+          <foreign-key table="process_type" column="process_type_id" update-later="false" is-primary-key="false"/>
+        </column>
+        <column name="senseware_install_id" type="NUMERIC">
+          <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+        </column>
+        <column name="start_ts" type="TIMESTAMP">
+        </column>
+        <column name="end_ts" type="TIMESTAMP">
+        </column>
+        <column name="state_data_0" type="VARCHAR">
+        </column>
+        <column name="state_data_1" type="VARCHAR">
+        </column>
+        <column name="state_data_2" type="VARCHAR">
+        </column>
+        <column name="state_data_3" type="VARCHAR">
+        </column>
+        <column name="state_data_4" type="VARCHAR">
+        </column>
+        <column name="state_data_5" type="VARCHAR">
+        </column>
+        <column name="state_data_6" type="VARCHAR">
+        </column>
+        <column name="state_data_7" type="VARCHAR">
+        </column>
+        <column name="state_data_8" type="VARCHAR">
+        </column>
+        <column name="state_data_9" type="VARCHAR">
+        </column>
+        <deleted-column name="deleted"/>
+        <state-column name="state"/>
+        <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+  
+
+  <table name="object_assn" migratable="false">
+    <column name="object_assn_id" type="NUMERIC">
+      <primary-key sequence="object_assn_seq"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="process_id" type="NUMERIC">
+          <foreign-key table="process" column="process_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="assn_relation_id" type="NUMERIC">
+      <foreign-key table="assn_relation" column="assn_relation_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="assn_start_method_id" type="NUMERIC">
+      <foreign-key table="assn_method" column="assn_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="assn_term_method_id" type="NUMERIC">
+      <foreign-key table="assn_method" column="assn_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="parent_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="parent_object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="end_ts" type="TIMESTAMP">
+    </column>
+    <column name="start_assn_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="end_assn_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="object_disassn">
+    <column name="object_disassn_id" type="NUMERIC">
+      <primary-key sequence="object_disassn_seq"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="assn_relation_id" type="NUMERIC">
+      <foreign-key table="assn_relation" column="assn_relation_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="assn_method_id" type="NUMERIC">
+      <foreign-key table="assn_method" column="assn_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="disassn_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="new_parent_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="new_parent_object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="disassn_ts" type="TIMESTAMP">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+
+
+  <table name="object_assn_verification" migratable="false">
+    <column name="object_assn_verification_id" type="NUMERIC">
+      <primary-key sequence="object_assn_verification_seq"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+          <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_assn_id" type="NUMERIC">
+      <foreign-key table="object_assn" column="object_assn_id" update-later="false" is-primary-key="false"/>
+    </column>
+     <column name="process_id" type="NUMERIC">
+              <foreign-key table="process" column="process_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="assn_method_id" type="NUMERIC">
+      <foreign-key table="assn_method" column="assn_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="verification_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="read_ts" type="TIMESTAMP">
+    </column>
+    <column name="verification_data_0" type="VARCHAR">
+    </column>
+    <column name="verification_data_1" type="VARCHAR">
+    </column>
+    <column name="verification_data_2" type="VARCHAR">
+    </column>
+    <column name="verification_data_3" type="VARCHAR">
+    </column>
+    <column name="verification_data_4" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="assn_exception">
+    <column name="assn_exception_id" type="NUMERIC">
+      <primary-key sequence="assn_exception_seq"/>
+    </column>
+    <column name="assn_exception_type_id" type="NUMERIC">
+      <foreign-key table="assn_exception_type" column="assn_exception_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="is_add_event" type="BOOLEAN">
+    </column>
+    <column name="object_epc" type="VARCHAR">
+    </column>
+    <column name="location_epc" type="VARCHAR">
+    </column>
+    <column name="event_millis" type="NUMERIC">
+    </column>
+    <column name="event_ts" type="TIMESTAMP">
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="exception_data_0" type="VARCHAR">
+    </column>
+    <column name="exception_data_1" type="VARCHAR">
+    </column>
+    <column name="exception_data_2" type="VARCHAR">
+    </column>
+    <column name="exception_data_3" type="VARCHAR">
+    </column>
+    <column name="exception_data_4" type="VARCHAR">
+    </column>
+    <column name="exception_data_5" type="VARCHAR">
+    </column>
+    <column name="exception_data_6" type="VARCHAR">
+    </column>
+    <column name="exception_data_7" type="VARCHAR">
+    </column>
+    <column name="exception_data_8" type="VARCHAR">
+    </column>
+    <column name="exception_data_9" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="product_epc_prefix" migratable="false">
+    <column name="product_epc_prefix_id" type="NUMERIC">
+      <primary-key sequence="product_epc_prefix_seq"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="epc_prefix" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="product_pure_identity" migratable="false">
+    <column name="product_pure_identity_id" type="NUMERIC">
+      <primary-key sequence="product_pure_identity_seq"/>
+    </column>
+    <column name="epc_identity_type_id" type="NUMERIC">
+      <foreign-key table="epc_identity_type" column="epc_identity_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="company_prefix" type="VARCHAR">
+    </column>
+    <column name="object_class" type="VARCHAR">
+    </column>
+    <column name="sscc_extension_digit" type="NUMERIC">
+    </column>
+    <column name="identity_code" type="VARCHAR">
+    </column>
+    <column name="filter_value" type="NUMERIC">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid">
+      <!-- the order of "guid-key"s is important - do not change 
+           after migration starts -->
+      <guid-key name="product_id"/>
+      <guid-key name="|" is-column="false"/>
+      <guid-key name="epc_identity_type_id"/>
+    </guid-column>
+  </table>
+
+  <table name="object_product_history" migratable="false">
+    <column name="object_product_history_id" type="NUMERIC">
+      <primary-key sequence="object_product_history_seq"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_product_start_method_id" type="NUMERIC">
+      <foreign-key table="object_product_method" column="object_product_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_product_term_method_id" type="NUMERIC">
+      <foreign-key table="object_product_method" column="object_product_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="end_ts" type="TIMESTAMP">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+   
+
+ 
+  <table name="object_state_type">
+    <column name="object_state_type_id" type="NUMERIC">
+      <primary-key sequence="object_state_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <!-- UPDATE object_state_type SET guid = type -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="object_state_method">
+    <column name="object_state_method_id" type="NUMERIC">
+      <primary-key sequence="object_state_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <!-- UPDATE object_state_method SET guid = method -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="object_state_history" migratable="false">
+    <column name="object_state_history_id" type="NUMERIC">
+      <primary-key sequence="object_state_history_seq"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_state_type_id" type="NUMERIC">
+      <foreign-key table="object_state_type" column="object_state_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_state_start_method_id" type="NUMERIC">
+      <foreign-key table="object_state_method" column="object_state_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_state_term_method_id" type="NUMERIC">
+      <foreign-key table="object_state_method" column="object_state_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="end_ts" type="TIMESTAMP">
+    </column>
+    <column name="state_data_0" type="VARCHAR">
+    </column>
+    <column name="state_data_1" type="VARCHAR">
+    </column>
+    <column name="state_data_2" type="VARCHAR">
+    </column>
+    <column name="state_data_3" type="VARCHAR">
+    </column>
+    <column name="state_data_4" type="VARCHAR">
+    </column>
+    <column name="state_data_5" type="VARCHAR">
+    </column>
+    <column name="state_data_6" type="VARCHAR">
+    </column>
+    <column name="state_data_7" type="VARCHAR">
+    </column>
+    <column name="state_data_8" type="VARCHAR">
+    </column>
+    <column name="state_data_9" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+  
+  <table name="object_state" migratable="false">
+    <column name="object_state_id" type="NUMERIC">
+      <primary-key sequence="object_state_seq"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_state_type_id" type="NUMERIC">
+      <foreign-key table="object_state_type" column="object_state_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_state_start_method_id" type="NUMERIC">
+      <foreign-key table="object_state_method" column="object_state_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="object_state_history_id" type="NUMERIC">
+      <foreign-key table="object_state_history" column="object_state_history_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="state_data_0" type="VARCHAR">
+    </column>
+    <column name="state_data_1" type="VARCHAR">
+    </column>
+    <column name="state_data_2" type="VARCHAR">
+    </column>
+    <column name="state_data_3" type="VARCHAR">
+    </column>
+    <column name="state_data_4" type="VARCHAR">
+    </column>
+    <column name="state_data_5" type="VARCHAR">
+    </column>
+    <column name="state_data_6" type="VARCHAR">
+    </column>
+    <column name="state_data_7" type="VARCHAR">
+    </column>
+    <column name="state_data_8" type="VARCHAR">
+    </column>
+    <column name="state_data_9" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid">
+      <guid-key name="object_state_type_id"/>
+      <guid-key name="|" is-column="false"/>
+      <guid-key name="object_id"/>
+    </guid-column>
+  </table>
+  
+  <table name="order_download_method">
+    <column name="order_download_method_id" type="NUMERIC">
+      <primary-key sequence="order_download_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="method"/>
+  </table>
+
+  <table name="order_sat_method">
+    <column name="order_sat_method_id" type="NUMERIC">
+      <primary-key sequence="order_sat_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="method"/>
+  </table>
+
+  <table name="order_sat_status">
+    <column name="order_sat_status_id" type="NUMERIC">
+      <primary-key sequence="order_sat_status_seq"/>
+    </column>
+    <column name="status" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="in_process" type="BOOLEAN">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="status"/>
+  </table>
+
+  <table name="order_sat_crrctn_type">
+    <column name="order_sat_crrctn_type_id" type="NUMERIC">
+      <primary-key sequence="order_sat_crrctn_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="order_sat_error_type">
+    <column name="order_sat_error_type_id" type="NUMERIC">
+      <primary-key sequence="order_sat_error_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="object_ols_method">
+    <column name="object_ols_method_id" type="NUMERIC">
+      <primary-key sequence="object_ols_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="method"/>
+  </table>
+
+  <table name="order_def">
+    <column name="order_id" type="NUMERIC">
+      <primary-key sequence="order_def_seq"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="order_download_method_id" type="NUMERIC">
+      <foreign-key table="order_download_method" column="order_download_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="epc" type="VARCHAR">
+    </column>
+    <column name="external_identifier" type="VARCHAR">
+    </column>
+    <column name="creation_ts" type="TIMESTAMP">
+    </column>
+    <column name="ship_to_address" type="VARCHAR">
+    </column>
+    <column name="outbound_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="order_li">
+    <column name="order_li_id" type="NUMERIC">
+      <primary-key sequence="order_li_seq"/>
+    </column>
+    <column name="order_li_number" type="NUMERIC">
+    </column>
+    <column name="order_id" type="NUMERIC">
+      <foreign-key table="order_def" column="order_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="expected_qty" type="NUMERIC">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="order_sat">
+    <column name="order_sat_id" type="NUMERIC">
+      <primary-key sequence="order_sat_seq"/>
+    </column>
+    <column name="order_id" type="NUMERIC">
+      <foreign-key table="order_def" column="order_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="order_sat_method_id" type="NUMERIC">
+      <foreign-key table="order_sat_method" column="order_sat_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="order_sat_status_id" type="NUMERIC">
+      <foreign-key table="order_sat_status" column="order_sat_status_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="end_ts" type="TIMESTAMP">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="order_li_sat">
+    <column name="order_li_sat_id" type="NUMERIC">
+      <primary-key sequence="order_li_sat_seq"/>
+    </column>
+    <column name="order_sat_id" type="NUMERIC">
+      <foreign-key table="order_sat" column="order_sat_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="order_li_id" type="NUMERIC">
+      <foreign-key table="order_li" column="order_li_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="actual_qty" type="NUMERIC">
+    </column>
+    <column name="location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="order_sat_crrctn_type_id" type="NUMERIC">
+      <foreign-key table="order_sat_crrctn_type" column="order_sat_crrctn_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="order_sat_correction_qty" type="NUMERIC">
+    </column>
+    <column name="order_sat_error_type_id" type="NUMERIC">
+      <foreign-key table="order_sat_error_type" column="order_sat_error_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="order_sat_error_qty" type="NUMERIC">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="object_ols">
+    <column name="object_ols_id" type="NUMERIC">
+      <primary-key sequence="object_ols_seq"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="order_li_sat_id" type="NUMERIC">
+      <foreign-key table="order_li_sat" column="order_li_sat_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_ols_method_id" type="NUMERIC">
+      <foreign-key table="object_ols_method" column="object_ols_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="content_creation_method">
+    <column name="content_creation_method_id" type="NUMERIC">
+      <primary-key sequence="content_creation_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="related_to_product" type="BOOLEAN">
+    </column>
+    <column name="related_to_product_set" type="BOOLEAN">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="method"/>
+  </table>
+
+  <table name="content_sat_method">
+    <column name="content_sat_method_id" type="NUMERIC">
+      <primary-key sequence="content_sat_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <!-- UPDATE content_sat_method SET guid = method -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="method"/>
+  </table>
+
+  <table name="content_sat_status">
+    <column name="content_sat_status_id" type="NUMERIC">
+      <primary-key sequence="content_sat_status_seq"/>
+    </column>
+    <column name="status" type="VARCHAR">
+      <!-- UPDATE content_sat_status SET guid = status -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="in_process" type="BOOLEAN">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="status"/>
+  </table>
+
+  <table name="content_sat_crrctn_type">
+    <column name="content_sat_crrctn_type_id" type="NUMERIC">
+      <primary-key sequence="content_sat_crrctn_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="content_sat_error_type">
+    <column name="content_sat_error_type_id" type="NUMERIC">
+      <primary-key sequence="content_sat_error_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="object_cls_method">
+    <column name="object_cls_method_id" type="NUMERIC">
+      <primary-key sequence="object_cls_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <!-- UPDATE object_cls_method SET guid = method -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="method"/>
+  </table>
+
+  <table name="content" migratable="false">
+    <column name="content_id" type="NUMERIC">
+      <primary-key sequence="content_seq"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="content_creation_method_id" type="NUMERIC">
+      <foreign-key table="content_creation_method" column="content_creation_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_set_id" type="NUMERIC">
+    </column>
+    <column name="epc" type="VARCHAR">
+    </column>
+    <column name="external_identifier" type="VARCHAR">
+    </column>
+    <column name="creation_ts" type="TIMESTAMP">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="content_li" migratable="false">
+    <column name="content_li_id" type="NUMERIC">
+      <primary-key sequence="content_li_seq"/>
+    </column>
+    <column name="content_id" type="NUMERIC">
+      <foreign-key table="content" column="content_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="expected_qty" type="NUMERIC">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="content_sat">
+    <column name="content_sat_id" type="NUMERIC">
+      <primary-key sequence="content_sat_seq"/>
+    </column>
+    <column name="content_id" type="NUMERIC">
+      <foreign-key table="content" column="content_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="content_sat_method_id" type="NUMERIC">
+      <foreign-key table="content_sat_method" column="content_sat_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="content_sat_status_id" type="NUMERIC">
+      <foreign-key table="content_sat_status" column="content_sat_status_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="end_ts" type="TIMESTAMP">
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="content_li_sat">
+    <column name="content_li_sat_id" type="NUMERIC">
+      <primary-key sequence="content_li_sat_seq"/>
+    </column>
+    <column name="content_sat_id" type="NUMERIC">
+      <foreign-key table="content_sat" column="content_sat_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="content_li_id" type="NUMERIC">
+      <foreign-key table="content_li" column="content_li_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="actual_qty" type="NUMERIC">
+    </column>
+    <column name="content_sat_crrctn_type_id" type="NUMERIC">
+      <foreign-key table="content_sat_crrctn_type" column="content_sat_crrctn_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="content_sat_correction_qty" type="NUMERIC">
+    </column>
+    <column name="content_sat_error_type_id" type="NUMERIC">
+      <foreign-key table="content_sat_error_type" column="content_sat_error_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="content_sat_error_qty" type="NUMERIC">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="object_cls">
+    <column name="object_cls_id" type="NUMERIC">
+      <primary-key sequence="object_cls_seq"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="content_li_sat_id" type="NUMERIC">
+      <foreign-key table="content_li_sat" column="content_li_sat_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_cls_method_id" type="NUMERIC">
+      <foreign-key table="object_cls_method" column="object_cls_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="shipment_creation_method">
+    <column name="shipment_creation_method_id" type="NUMERIC">
+      <primary-key sequence="shipment_creation_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="method"/>
+  </table>
+
+  <table name="sent_shipment_status">
+    <column name="sent_shipment_status_id" type="NUMERIC">
+      <primary-key sequence="sent_shipment_status_seq"/>
+    </column>
+    <column name="status" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="in_process" type="BOOLEAN">
+    </column>
+    <column name="is_open" type="BOOLEAN">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="status"/>
+  </table>
+
+  <table name="recv_shipment_status">
+    <column name="recv_shipment_status_id" type="NUMERIC">
+      <primary-key sequence="recv_shipment_status_seq"/>
+    </column>
+    <column name="status" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="in_process" type="BOOLEAN">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="status"/>
+  </table>
+
+  <table name="shipment_status">
+    <column name="shipment_status_id" type="NUMERIC">
+      <primary-key sequence="shipment_status_seq"/>
+    </column>
+    <column name="status" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="is_successful" type="BOOLEAN">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="status"/>
+  </table>
+
+  <table name="object_shipment_method">
+    <column name="object_shipment_method_id" type="NUMERIC">
+      <primary-key sequence="object_shipment_method_seq"/>
+    </column>
+    <column name="method" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="method"/>
+  </table>
+
+  <table name="shipment_exception_type">
+    <column name="shipment_exception_type_id" type="NUMERIC">
+      <primary-key sequence="shipment_exception_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="sent_shipment">
+    <column name="sent_shipment_id" type="NUMERIC">
+      <primary-key sequence="sent_shipment_seq"/>
+    </column>
+    <column name="shipment_creation_method_id" type="NUMERIC">
+      <foreign-key table="shipment_creation_method" column="shipment_creation_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="sent_shipment_status_id" type="NUMERIC">
+      <foreign-key table="sent_shipment_status" column="sent_shipment_status_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="is_active" type="BOOLEAN">
+    </column>
+    <column name="location_id" type="NUMERIC">
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="exp_recv_sw_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="end_ts" type="TIMESTAMP">
+    </column>
+    <column name="external_identifier" type="VARCHAR">
+    </column>
+    <column name="external_recipient_identifier" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="object_sent_shipment">
+    <column name="object_sent_shipment_id" type="NUMERIC">
+      <primary-key sequence="object_sent_shipment_seq"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="sent_shipment_id" type="NUMERIC">
+      <foreign-key table="sent_shipment" column="sent_shipment_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_shipment_method_id" type="NUMERIC">
+      <foreign-key table="object_shipment_method" column="object_shipment_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="recv_shipment">
+    <column name="recv_shipment_id" type="NUMERIC">
+      <primary-key sequence="recv_shipment_seq"/>
+    </column>
+    <column name="shipment_creation_method_id" type="NUMERIC">
+      <foreign-key table="shipment_creation_method" column="shipment_creation_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="recv_shipment_status_id" type="NUMERIC">
+      <foreign-key table="recv_shipment_status" column="recv_shipment_status_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="location_id" type="NUMERIC">
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="end_ts" type="TIMESTAMP">
+    </column>
+    <column name="external_identifier" type="VARCHAR">
+    </column>
+    <column name="external_sender_identifier" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+  
+  
+
+  <table name="object_recv_shipment">
+    <column name="object_recv_shipment_id" type="NUMERIC">
+      <primary-key sequence="object_recv_shipment_seq"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_shipment_method_id" type="NUMERIC">
+      <foreign-key table="object_shipment_method" column="object_shipment_method_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="recv_shipment_id" type="NUMERIC">
+      <foreign-key table="recv_shipment" column="recv_shipment_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="shipment_match">
+    <column name="shipment_match_id" type="NUMERIC">
+      <primary-key sequence="shipment_match_seq"/>
+    </column>
+    <column name="shipment_status_id" type="NUMERIC">
+      <foreign-key table="shipment_status" column="shipment_status_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="sent_shipment_id" type="NUMERIC">
+      <foreign-key table="sent_shipment" column="sent_shipment_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="recv_shipment_id" type="NUMERIC">
+      <foreign-key table="recv_shipment" column="recv_shipment_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="shipment_exception">
+    <column name="shipment_exception_id" type="NUMERIC">
+      <primary-key sequence="shipment_exception_seq"/>
+    </column>
+    <column name="shipment_exception_type_id" type="NUMERIC">
+      <foreign-key table="shipment_exception_type" column="shipment_exception_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="shipment_match_id" type="NUMERIC">
+      <foreign-key table="shipment_match" column="shipment_match_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="exception_detail_0" type="VARCHAR">
+    </column>
+    <column name="exception_detail_1" type="VARCHAR">
+    </column>
+    <column name="exception_detail_2" type="VARCHAR">
+    </column>
+    <column name="exception_detail_3" type="VARCHAR">
+    </column>
+    <column name="exception_detail_4" type="VARCHAR">
+    </column>
+    <column name="exception_detail_5" type="VARCHAR">
+    </column>
+    <column name="exception_detail_6" type="VARCHAR">
+    </column>
+    <column name="exception_detail_7" type="VARCHAR">
+    </column>
+    <column name="exception_detail_8" type="VARCHAR">
+    </column>
+    <column name="exception_detail_9" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="asn_status">
+    <column name="asn_status_id" type="NUMERIC">
+      <primary-key sequence="asn_status_seq"/>
+    </column>
+    <column name="status" type="VARCHAR">
+      <!-- UPDATE asn_status SET guid = status -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="status"/>
+  </table>
+
+  <table name="asn_li_status">
+    <column name="asn_li_status_id" type="NUMERIC">
+      <primary-key sequence="asn_li_status_seq"/>
+    </column>
+    <column name="status" type="VARCHAR">
+      <!-- UPDATE asn_li_status SET guid = status -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="status"/>
+  </table>
+
+  <table name="asn">
+    <column name="asn_id" type="NUMERIC">
+      <primary-key sequence="asn_seq"/>
+    </column>
+    <column name="asn_number" type="VARCHAR">
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="shipment_identifier" type="VARCHAR">
+    </column>
+    <column name="asn_receipt_ts" type="TIMESTAMP">
+    </column>
+    <column name="expected_delivery_ts" type="TIMESTAMP">
+    </column>
+    <column name="ship_to_identifier" type="VARCHAR">
+    </column>
+    <column name="asn_status_id" type="NUMERIC">
+      <foreign-key table="asn_status" column="asn_status_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="trailer_number" type="VARCHAR">
+    </column>
+    <column name="carrier_description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="purchase_order">
+    <column name="purchase_order_id" type="NUMERIC">
+      <primary-key sequence="purchase_order_seq"/>
+    </column>
+    <column name="po_number" type="VARCHAR">
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="supplier" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="asn_li">
+    <column name="asn_li_id" type="NUMERIC">
+      <primary-key sequence="asn_li_seq"/>
+    </column>
+    <column name="asn_id" type="NUMERIC">
+      <foreign-key table="asn" column="asn_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="epc_uri" type="VARCHAR">
+    </column>
+    <column name="container_epc_uri" type="VARCHAR">
+    </column>
+    <column name="purchase_order_id" type="NUMERIC">
+      <foreign-key table="purchase_order" column="purchase_order_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="invalid_epc_flag" type="BOOLEAN">
+    </column>
+    <column name="asn_li_status_id" type="NUMERIC">
+      <foreign-key table="asn_li_status" column="asn_li_status_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="pml_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="asn_receipt_quantity">
+    <column name="asn_receipt_quantity_id" type="NUMERIC">
+      <primary-key sequence="asn_receipt_quantity_seq"/>
+    </column>
+    <column name="asn_id" type="NUMERIC">
+      <foreign-key table="asn" column="asn_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="purchase_order_id" type="NUMERIC">
+      <foreign-key table="purchase_order" column="purchase_order_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="container_object_id" type="NUMERIC">
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="quantity" type="NUMERIC">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="asn_case_contents">
+    <column name="asn_case_contents_id" type="NUMERIC">
+      <primary-key sequence="asn_case_contents_seq"/>
+    </column>
+    <column name="asn_li_id" type="NUMERIC">
+      <foreign-key table="asn_li" column="asn_li_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="quantity" type="NUMERIC">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="order_type">
+    <column name="order_type_id" type="NUMERIC">
+      <primary-key sequence="order_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <!-- UPDATE order_type SET guid = type -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="generic_order">
+    <column name="generic_order_id" type="NUMERIC">
+      <primary-key sequence="generic_order_seq"/>
+    </column>
+    <column name="order_number" type="VARCHAR">
+    </column>
+    <column name="alternative_number1" type="VARCHAR">
+    </column>
+    <column name="alternative_number2" type="VARCHAR">
+    </column>
+    <column name="issue_from" type="VARCHAR">
+    </column>
+    <column name="issue_to" type="VARCHAR">
+    </column>
+    <column name="create_time" type="TIMESTAMP">
+    </column>
+    <column name="order_type_id" type="NUMERIC">
+      <foreign-key table="order_type" column="order_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="shipment_type">
+    <column name="shipment_type_id" type="NUMERIC">
+      <primary-key sequence="shipment_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <!-- UPDATE shipment_type SET guid = type -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="generic_shipment_status">
+    <column name="generic_shipment_status_id" type="NUMERIC">
+      <primary-key sequence="generic_shipment_status_seq"/>
+    </column>
+    <column name="status" type="VARCHAR">
+      <!-- UPDATE generic_shipment_status SET guid = status -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="status"/>
+  </table>
+
+  <table name="generic_shipment">
+    <column name="generic_shipment_id" type="NUMERIC">
+      <primary-key sequence="generic_shipment_seq"/>
+    </column>
+    <column name="shipment_number" type="VARCHAR">
+    </column>
+    <column name="alternative_number1" type="VARCHAR">
+    </column>
+    <column name="alternative_number2" type="VARCHAR">
+    </column>
+    <column name="creation_time" type="TIMESTAMP">
+    </column>
+    <column name="asn_number" type="VARCHAR">
+    </column>
+    <column name="expected_ship_time" type="TIMESTAMP">
+    </column>
+    <column name="actual_ship_time" type="TIMESTAMP">
+    </column>
+    <column name="expected_recv_time" type="TIMESTAMP">
+    </column>
+    <column name="from_loc_identifier" type="VARCHAR">
+    </column>
+    <column name="to_loc_identifier" type="VARCHAR">
+    </column>
+    <column name="ship_from_desc" type="VARCHAR">
+    </column>
+    <column name="ship_to_desc" type="VARCHAR">
+    </column>
+    <column name="header_version" type="VARCHAR">
+    </column>
+    <column name="shipment_type_id" type="NUMERIC">
+      <foreign-key table="shipment_type" column="shipment_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="generic_shipment_status_id" type="NUMERIC">
+      <foreign-key table="generic_shipment_status" column="generic_shipment_status_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="shipment_receipt">
+    <column name="shipment_receipt_id" type="NUMERIC">
+      <primary-key sequence="shipment_receipt_seq"/>
+    </column>
+    <column name="actual_recv_time" type="TIMESTAMP">
+    </column>
+    <column name="recv_loc_identifier" type="VARCHAR">
+    </column>
+    <column name="recv_by" type="VARCHAR">
+    </column>
+    <column name="memo" type="VARCHAR">
+    </column>
+    <column name="recv_desc" type="VARCHAR">
+    </column>
+    <column name="generic_shipment_id" type="NUMERIC">
+      <foreign-key table="generic_shipment" column="generic_shipment_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="truck_plan">
+    <column name="truck_plan_id" type="NUMERIC">
+      <primary-key sequence="truck_plan_seq"/>
+    </column>
+    <column name="trailer_number" type="VARCHAR">
+    </column>
+    <column name="driver_name" type="VARCHAR">
+    </column>
+    <column name="contact_number" type="VARCHAR">
+    </column>
+    <column name="carrier_type" type="VARCHAR">
+    </column>
+    <column name="carrier_name" type="VARCHAR">
+    </column>
+    <column name="carrier_desc" type="VARCHAR">
+    </column>
+    <column name="truck_plan_number" type="VARCHAR">
+    </column>
+    <column name="creation_time" type="TIMESTAMP">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="shipment_truck_plan">
+    <column name="shipment_truck_plan_id" type="NUMERIC">
+      <primary-key sequence="shipment_truck_plan_seq"/>
+    </column>
+    <column name="create_time" type="TIMESTAMP">
+    </column>
+    <column name="truck_plan_id" type="NUMERIC">
+      <foreign-key table="truck_plan" column="truck_plan_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="generic_shipment_id" type="NUMERIC">
+      <foreign-key table="generic_shipment" column="generic_shipment_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="package_type">
+    <column name="package_type_id" type="NUMERIC">
+      <primary-key sequence="package_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <!-- UPDATE package_type SET guid = type -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="is_reusable" type="BOOLEAN">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="ship_unit_status">
+    <column name="ship_unit_status_id" type="NUMERIC">
+      <primary-key sequence="ship_unit_status_seq"/>
+    </column>
+    <column name="name" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="name"/>
+  </table>
+
+  <table name="ship_unit">
+    <column name="ship_unit_id" type="NUMERIC">
+      <primary-key sequence="ship_unit_seq"/>
+    </column>
+    <column name="asset_epc" type="VARCHAR">
+    </column>
+    <column name="container_seal_id" type="VARCHAR">
+    </column>
+    <column name="epc" type="VARCHAR">
+    </column>
+    <column name="epc_uri" type="VARCHAR">
+    </column>
+    <column name="product_identifier" type="VARCHAR">
+    </column>
+    <column name="quantity" type="NUMERIC">
+    </column>
+    <column name="lvl" type="NUMERIC">
+    </column>
+    <column name="external_id" type="VARCHAR">
+    </column>
+    <column name="generic_shipment_id" type="NUMERIC">
+      <foreign-key table="generic_shipment" column="generic_shipment_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="parent_ship_unit_id" type="NUMERIC">
+      <foreign-key table="ship_unit" column="ship_unit_id" update-later="true" is-primary-key="false"/>
+    </column>
+    <column name="package_type_id" type="NUMERIC">
+      <foreign-key table="package_type" column="package_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="generic_order_id" type="NUMERIC">
+      <foreign-key table="generic_order" column="generic_order_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="ship_unit_status_id" type="NUMERIC">
+      <foreign-key table="ship_unit_status" column="ship_unit_status_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="ship_unit_receipt">
+    <column name="ship_unit_receipt_id" type="NUMERIC">
+      <primary-key sequence="ship_unit_receipt_seq"/>
+    </column>
+    <column name="rfid_recv_quantity" type="NUMERIC">
+    </column>
+    <column name="invalid_epc_flag" type="BOOLEAN">
+    </column>
+    <column name="adjust_quantity" type="NUMERIC">
+    </column>
+    <column name="ship_unit_id" type="NUMERIC">
+      <foreign-key table="ship_unit" column="ship_unit_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="logical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="ship_unit_state_type">
+    <column name="ship_unit_state_type_id" type="NUMERIC">
+      <primary-key sequence="ship_unit_state_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="ship_unit_state">
+    <column name="ship_unit_state_id" type="NUMERIC">
+      <primary-key sequence="ship_unit_state_seq"/>
+    </column>
+    <column name="state_data_0" type="VARCHAR">
+    </column>
+    <column name="state_data_1" type="VARCHAR">
+    </column>
+    <column name="state_data_2" type="VARCHAR">
+    </column>
+    <column name="state_data_3" type="VARCHAR">
+    </column>
+    <column name="state_data_4" type="VARCHAR">
+    </column>
+    <column name="state_data_5" type="VARCHAR">
+    </column>
+    <column name="state_data_6" type="VARCHAR">
+    </column>
+    <column name="state_data_7" type="VARCHAR">
+    </column>
+    <column name="state_data_8" type="VARCHAR">
+    </column>
+    <column name="state_data_9" type="VARCHAR">
+    </column>
+    <column name="ship_unit_state_type_id" type="NUMERIC">
+      <foreign-key table="ship_unit_state_type" column="ship_unit_state_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="ship_unit_id" type="NUMERIC">
+      <foreign-key table="ship_unit" column="ship_unit_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="untagged_content">
+    <column name="untagged_content_id" type="NUMERIC">
+      <primary-key sequence="untagged_content_seq"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="quantity" type="NUMERIC">
+    </column>
+    <column name="external_id" type="VARCHAR">
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="untagged_content_history">
+    <column name="untagged_content_history_id" type="NUMERIC">
+      <primary-key sequence="untagged_content_history_seq"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="quantity" type="NUMERIC">
+    </column>
+    <column name="external_id" type="VARCHAR">
+    </column>
+    <column name="end_ts" type="TIMESTAMP">
+    </column>
+    <column name="object_id" type="NUMERIC">
+      <foreign-key table="object" column="object_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+

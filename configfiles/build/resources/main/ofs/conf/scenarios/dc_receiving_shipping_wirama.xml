@@ -1,0 +1,1397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://support.oatsystems.com/xsd/scenarios4_0.xsd">
+	<property key="name">DC Receiving and Shipping Scenario Wirama</property>
+	<property key="description">This scenario performs DC Shipping and Receiving activity for fixed readers as well as handheld</property>
+	<property key="version">8.2</property>
+	<property key="scenario.type">DC_RECV_SHIP</property>
+	<property key="ui.custom">flooruiWS.jsp</property>
+	<process>
+		<start name="Start">
+			<target exit="Exit Condition" name="ResetScenarioStateOnStart1"/>
+		</start>
+		<end name="END"/>
+		<activity name="ResetScenarioStateOnStart1" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+			<target exit="done" name="ResetScenarioStateOnStart2"/>
+			<target exit="error" name="ResetScenarioStateOnStart2"/>
+			<target exit="skip" name="ResetScenarioStateOnStart2"/>
+			<output class="java.lang.String" constant="false" name="variable0">${process.numFailureEndTrigger}</output>
+			<output class="java.lang.String" constant="false" name="variable1">${process.duplicateStartTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="variable2">${process.missedStartTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="variable3">${process.unexpectedStartTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="variable4">${process.duplicateStopTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="variable5">${process.missedStopTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="variable6">${process.unexpectedStopTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="variable7">${process.duplicateLotStartCount}</output>
+			<output class="java.lang.String" constant="false" name="variable8">${process.missedLotStartCount}</output>
+			<output class="java.lang.String" constant="false" name="variable9">${process.unexpectedLotStartCount}</output>
+		</activity>
+
+		<activity name="ResetScenarioStateOnStart2" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+			<target exit="done" name="InputHandler"/>
+			<target exit="error" name="InputHandler"/>
+			<target exit="skip" name="InputHandler"/>
+			<output class="java.lang.String" constant="false" name="variable0">${process.duplicateLotStopCount}</output>
+			<output class="java.lang.String" constant="false" name="variable1">${process.missedLotStopCount}</output>
+			<output class="java.lang.String" constant="false" name="variable2">${process.unexpectedLotStopCount}</output>
+			<output class="java.lang.String" constant="false" name="variable3">${process.lastLotEvent}</output>
+			<output class="java.lang.String" constant="false" name="variable4">${process.lastLotEventNumber}</output>
+			<output class="java.lang.String" constant="false" name="variable5">${process.lotNumber}</output>
+			<output class="java.lang.String" constant="false" name="variable6">${process.lastLotStartId}</output>
+			<output class="java.lang.String" constant="false" name="variable7">${process.lastLotStopId}</output>
+		</activity>
+
+		<call name="InputHandler" resource="dc_input_handler_wirama.xml">
+			<target name="ProcessInitiliazer" exit="DONE"/>
+			<target name="END" exit="ERROR"/>
+			<input class="java.lang.String" name="bypassReader">${process.bypassReader}</input>
+			<input class="java.lang.String" name="configDevicePoint6EpcForDeviceStatus">${process.configDevicePoint6EpcForDeviceStatus}</input>
+			<input class="java.lang.String" name="readerEpc">${process.readerEpc}</input>
+			<input class="java.lang.String" name="configRfidOpOutput">${process.configRfidOpOutput}</input>
+			<input class="java.lang.String" name="configNonrfidOpOutput">${process.configNonrfidOpOutput}</input>	
+			<input class="java.lang.String" name="configReadOnOutput">${process.configReadOnOutput}</input>
+			<input class="java.lang.String" name="configReadOffOutput">${process.configReadOffOutput}</input>
+			<input class="java.lang.String" name="configNonrfidStartOutput">${process.configNonrfidStartOutput}</input>
+			<input class="java.lang.String" name="configCriticalErrorOutput">${process.configCriticalErrorOutput}</input>
+			<input class="java.lang.String" name="confgNonCriticalErrorOutput">${process.confgNonCriticalErrorOutput}</input>
+			<input class="java.lang.String" name="configMaintenanceDoneOutput">${process.configMaintenanceDoneOutput}</input>
+			<input class="java.lang.String" name="configDevicePointEpcForEnd">${process.configDevicePointEpcForEnd}</input>
+			<input class="java.lang.String" name="configDevicePoint7EpcForEnd">${process.configDevicePoint7EpcForEnd}</input>
+			<input class="java.lang.String" name="configDevicePoint5EpcForAntennaStatus">${process.configDevicePoint5EpcForAntennaStatus}</input>
+			<input class="java.lang.String" name="stationId">${process.stationId}</input>
+			<input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>
+			<input class="java.lang.String" name="configSessionStopOutput">${process.configSessionStopOutput}</input>
+			<input class="java.lang.String" name="configSessionStartOutput">${process.configSessionStartOutput}</input>
+			<input class="java.lang.String" name="configNoActiveSessionOutput">${process.configNoActiveSessionOutput}</input>
+			<input class="java.lang.String" name="configAccuracyMetOutput">${process.configAccuracyMetOutput}</input>
+			<input class="java.lang.String" name="configAccuracyNotMetOutput">${process.configAccuracyNotMetOutput}</input>
+			<input class="java.lang.String" name="configWrongItemOutput">${process.configWrongItemOutput}</input>
+			<output class="java.lang.String" name="rfidOpOutput">${process.rfidOpOutput}</output>
+			<output class="java.lang.String" name="nonrfidOpOutput">${process.nonrfidOpOutput}</output>
+			<output class="java.lang.String" name="readOffOutput">${process.readOffOutput}</output>
+			<output class="java.lang.String" name="nonrfidStartOutput">${process.nonrfidStartOutput}</output>
+			<output class="java.lang.String" name="nonrfidStopOutput">${process.nonrfidStopOutput}</output>
+			<output class="java.lang.String" name="criticalErrorOutput">${process.criticalErrorOutput}</output>
+			<output class="java.lang.String" name="nonCriticalErrorOutput">${process.nonCriticalErrorOutput}</output>
+			<output class="java.lang.String" name="maintenanceDoneOutput">${process.maintenanceDoneOutput}</output>
+			<output class="java.lang.String" name="devicePointForStart">${process.devicePointForStart}</output>
+			<output class="java.lang.String" name="devicePointEpcForEnd">${process.devicePointEpcForEnd}</output>
+			<output class="java.lang.String" name="devicePoint7EpcForEnd">${process.devicePoint7EpcForEnd}</output>
+			<output class="java.lang.String" name="devicePoint5EpcForAntennaStatus">${process.devicePoint5EpcForAntennaStatus}</output>
+			<output class="java.lang.String" name="devicePoint6EpcForDeviceStatus">${process.devicePoint6EpcForDeviceStatus}</output>
+			<output class="java.lang.String" name="endError">${process.endError}</output>
+			<output class="java.lang.String" name="logicalState">${process.logicalState}</output>  
+			<output class="java.lang.String" name="eventErrCode">${process.eventErrCode}</output>
+			<output class="java.lang.String" name="errorDesc">${process.errorDesc}</output>
+			<output class="java.lang.String" name="origNode">${process.origNode}</output>
+			<output class="java.lang.String" name="readOnOutput">${process.readOnOutput}</output>
+			<output class="java.lang.String" name="sessionStartedOutput">${process.sessionStartedOutput}</output>
+			<output class="java.lang.String" name="sessionStopOutput">${process.sessionStopOutput}</output>
+			<output class="java.lang.String" name="noActiveSessionOutput">${process.noActiveSessionOutput}</output>
+			<output class="java.lang.String" name="accuracyMetOutput">${process.accuracyMetOutput}</output>
+			<output class="java.lang.String" name="accuracyNotMetOutput">${process.accuracyNotMetOutput}</output>
+			<output class="java.lang.String" name="wrongItemOutput">${process.wrongItemOutput}</output>
+		</call>
+		<call name="ProcessInitiliazer" resource="dc_process_initializer_wirama.xml">
+			<target name="WaitForEvents" exit="DONE"/>
+			<target name="END" exit="ERROR"/>
+			<input class="java.lang.String" name="stationId">${process.stationId}</input>
+			<input class="java.lang.String" name="criticalErrorOutput">${process.criticalErrorOutput}</input>
+			<input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+			<input class="java.lang.String" name="distBtwScannerAndTrigger">${process.distBtwScannerAndTrigger}</input>
+			<input class="java.lang.String" name="distBtwLots">${process.distBtwLots}</input>
+			<input class="java.lang.String" name="lotLength">${process.lotLength}</input>
+			<input class="java.lang.String" name="readerEpc">${process.readerEpc}</input>			
+			<input class="java.lang.String" name="maintenanceDoneOutput">${process.maintenanceDoneOutput}</input>
+			<input class="java.lang.String" name="asnMode">${process.asnMode}</input>
+			<input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>
+			<input class="java.lang.String" name="scenarioDeviceType">${process.scenarioDeviceType}</input>
+			<input class="java.lang.String" name="locSubType">${process.locSubType}</input>
+			<input class="java.lang.String" name="asnExpected">${process.asnExpected}</input>
+			<input class="java.lang.String" name="generateASN">${process.generateASN}</input>
+			<input class="java.lang.String" name="transitLocation">${process.transitLocation}</input>
+			<input class="java.lang.String" name="transitLocationRP">${process.transitLocationRP}</input>
+			<input class="java.lang.String" name="shipToDesc">${process.shipToDesc}</input>
+			<input class="java.lang.String" name="defaultShipToDescBarcodeMode">${process.defaultShipToDescBarcodeMode}</input>
+			<input class="java.lang.String" name="barcodeReadsTimeDiff">${process.barcodeReadsTimeDiff}</input>
+			<input class="java.lang.String" name="historyLength">${process.historyLength}</input>
+			<input class="java.lang.String" name="publishDelay">${process.publishDelay}</input>		
+			<input class="java.lang.String" name="logEPCLevel">${process.logEPCLevel}</input>		
+			<input class="java.lang.String" name="tunnelType">${process.tunnelType}</input>		
+			<output class="java.lang.String" name="siteName">${process.siteName}</output>
+			<output class="java.lang.String" name="logicalState">${process.logicalState}</output>		
+		</call>
+		<call name="ASNHandler" resource="dc_asn_handler_wirama.xml">
+			<target name="WaitForEvents" exit="DONE"/>
+			<target name="WaitForEvents" exit="ERROR"/>
+			<input class="java.lang.String" name="logicalState">${process.logicalState}</input>
+			<input class="java.lang.String" name="eventReceived">${process.eventReceived}</input>
+			<input class="java.lang.String" name="stationId">${process.stationId}</input>
+			<input class="java.lang.String" name="asnMode">${process.asnMode}</input>
+			<input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>
+			<input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+			<input class="java.lang.String" name="lotNumber">${process.lotNumber}</input>
+			<input class="java.lang.String" name="shipToDesc">${process.shipToDesc}</input>
+			<input class="java.lang.String" name="siteName">${process.siteName}</input>
+			<input class="java.lang.String" name="defaultShipToDescBarcodeMode">${process.defaultShipToDescBarcodeMode}</input>
+			<input class="java.lang.String" name="readOnOutput">${process.readOnOutput}</input>
+			<input class="java.lang.String" name="readOffOutput">${process.readOffOutput}</input>	
+			<output class="java.lang.String" name="logicalState">${process.logicalState}</output>		
+		</call>
+		<call name="RFIDReadHandler" resource="dc_rfid_read_handler_wirama.xml">
+			<target name="WaitForEvents" exit="DONE"/>
+			<target name="WaitForEvents" exit="ERROR"/>
+			<input class="java.lang.String" name="logicalState">${process.logicalState}</input>
+			<input class="java.lang.String" name="eventReceived">${process.eventReceived}</input>
+			<input class="java.lang.String" name="stationId">${process.stationId}</input>
+			<input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>
+			<input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+			<input class="java.lang.String" name="epc">${process.epc}</input>
+			<input class="java.util.Map" name="epcPayload">${process.epcPayload}</input>
+			<input class="java.lang.String" name="shipToDesc">${process.shipToDesc}</input>
+			<input class="java.lang.String" name="siteName">${process.siteName}</input>
+			<input class="java.lang.String" name="defaultShipToDescBarcodeMode">${process.defaultShipToDescBarcodeMode}</input>
+			<input class="java.lang.String" name="maintenanceDoneOutput">${process.maintenanceDoneOutput}</input>
+			<input class="java.lang.String" name="criticalErrorOutput">${process.criticalErrorOutput}</input>
+			<input class="java.lang.String" name="epcReadTime">${process.epcReadTime}</input>
+			<output class="java.lang.String" name="logicalState">${process.logicalState}</output>		
+		</call>
+		<call name="BarcodeHandler" resource="dc_barcode_handler_wirama.xml">
+			<target name="WaitForEvents" exit="DONE"/>
+			<target name="WaitForEvents" exit="ERROR"/>
+			<input class="java.lang.String" name="barcodeReadTime">${process.barcodeReadTime}</input>
+			<input class="java.lang.String" name="logicalState">${process.logicalState}</input>
+			<input class="java.lang.String" name="eventReceived">${process.eventReceived}</input>
+			<input class="java.lang.String" name="stationId">${process.stationId}</input>
+			<input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>
+			<input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+			<input class="java.lang.String" name="readBarcode">${process.readBarcode}</input>
+			<input class="java.lang.String" name="shipToDesc">${process.shipToDesc}</input>
+			<input class="java.lang.String" name="siteName">${process.siteName}</input>
+			<input class="java.lang.String" name="asnMode">${process.asnMode}</input>
+			<input class="java.lang.String" name="defaultShipToDescBarcodeMode">${process.defaultShipToDescBarcodeMode}</input>
+			<input class="java.lang.String" name="prevBarcode">${process.prevBarcode}</input>
+			<output class="java.lang.String" name="prevBarcode">${process.prevBarcode}</output>
+		</call>
+		<call name="SessionHandler" resource="dc_session_handler_wirama.xml">
+			<target name="WaitForEvents" exit="DONE"/>
+			<target name="WaitForEvents" exit="ERROR"/>
+			<input class="java.lang.String" name="logicalState">${process.logicalState}</input>
+			<input class="java.lang.String" name="eventReceived">${process.eventReceived}</input>
+			<input class="java.lang.String" name="stationId">${process.stationId}</input>
+			<input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>
+			<input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+			<input class="java.lang.String" name="sessionID">${process.sessionID}</input>
+			<input class="java.lang.String" name="noOfBoxes">${process.noOfBoxes}</input>
+			<output class="java.lang.String" name="sessionID">${process.sessionID}</output>
+			<output class="java.lang.String" name="noOfBoxes">${process.noOfBoxes}</output>
+		</call>		
+
+		<wait name="WaitForEvents">
+			<event name="barcode_read" target="SetEventNameForBarcode">
+				<param class="java.lang.String" name="gtin">${process.readBarcode}</param>
+				<param class="java.lang.String" name="timestamp">${process.barcodeReadTime}</param>
+				<filter resource="filter:BarcodeEventFilter">
+					<argument class="java.lang.String"  name="deviceEpc">${process.barcodeScannerEPC}</argument>
+				</filter>
+			</event>
+			<event name="photocell_trigger" target="SetEventNameForStartTrigger">
+				<filter resource="filter:PhotocellEventFilter">
+					<argument class="java.lang.String"  name="deviceEpcAndPoint">${process.devicePointForStart}</argument>
+					<argument class="java.lang.String"  name="state">${process.devicePointStateForStart}</argument>
+				</filter>
+			</event>
+			<event name="photocell_trigger" target="SetEventNameForStopTrigger">
+				<filter resource="filter:PhotocellEventFilter">
+					<argument class="java.lang.String"  name="deviceEpcAndPoint">${process.devicePointEpcForEnd}</argument>
+					<argument class="java.lang.String"  name="state">${process.devicePointStateForEnd}</argument>
+				</filter>
+			</event>
+			<event name="epc_add_read" target="ParseEpcPayload">
+				<param class="java.lang.String"  name="epc">${process.epc}</param>
+				<param class="java.lang.String"  name="TIMESTAMP">${process.epcReadTime}</param>
+				<param class="java.util.Map" name="payload">${process.epcPayload}</param>
+				<filter resource="filter:EpcAddEventFilter">
+					<argument class="java.lang.String"  name="locationEpc">${process.transitLocationRP}</argument>
+				</filter>
+			</event>
+			<event  name="photocell_trigger"   target="SetEventNameForSessionStarted">
+				<filter resource="filter:PhotocellEventFilter">
+					<argument name="deviceEpcAndPoint" class="java.lang.String">${process.sessionStartDeviceEpcAndPoint}</argument>
+					<argument name="state" class="java.lang.String">${process.sessionPointStateForStart}</argument>
+				</filter>
+			</event>
+			<event  name="photocell_trigger"   target="SetEventNameForSessionStopped">
+				<filter resource="filter:PhotocellEventFilter">
+					<argument name="deviceEpcAndPoint" class="java.lang.String">${process.sessionStopDeviceEpcAndPoint}</argument>
+					<argument name="state" class="java.lang.String">${process.sessionPointStateForStop}</argument>
+				</filter>
+			</event>	 
+			<event name="photocell_trigger" target="SetEventNameForDeviceOnline">
+				<filter resource="filter:PhotocellEventFilter">
+					<argument class="java.lang.String"  constant="false"  name="deviceEpc">${process.readerEpc}</argument>
+					<argument class="java.lang.String"  constant="false" name="state">${process.devicePointStateForStart}</argument>
+					<argument class="java.lang.String" constant="true"  name="point">6</argument>
+				</filter>
+			</event>
+			<event name="photocell_trigger" target="SetEventNameForDeviceOffline">
+				<filter resource="filter:PhotocellEventFilter">
+					<argument class="java.lang.String" constant="false" name="deviceEpc">${process.readerEpc}</argument>
+					<argument class="java.lang.String" constant="false"  name="state">${process.devicePointStateForEnd}</argument>
+					<argument class="java.lang.String" constant="true"  name="point">6</argument>
+				</filter>
+			</event>
+
+			<event name="carton_msg_ui" target="CreateWMSPayloadFromUIString">
+				<param class="java.lang.String" name="soapmessage">${process.uiMessage}</param>
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/soap_message_simulator.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="barcode_read_ui" target="GetBarcodeReadTime">
+				<param class="java.lang.String"  name="soapmessage">${process.readBarcode}</param>
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/barcode_read.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event> 
+			<event name="start_trigger_ui" target="SetEventNameForStartTrigger">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/Start_Trigger.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="epc_add_read_ui" target="CreateEpcAddReadPayloadFromUIString">
+				<param class="java.lang.String"  name="epc">${process.epc}</param>
+				<param class="java.lang.String"  name="timestamp">${process.timestamp}</param>
+				<param class="java.lang.String" name="soapmessage">${process.uiMessage}</param>
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/read_message_simulator.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="end_trigger_ui" target="SetEventNameForStopTrigger">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/End_Trigger.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="lot_start_ui" target="SetEventNameForLotStart">
+				<param class="java.lang.String" name="soapmessage">${process.lotNumber}</param>
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/lot_start.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="lot_stop_ui" target="SetEventNameForLotStop">
+				<param class="java.lang.String" name="soapmessage">${process.lotNumber}</param>
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/lot_stop.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>	 
+			<event name="epc_lot_ui" target="CreateEpcLotPayloadFromUIString">
+				<param class="java.lang.String"  name="epc">${process.epc}</param>
+				<param class="java.lang.String" name="soapmessage">${process.uiMessage}</param>
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/read_message_simulator.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="lot_end_ui" target="SetEventNameForEndLot">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/lot_end.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="point6_device_error_ui_on" target="SetEventNameForDeviceOnline">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/Point6_Trigger.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="point6_device_error_ui_off" target="SetEventNameForDeviceOffline">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/Point6_Trigger.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="sessionStarted" target="SetEventNameForSessionStarted">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/session_started.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="sessionStopped" target="SetEventNameForSessionStopped">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/session_stopped.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>	 			
+			<event name="enable_ui" target="SetEventNameForEnable">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/enable.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="disable_ui" target="SetEventNameForDisable">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/disable.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>	 
+			<event name="conveyor_on_ui" target="WaitForEvents">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/conveyor_on.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="conveyor_off_ui" target="WaitForEvents">
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp">/workflow/floor_ui/event_tiles/conveyor_off.jsp</property>
+				<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+			</event>
+			<event name="submit_ui" target="WaitForEvents">
+				<param class="java.lang.String" name="submittedValue">${process.uiAction}</param>
+				<property key="ui.invisibleWhenInactive">false</property>
+				<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+				<property key="ui.jsp"/>
+				<property key="waitCondition">true</property>
+			</event>			
+		</wait>
+		
+		<activity name="GetBarcodeReadTime" resource="class:com.oatsystems.workflow.apparel.primitives.GetCurrentTimestamp">
+			<target exit="done" name="ConvertLongToString"/>
+			<target exit="error" name="ConvertLongToString"/>
+			<output class="java.lang.Long" constant="false" name="currTimestamp">${process.currTimestamp}</output>
+        </activity>
+		
+		
+		<activity name="ConvertLongToString" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="SetEventNameForBarcode"/>
+			<target exit="error" name="SetEventNameForBarcode"/>
+			<input class="java.lang.String" constant="false" name="inArg0">${process.currTimestamp}</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.barcodeReadTime}</output>		
+		</activity>
+		
+		<activity name="ParseEpcPayload" resource="class:com.oatsystems.solutions.apparel.primitives.ParseEPCPayload">
+			<target exit="gotoWait" name="WaitForEvents"/>
+			<target exit="gotoLotStart" name="SetEventNameForLotStart"/>
+			<target exit="gotoLotStop" name="SetEventNameForLotStop"/>
+			<target exit="gotoEndLot" name="SetEventNameForEndLot"/>
+			<target exit="gotoConvOn" name="WaitForEvents"/>
+			<target exit="gotoConvOff" name="WaitForEvents"/>
+			<target exit="gotoEnabled" name="SetEventNameForEnable"/>
+			<target exit="gotoDisabled" name="SetEventNameForDisable"/>
+			<target exit="gotoEpcLot" name="ProcessLotEPC"/>
+			<target exit="gotoEpcAddRead" name="ProcessEpc"/>
+			<input class="java.lang.String" constant="false" name="epc">${process.epc}</input>
+			<input class="java.util.Map" constant="false" name="epcPayload">${process.epcPayload}</input>
+			<output class="java.lang.String" constant="false" name="epc">${process.epc}</output>
+			<output class="java.lang.String" constant="false" name="lotNumber">${process.lotNumber}</output>
+		</activity>
+		<activity name="SetEventNameForEndLot" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">LotEnd</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>
+		<activity name="SetEventNameForStartTrigger" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">StartTrigger</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>   
+		<activity name="SetEventNameForStopTrigger" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">StopTrigger</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>   
+		<activity name="SetEventNameForDeviceOffline" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">DeviceOffline</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>   		
+		<activity name="SetEventNameForDeviceOnline" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="ResetScenarioStateOnDeviceOnline"/>
+			<target exit="error" name="ResetScenarioStateOnDeviceOnline"/>
+			<input class="java.lang.String" constant="false" name="inArg0">DeviceOnline</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>
+		<activity name="SetEventNameForSessionStarted" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">SessionStarted</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>
+		<activity name="SetEventNameForSessionStopped" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">SessionStopped</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>
+		<activity name="SetEventNameForLotStart" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">LotStart</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>
+		<activity name="SetEventNameForLotStop" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">LotStop</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>		
+
+		<activity name="SetEventNameForBarcode" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">Barcode</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>  
+		<activity name="SetEventNameForEPCLot" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="RFIDReadHandler"/>
+			<target exit="error" name="RFIDReadHandler"/>
+			<input class="java.lang.String" constant="false" name="inArg0">EpcLot</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>   		
+		<activity name="SetEventNameForEPCAddRead" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">EpcAddRead</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>  
+
+		<activity name="SetEventNameForDisable" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="TriggerFaultDetector"/>
+			<target exit="error" name="TriggerFaultDetector"/>
+			<input class="java.lang.String" constant="false" name="inArg0">ReaderStateDisabled</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>  
+		<activity name="SetEventNameForEnable" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="ResetScenarioStateOnDeviceOnline"/>
+			<target exit="error" name="ResetScenarioStateOnDeviceOnline"/>
+			<input class="java.lang.String" constant="false" name="inArg0">ReaderStateEnabled</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.eventReceived}</output>
+		</activity>  
+
+		<activity name="CreateEpcLotPayloadFromUIString" resource="class:com.oatsystems.solutions.apparel.primitives.ConvertDelimitedStringToPayload">
+			<target exit="done" name="ProcessLotEPC"/>
+			<target exit="error" name="ProcessLotEPC"/>
+			<target exit="end" name="ProcessLotEPC"/>
+			<input class="java.lang.String" constant="false" name="message" required="true">${process.uiMessage}</input>
+			<output class="java.lang.String" constant="false" name="epc">${process.epc}</output>
+			<output class="java.lang.String" constant="false" name="epcEventType">${process.epcEventType}</output>
+			<output class="java.util.Map" constant="false" name="payload">${process.epcPayload}</output>
+		</activity>
+		<activity name="CreateEpcAddReadPayloadFromUIString" resource="class:com.oatsystems.solutions.apparel.primitives.ConvertDelimitedStringToPayload">
+			<target exit="done" name="ProcessEpc"/>
+			<target exit="error" name="ProcessEpc"/>
+			<target exit="end" name="ProcessEpc"/>
+			<input class="java.lang.String" constant="false" name="message" required="true">${process.uiMessage}</input>
+			<output class="java.lang.String" constant="false" name="epc">${process.epc}</output>
+			<output class="java.lang.String" constant="false" name="epcEventType">${process.epcEventType}</output>
+			<output class="java.util.Map" constant="false" name="payload">${process.epcPayload}</output>
+		</activity>
+
+		<activity name="CreateWMSPayloadFromUIString" resource="class:com.oatsystems.solutions.apparel.primitives.ConvertDelimitedStringToPayload">
+			<target exit="done" name="WaitForEvents"/>
+			<target exit="error" name="WaitForEvents"/>
+			<target exit="end" name="WaitForEvents"/>
+			<input class="java.lang.String" constant="false" name="message" required="true">${process.uiMessage}</input>
+			<input class="java.lang.String" constant="false" name="stationId" required="true">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="scenarioType" required="true">${process.scenarioType}</input>
+			<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+			<input class="java.lang.String" constant="false" name="scenarioName">${process.scenarioName}</input>
+			<input class="java.lang.String" constant="false" name="isWirama">TRUE</input>
+		</activity>
+
+		<activity name="ResetScenarioStateOnDeviceOnline" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+			<target exit="done" name="STEngine"/>
+			<target exit="error" name="STEngine"/>
+			<target exit="skip" name="STEngine"/>
+			<output class="java.lang.String" constant="false" name="variable0">${process.lotNumber}</output>
+			<output class="java.lang.String" constant="false" name="variable1">${process.lastLotEvent}</output>
+			<output class="java.lang.String" constant="false" name="variable2">${process.lastLotEventNumber}</output>
+			<output class="java.lang.String" constant="false" name="variable3">${process.lastLotStartId}</output>
+			<output class="java.lang.String" constant="false" name="variable4">${process.lastLotStopId}</output>
+		</activity>
+
+		<activity name="TriggerFaultDetector" resource="class:com.oatsystems.solutions.apparel.primitives.DCFaultDetector">
+			<target exit="done" name="STEngine"/>
+			<target exit="handleError" name="TakeErrorAction"/>
+			<input class="java.lang.String" constant="false" name="eventReceived">${process.eventReceived}</input>
+			<input class="java.lang.String" constant="false" name="logicalState">${process.logicalState}</input>
+			<input class="java.lang.String" constant="false" name="numTriesBeforeFailure">${process.numTriesBeforeFailure}</input>
+			<input class="java.lang.String" constant="false" name="numTriesBeforeSessionFailure">${process.numTriesBeforeSessionFailure}</input>
+
+			<input class="java.lang.String" constant="false" name="duplicateStartTriggerCount">${process.duplicateStartTriggerCount}</input>
+			<input class="java.lang.String" constant="false" name="missedStartTriggerCount">${process.missedStartTriggerCount}</input>
+			<input class="java.lang.String" constant="false" name="unexpectedStartTriggerCount">${process.unexpectedStartTriggerCount}</input>
+			<input class="java.lang.String" constant="false" name="duplicateStopTriggerCount">${process.duplicateStopTriggerCount}</input>
+			<input class="java.lang.String" constant="false" name="missedStopTriggerCount">${process.missedStopTriggerCount}</input>
+			<input class="java.lang.String" constant="false" name="unexpectedStopTriggerCount">${process.unexpectedStopTriggerCount}</input>
+			<input class="java.lang.String" constant="false" name="duplicateLotStartCount">${process.duplicateLotStartCount}</input>
+			<input class="java.lang.String" constant="false" name="missedLotStartCount">${process.missedLotStartCount}</input>
+			<input class="java.lang.String" constant="false" name="unexpectedLotStartCount">${process.unexpectedLotStartCount}</input>
+			<input class="java.lang.String" constant="false" name="duplicateLotStopCount">${process.duplicateLotStopCount}</input>
+			<input class="java.lang.String" constant="false" name="missedLotStopCount">${process.missedLotStopCount}</input>
+			<input class="java.lang.String" constant="false" name="unexpectedLotStopCount">${process.unexpectedLotStopCount}</input>
+			<input class="java.lang.String" constant="false" name="lotNumber">${process.lotNumber}</input>
+			<input class="java.lang.String" constant="false" name="lastLotEvent">${process.lastLotEvent}</input>
+			<input class="java.lang.String" constant="false" name="lastLotEventNumber">${process.lastLotEventNumber}</input>
+
+			<input class="java.lang.String" constant="false"  name="criticalErrorOutput">${process.criticalErrorOutput}</input>
+			<input class="java.lang.String" constant="false"  name="nonCriticalErrorOutput">${process.nonCriticalErrorOutput}</input>
+			<input class="java.lang.String" constant="false"  name="noActiveSessionOutput">${process.noActiveSessionOutput}</input>
+
+			<output class="java.lang.String" constant="false" name="duplicateStartTriggerCount">${process.duplicateStartTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="missedStartTriggerCount">${process.missedStartTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="unexpectedStartTriggerCount">${process.unexpectedStartTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="duplicateStopTriggerCount">${process.duplicateStopTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="missedStopTriggerCount">${process.missedStopTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="unexpectedStopTriggerCount">${process.unexpectedStopTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="duplicateLotStartCount">${process.duplicateLotStartCount}</output>
+			<output class="java.lang.String" constant="false" name="missedLotStartCount">${process.missedLotStartCount}</output>
+			<output class="java.lang.String" constant="false" name="unexpectedLotStartCount">${process.unexpectedLotStartCount}</output>
+			<output class="java.lang.String" constant="false" name="duplicateLotStopCount">${process.duplicateLotStopCount}</output>
+			<output class="java.lang.String" constant="false" name="missedLotStopCount">${process.missedLotStopCount}</output>
+			<output class="java.lang.String" constant="false" name="unexpectedLotStopCount">${process.unexpectedLotStopCount}</output>
+			<output class="java.lang.String" constant="false" name="lastLotEvent">${process.lastLotEvent}</output>
+			<output class="java.lang.String" constant="false" name="lastLotEventNumber">${process.lastLotEventNumber}</output>
+
+			<output class="java.lang.String" constant="false" name="eventErrCode">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="errorDesc">${process.errorDesc}</output>
+			<output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.digitalOutputPattern}</output>
+			<output class="java.lang.String" constant="false" name="isCriticalErr">${process.isCriticalErr}</output>
+		</activity>   		
+
+		<activity name="TakeErrorAction" resource="class:com.oatsystems.solutions.apparel.primitives.CallErrorHandler">
+			<target exit="done" name="DecideOnPublishOutput"/>
+			<target exit="error" name="DecideOnPublishOutput"/>
+			<input class="java.lang.String" constant="false" name="eventErrCode" required="true">${process.eventErrCode}</input>
+			<input class="java.lang.String" constant="false" name="errorDesc" required="true">${process.errorDesc}</input>
+		</activity>	
+
+		<decision name="DecideOnPublishOutput">
+			<case condition="${process.digitalOutputPattern}!=null"  label="PublishOutput" target="PublishOutput"/>
+			<default label="DoNothing" target="ResetError"/>
+		</decision>
+
+		<activity name="PublishOutput" resource="primitive:PublishDigitalOutput">
+			<target exit="done" name="ResetError"/>
+			<target exit="error" name="ResetError"/>
+			<input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.digitalOutputPattern}</input>
+		</activity>
+
+		<activity name="ResetError" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+			<target exit="done" name="DecideOnCriticalErr"/>
+			<target exit="skip" name="DecideOnCriticalErr"/>
+			<target exit="error" name="DecideOnCriticalErr"/>
+			<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="variable1">${process.errorDesc}</output>
+			<output class="java.lang.String" constant="false" name="variable2">${process.digitalOutputPattern}</output>
+		</activity>
+
+		<decision name="DecideOnCriticalErr">
+			<case condition="${process.isCriticalErr}!=null and ${process.isCriticalErr} eq 'TRUE'"  label="GotoMaintenanceMode" target="GotoMaintenanceMode"/>
+			<default label="DoNothing" target="STEngine"/>
+		</decision>
+
+		<activity name="GotoMaintenanceMode" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="WaitForEvents"/>
+			<target exit="error" name="WaitForEvents"/>
+			<input class="java.lang.String" constant="false" name="inArg0">ls.Maintenance</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>		
+		</activity> 
+
+		<activity name="STEngine" resource="class:com.oatsystems.solutions.apparel.primitives.DCSTEngine">
+			<target exit="GotoRFIDReadHandler" name="RFIDReadHandler"/>
+			<target exit="GotoBarcodeHandler" name="BarcodeHandler"/>
+			<target exit="GotoASNHandler" name="ASNHandler"/>
+			<target exit="GotoSessionHandler" name="SessionHandler"/>
+			<target exit="GotoWait" name="WaitForEvents"/>
+			<target exit="GotoPubOutput" name="PublishDigOutput"/>
+			<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+			<input class="java.lang.String" constant="false" name="eventReceived">${process.eventReceived}</input>
+			<input class="java.lang.String" constant="false" name="logicalState">${process.logicalState}</input>
+			<input class="java.lang.String" constant="false" name="lastLotStartId">${process.lastLotStartId}</input>
+			<input class="java.lang.String" constant="false" name="lastLotStopId">${process.lastLotStopId}</input>
+			<input class="java.lang.String" constant="false" name="lotNumber">${process.lotNumber}</input>
+			<input class="java.lang.String" constant="false" name="tunnelType">${process.tunnelType}</input>		
+			<output class="java.lang.String" constant="false" name="logicalState">${process.logicalState}</output>
+			<output class="java.lang.String" constant="false" name="lastLotStartId">${process.lastLotStartId}</output>
+			<output class="java.lang.String" constant="false" name="lastLotStopId">${process.lastLotStopId}</output>
+		</activity>			
+
+		<activity name="PublishDigOutput" resource="primitive:PublishDigitalOutput">
+			<target exit="done" name="WaitForEvents"/>
+			<target exit="error" name="WaitForEvents"/>
+			<input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.maintenanceDoneOutput}</input>
+		</activity>
+
+		<activity name="ProcessLotEPC" resource="class:com.oatsystems.solutions.apparel.primitives.ProcessLotEpc">
+			<target exit="done" name="WaitForEvents"/>
+			<target exit="error" name="WaitForEvents"/>
+			<target exit="handleException" name="TakeErrorActionEPC"/>
+			<input class="java.lang.String" constant="false" name="eventReceived">${process.eventReceived}</input>
+			<input class="java.lang.String" constant="false" name="logicalState">${process.logicalState}</input>
+			<input class="java.lang.String" constant="false" name="epc">${process.epc}</input>
+			<input class="java.util.Map" constant="false" name="epcPayload">${process.epcPayload}</input>
+			<input class="java.lang.String" constant="false" name="scenarioName" required="true">${process.scenarioName}</input>
+			<input class="java.lang.String" constant="false" name="stationId" required="true">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+			<input class="java.lang.String" constant="false" name="defaultShipToDescBarcodeMode">${process.defaultShipToDescBarcodeMode}</input>
+			<input class="java.lang.String" constant="false" name="shipToDesc">${process.shipToDesc}</input>
+			<input class="java.lang.String" constant="false" name="siteName">${process.siteName}</input>
+			<input class="java.lang.String" constant="false" name="epcReadTime">${process.epcReadTime}</input>
+			<input class="java.lang.String" constant="false" name="tunnelType">${process.tunnelType}</input>		
+			<output class="java.lang.String" constant="false" name="eventErrCode">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="errorDesc">${process.errorDesc}</output>
+		</activity>
+		<activity name="ProcessEpc" resource="class:com.oatsystems.solutions.apparel.primitives.ProcessEpc">
+			<target exit="done" name="WaitForEvents"/>
+			<target exit="error" name="WaitForEvents"/>
+			<target exit="handleException" name="TakeErrorActionEPC"/>
+			<input class="java.lang.String" constant="false" name="eventReceived">${process.eventReceived}</input>
+			<input class="java.lang.String" constant="false" name="logicalState">${process.logicalState}</input>
+			<input class="java.lang.String" constant="false" name="epc">${process.epc}</input>
+			<input class="java.util.Map" constant="false" name="epcPayload">${process.epcPayload}</input>
+			<input class="java.lang.String" constant="false" name="scenarioName" required="true">${process.scenarioName}</input>
+			<input class="java.lang.String" constant="false" name="stationId" required="true">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+			<input class="java.lang.String" constant="false" name="defaultShipToDescBarcodeMode">${process.defaultShipToDescBarcodeMode}</input>
+			<input class="java.lang.String" constant="false" name="shipToDesc">${process.shipToDesc}</input>
+			<input class="java.lang.String" constant="false" name="siteName">${process.siteName}</input>
+			<input class="java.lang.String" constant="false" name="epcReadTime">${process.epcReadTime}</input>
+			<input class="java.lang.String" constant="false" name="numTriesBeforeFailure">${process.numTriesBeforeFailure}</input>
+			<input class="java.lang.String" constant="false" name="duplicateStartTriggerCount">${process.duplicateStartTriggerCount}</input>
+			<input class="java.lang.String" constant="false" name="missedStartTriggerCount">${process.missedStartTriggerCount}</input>
+			<input class="java.lang.String" constant="false" name="unexpectedStartTriggerCount">${process.unexpectedStartTriggerCount}</input>
+			<input class="java.lang.String" constant="false"  name="criticalErrorOutput">${process.criticalErrorOutput}</input>
+			<input class="java.lang.String" constant="false"  name="nonCriticalErrorOutput">${process.nonCriticalErrorOutput}</input>
+			<output class="java.lang.String" constant="false" name="duplicateStartTriggerCount">${process.duplicateStartTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="missedStartTriggerCount">${process.missedStartTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="unexpectedStartTriggerCount">${process.unexpectedStartTriggerCount}</output>
+			<output class="java.lang.String" constant="false" name="eventErrCode">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="errorDesc">${process.errorDesc}</output>
+			<output class="java.lang.String" constant="false" name="digitalOutputPattern">${process.digitalOutputPattern}</output>
+			<output class="java.lang.String" constant="false" name="isCriticalErr">${process.isCriticalErr}</output>
+			<output class="java.lang.String" constant="false" name="logicalState">${process.logicalState}</output>
+		</activity>
+		<activity name="TakeErrorActionEPC" resource="class:com.oatsystems.solutions.apparel.primitives.CallErrorHandler">
+			<target exit="done" name="PublishOutputEPC"/>
+			<target exit="error" name="PublishOutputEPC"/>
+			<input class="java.lang.String" constant="false" name="eventErrCode" required="true">${process.eventErrCode}</input>
+			<input class="java.lang.String" constant="false" name="errorDesc" required="true">${process.errorDesc}</input>
+		</activity>	
+		<activity name="PublishOutputEPC" resource="primitive:PublishDigitalOutput">
+			<target exit="done" name="ResetErrorEPC"/>
+			<target exit="error" name="ResetErrorEPC"/>
+			<input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.digitalOutputPattern}</input>
+		</activity>
+		<activity name="ResetErrorEPC" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+			<target exit="done" name="DecideOnCriticalErrEPC"/>
+			<target exit="skip" name="DecideOnCriticalErrEPC"/>
+			<target exit="error" name="DecideOnCriticalErrEPC"/>
+			<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="variable1">${process.errorDesc}</output>
+		</activity>
+		<decision name="DecideOnCriticalErrEPC">
+			<case condition="${process.isCriticalErr}!=null and ${process.isCriticalErr} eq 'TRUE'"  label="GotoMaintenanceMode" target="GotoMaintenanceMode"/>
+			<default label="DoNothing" target="WaitForEvents"/>
+		</decision>
+	</process>
+
+	<config>
+		<var name="${process.scenarioName}" class="java.lang.String">
+			<property key="ui.group">Scenario configuratio</property>
+			<property key="ui.label">Scenario Instance name for UI display</property>
+			<property key="ui.required">true</property>
+			<property key="ui.input">
+				<![CDATA[
+              <textinput default="dcrecvship" type="BigString"/>
+          ]]></property>
+			<!--      <property key="ui.enabler">scenarioName</property> -->
+		</var>
+		<var name="${process.scenarioType}" class="java.lang.String">
+			<property key="ui.label">Specify type of Scenario</property>
+			<property key="ui.group">Scenario configuration</property>
+			<property key="ui.required">true</property>
+			<property key="ui.list">
+				<![CDATA[
+		    <option SELECTED value="ITEM_RECV">RECEIVING</option>
+		    <option value="ITEM_SHIP">SHIPPING</option>
+		     <option value="ITEM_PACK">PACKING</option>
+		]]></property>
+			<property key="ui.enabler">scenarioType</property>
+		</var> 
+		<var name="${process.scenarioDeviceType}" class="java.lang.String">
+			<property key="ui.label">Specify device type of Scenario</property>
+			<property key="ui.group">Scenario configuration</property>
+			<property key="ui.required">true</property>
+			<property key="ui.list">
+				<![CDATA[
+	    <option SELECTED value="TUNNEL_FR">TUNNEL</option>
+	    <option value="TABLE_FR">TABLE</option>
+	  ]]></property>
+			<property key="ui.enabler">scenarioDeviceType</property>
+		</var>  
+		<var name="${process.asnExpected}" class="java.lang.String">
+			<property key="ui.label">Specify if UI display should be ON.</property>
+			<property key="ui.group">Scenario configuration</property>
+			<property key="ui.required">true</property>
+			<property key="ui.list">
+				<![CDATA[
+	        <option SELECTED value="true">YES</option>
+		<option value="false">NO</option>
+	   ]]></property>
+			<property key="ui.enabler">asnExpected</property>
+		</var>
+		<var name="${process.tunnelType}" class="java.lang.String">
+			<property key="ui.label">Specify type of tunnel</property>
+			<property key="ui.group">Scenario configuration</property>
+			<property key="ui.required">true</property>
+			<property key="ui.list">
+						<![CDATA[
+	    <option SELECTED value="TUNNEL_FR">Box</option>
+	    <option value="TUNNEL_TR">Hanging</option>
+	  ]]>
+			</property>
+			<property key="ui.enable.on">scenarioDeviceType:TUNNEL_FR</property>
+		</var>
+		<var name="${process.asnMode}" class="java.lang.String">
+			<property key="ui.label">Specify ASN mode</property>
+			<property key="ui.group">Scenario configuration</property>
+			<property key="ui.required">true</property>
+			<property key="ui.list">
+				<![CDATA[
+	        <option SELECTED value="BARCODE">Barcode scan for Carton ID</option>
+		<option value="WMS">WMS Integration</option>
+		<option value="LOCAL">Scenario will create ASN</option>
+	   ]]></property>
+			<property key="ui.enabler">asnMode</property>
+		</var>        
+		<var name="${process.generateASN}" class="java.lang.String">
+			<property key="ui.label">Specify if ASN is to be distributed on End Trigger</property>
+			<property key="ui.group">Scenario configuration</property>
+			<property key="ui.required">true</property>
+			<property key="ui.list">
+				<![CDATA[
+	        <option SELECTED value="true">Yes</option>
+		<option value="false">no</option>
+                ]]></property>
+			<property key="ui.enable.on">scenarioType:ITEM_SHIP</property>
+		</var>
+		<var name="${process.shipToDesc}" class="java.lang.String">
+			<property key="ui.label">Specify Ship to Destination parameter for virtual ASN.</property>
+			<property key="ui.group">Scenario configuration</property>
+			<property key="ui.required">true</property>
+			<property key="ui.input">
+				<![CDATA[
+                       <textinput default="Store1" type="BigString"/>
+                ]]></property>
+			<property key="ui.enable.on">scenarioType:ITEM_SHIP</property>
+		</var>   
+<!-- 
+		<var name="${process.defaultShipToDescBarcodeMode}" class="java.lang.String">
+			<property key="ui.label">Specify default Ship to Destination parameter for Box search in Barcode mode.</property>
+			<property key="ui.group">Scenario configuration</property>
+			<property key="ui.required">false</property>
+			<property key="ui.input">
+				<![CDATA[
+	                 <textinput default="Store1" type="BigString"/>
+	         ]]></property>
+			<property key="ui.enable.on">asnMode:BARCODE</property>
+		</var>
+ -->          
+		<var name="${process.locSubType}" class="java.lang.String">
+			<property key="ui.label">Specify Location SubType  for virtual ASN. Note location subtype should map to location of destination OATXpress where EPCs should be auto-received.</property>
+			<property key="ui.group">Scenario configuration</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.required">true</property>
+			<property key="ui.list">
+				<![CDATA[
+                       <source="class:com.oatsystems.raf.config.LocationSubTypeListSource"/>
+                ]]></property>
+			<property key="ui.enable.on">scenarioType:ITEM_SHIP</property>
+		</var>         
+		<var class="java.lang.String" name="${process.stationId}">
+			<property key="doc">STATIONID</property>
+			<property key="name">StationId</property>
+			<property key="ui.group">Station Information</property>
+			<property key="ui.input">
+				<![CDATA[         
+                <textinput default="" type="EPCPrefix"/>
+                       ]]></property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Station ID</property>
+			<property key="ui.required">true</property>
+		</var>
+		<var name="${process.sessionStartDeviceEpcAndPoint}" class="java.lang.String">
+			<property key="ui.label">Specify the digital input device for starting session</property>
+			<property key="ui.group">Session Information</property>
+			<property key="ui.required">false</property>
+			<property key="ui.list">
+				<![CDATA[
+                <source="listsource:PhotoCellListSource"/>
+            ]]></property>
+			<property key="doc">DEVICEPHOTOCELL</property>
+		</var>     
+		<var class="java.lang.String" name="${process.sessionPointStateForStart}">
+			<property key="doc">DEVICEPOINTSTATEFORSTART</property>
+			<property key="ui.group">Session Information</property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Input State for Session Start Trigger</property>
+			<property key="ui.list">
+				<![CDATA[    
+                <option value="off">off</option>
+                <option SELECTED value="on">on</option>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>        
+		<var name="${process.sessionStopDeviceEpcAndPoint}" class="java.lang.String">
+			<property key="ui.label">Specify the digital input device for stopping session</property>
+			<property key="ui.group">Session Information</property>
+			<property key="ui.required">false</property>
+			<property key="ui.list">
+				<![CDATA[
+                <source="listsource:PhotoCellListSource"/>
+            ]]></property>
+			<property key="doc">DEVICEPHOTOCELL</property>
+		</var>  
+		<var class="java.lang.String" name="${process.sessionPointStateForStop}">
+			<property key="doc">DEVICEPOINTSTATEFORSTOP</property>
+			<property key="ui.group">Session Information</property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Input State for Session Stop Trigger</property>
+			<property key="ui.list">
+				<![CDATA[    
+                <option value="off">off</option>
+                <option SELECTED value="on">on</option>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.barcodeScannerEPC}">
+			<property key="doc">BARCODESCANNEREPC</property>
+			<property key="name">barcodeScannerEPC</property>
+			<property key="ui.group">Barcode Device Information</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Barcode Scanner</property>
+			<property key="ui.list">
+				<![CDATA[         
+            <source="listsource:BarcodeScannerListSource"/>
+              ]]></property>
+			<property key="ui.required">false</property>
+			<property key="ui.enable.on">asnMode:BARCODE</property>
+		</var>         
+		<var class="java.lang.String" name="${process.readerEpc}">
+			<property key="doc">READERRPC</property>
+			<property key="name">readerEpc</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Station Reader</property>
+			<property key="ui.list">
+				<![CDATA[         
+            <source="class:com.oatsystems.raf.config.DeviceListSource"/>
+              ]]></property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.barcodeReadsTimeDiff}">
+			<property key="doc">TIMEBETWEENBARCODEREADS</property>
+			<property key="name">TimeDiffBetweenBarcodeReads</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.input">
+				<![CDATA[         
+                <textinput default="10" type="EPCPrefix" min="10"/>
+                       ]]></property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Barcode is shifted when time difference between two barcode reads is lesser than this time (in ms).</property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.historyLength}">
+			<property key="doc">HISTORYLENGTH</property>
+			<property key="name">HistoryLength</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.input">
+				<![CDATA[         
+                <textinput default="5" type="EPCPrefix"/>
+                       ]]></property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Number of History Points to Filter Reads</property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.publishDelay}">
+			<property key="doc">PUBLISHDELAY</property>
+			<property key="name">PublishDelay</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.input">
+				<![CDATA[         
+                <textinput default="0" type="EPCPrefix"/>
+                       ]]></property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">EPC reporting delay configured at reader</property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.logEPCLevel}">
+			<property key="doc">LOGEPCLEVEL</property>
+			<property key="name">LogEpcLevel</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.list">
+					<![CDATA[   
+				<option SELECTED value="true">TRUE</option>
+				<option value="false">FALSE</option>
+				]]></property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">should log EPC level data into DB</property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.numTriesBeforeFailure}">
+			<property key="doc">NUMTRIES</property>
+			<property key="name">NumTries</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.input">
+				<![CDATA[         
+                <textinput default="3" type="EPCPrefix"/>
+                       ]]></property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Number of Tries to Confirm Hardware Trigger Failure</property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.numTriesBeforeSessionFailure}">
+			<property key="doc">NUMTRIESSESSION</property>
+			<property key="name">NumTriesSession</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.input">
+				<![CDATA[         
+                <textinput default="10" type="EPCPrefix"/>
+                       ]]></property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Number of Tries to Confirm Session Trigger Failure</property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.distBtwLots}">
+			<property key="doc">DISTBTWLOTS</property>
+			<property key="name">distBtwLots</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.input">
+				<![CDATA[         
+                <textinput default="0" type="EPCPrefix"/>
+                       ]]></property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Distance between two bundles in cm</property>
+			<property key="ui.required">false</property>
+		</var>		
+		<var class="java.lang.String" name="${process.lotLength}">
+			<property key="doc">LOTLENGTH</property>
+			<property key="name">lotLength</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.input">
+				<![CDATA[         
+                <textinput default="0" type="EPCPrefix"/>
+                       ]]></property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Minimum length of a bundle in cm</property>
+			<property key="ui.required">false</property>
+		</var>		
+		<var class="java.lang.String" name="${process.distBtwScannerAndTrigger}">
+			<property key="doc">DISTBTWSCANNERANDTRIGGER</property>
+			<property key="name">distBtwScannerAndTrigger</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.input">
+				<![CDATA[         
+                <textinput default="0" type="EPCPrefix"/>
+                       ]]></property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Distance between barcode scanner and start trigger in cm</property>
+			<property key="ui.required">false</property>
+		</var>				
+		<var class="java.lang.String" name="${process.configDevicePointForStart}">
+			<property key="doc">DEVICEPOINTFORSTART</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Start Trigger</property>
+			<property key="ui.list">
+				<![CDATA[    
+                <option value="01">01</option>
+                <option value="02">02</option>
+				<option value="03">03</option>
+				<option value="04">04</option>
+				<option value="05">05</option>
+				<option value="06">06</option>
+				<option value="07">07</option>
+				<option value="08">08</option>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.devicePointStateForStart}">
+			<property key="doc">DEVICEPOINTSTATEFORSTART</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Input State for Start Trigger</property>
+			<property key="ui.list">
+				<![CDATA[    
+                <option SELECTED value="off">off</option>
+                <option  value="on">on</option>
+          ]]></property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.configDevicePointEpcForEnd}">
+			<property key="doc">DEVICEPOINTEPCFOREND</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">End Trigger</property>
+			<property key="ui.list">
+				<![CDATA[    
+                    <option value="01">01</option>
+					<option value="02">02</option>
+					<option  value="03">03</option>
+					<option value="04">04</option>
+					<option value="05">05</option>
+					<option value="06">06</option>
+					<option value="07">07</option>
+					<option value="08">08</option>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configDevicePointStateForEnd}">
+			<property key="doc">DEVICEPOINTSTATEFOREND</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Input State for End Trigger</property>
+			<property key="ui.list">
+				<![CDATA[    
+                <option SELECTED value="off">off</option>
+                <option value="on">on</option>
+          ]]></property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.configDevicePoint7EpcForEnd}">
+			<property key="doc">DEVICEPOINT7EPCFOREND</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Input Point to Indicate End of Process</property>
+			<property key="ui.list">
+				<![CDATA[    
+                    <option value="01">01</option>
+                <option value="02">02</option>
+            <option value="03">03</option>
+            <option value="04">04</option>
+            <option value="05">05</option>
+            <option value="06">06</option>
+            <option SELECTED value="07">07</option>
+            <option value="08">08</option>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.devicePoint7StateForEnd}">
+			<property key="doc">DEVICEPOINT7STATEFOREND</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Input State for End of Process Input Point</property>
+			<property key="ui.list">
+				<![CDATA[    
+                <option value="on">on</option>
+                <option SELECTED value="off">off</option>
+          ]]></property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.configDevicePoint5EpcForAntennaStatus}">
+			<property key="doc">DEVICEPOINT5EPCFORANTENNA</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Input Point to Indicate Antenna Status</property>
+			<property key="ui.list">
+				<![CDATA[    
+                    <option value="01">01</option>
+                <option value="02">02</option>
+            <option value="03">03</option>
+            <option value="04">04</option>
+            <option SELECTED value="05">05</option>
+            <option value="06">06</option>
+            <option value="07">07</option>
+            <option value="08">08</option>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configDevicePoint6EpcForDeviceStatus}">
+			<property key="doc">DEVICEPOINT6EPCFOREND</property>
+			<property key="ui.group">Device Information</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Input Point to Indicate Reader Status</property>
+			<property key="ui.list">
+				<![CDATA[    
+                    <option value="01">01</option>
+                <option value="02">02</option>
+            <option value="03">03</option>
+            <option value="04">04</option>
+            <option value="05">05</option>
+            <option SELECTED value="06">06</option>
+            <option value="07">07</option>
+            <option value="08">08</option>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configSessionStartOutput}">
+			<property key="doc">SESSIONSTARTOUTPUT</property>
+			<property key="name">SESSIONSTARTOUTPUT</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Session Start</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>     
+		<var class="java.lang.String" name="${process.configSessionStopOutput}">
+			<property key="doc">SESSIONSTOPOUTPUT</property>
+			<property key="name">SESSIONSTOPOUTPUT</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Session Stop</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>          
+		<var class="java.lang.String" name="${process.configNoActiveSessionOutput}">
+			<property key="doc">NOACTIVESESSIONOUTPUT</property>
+			<property key="name">NOACTIVESESSIONOUTPUT</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Reading start without session</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>          
+		<var class="java.lang.String" name="${process.configRfidOpOutput}">
+			<property key="doc">RFIDOPOUTPUT</property>
+			<property key="name">RFIDOPOUTPUT</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On RFID Operation</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configNonrfidOpOutput}">
+			<property key="doc">NONRFIDOPOUTPUT</property>
+			<property key="name">NONRFIDOUTPUT</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Non-RFID Operation</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configReadOnOutput}">
+			<property key="doc">READONOUTPUT</property>
+			<property key="name">ReadOnOutput</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Reading Start</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configReadOffOutput}">
+			<property key="doc">READOFFOUTPUT</property>
+			<property key="name">ReadOffOutput</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Reading Stop</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configNonrfidStartOutput}">
+			<property key="doc">NONRFIDSTART</property>
+			<property key="name">NonrfidStartOutput</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Non-RFID Start</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configNonrfidStopOutput}">
+			<property key="doc">NONRFIDSTOP</property>
+			<property key="name">NonrfidStopOutput</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Non-RFID Stop</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configCriticalErrorOutput}">
+			<property key="doc">CRITICALERROROUTPUT</property>
+			<property key="name">CriticalErrorOutput</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Critical Error</property>
+			<property key="ui.popup">
+				<![CDATA[    
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configNonCriticalErrorOutput}">
+			<property key="doc">NONCRITICALERROROUTPUT</property>
+			<property key="name">NonCriticalErrorOutput</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Non-Critical Error</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configMaintenanceDoneOutput}">
+			<property key="doc">RESOLVEERROROUTPUT</property>
+			<property key="name">ResolveErrorOutput</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">On Resolving Error</property>
+			<property key="ui.popup">
+				<![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		<var class="java.lang.String" name="${process.configAccuracyMetOutput}">
+			<property key="doc">ACCURACYMETOUTPUT</property>
+			<property key="name">ACCURACYMETOUTPUT</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">When accuracy is met</property>
+			<property key="ui.popup">
+				<![CDATA[       
+	              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+	          ]]></property>
+			<property key="ui.required">false</property>
+			<property key="ui.enable.on">scenarioType:ITEM_PACK</property>
+		</var>
+		<var class="java.lang.String" name="${process.configAccuracyNotMetOutput}">
+			<property key="doc">ACCURACYNOTMETOUTPUT</property>
+			<property key="name">ACCURACYNOTMETOUTPUT</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">When accuracy is not met</property>
+			<property key="ui.popup">
+				<![CDATA[       
+	              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+	          ]]></property>
+			<property key="ui.required">false</property>
+			<property key="ui.enable.on">scenarioType:ITEM_PACK</property>
+		</var>
+		<var class="java.lang.String" name="${process.configWrongItemOutput}">
+			<property key="doc">WRONGITEMOUTPUT</property>
+			<property key="name">WRONGITEMOUTPUT</property>
+			<property key="ui.group">Digital Outputs</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">When wrong item is encountered</property>
+			<property key="ui.popup">
+				<![CDATA[       
+	              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+	          ]]></property>	
+			<property key="ui.required">false</property>
+			<property key="ui.enable.on">scenarioType:ITEM_PACK</property>
+		</var>        
+		<var name="${process.transitLocation}" class="java.lang.String">
+			<property key="ui.label">Specify business location to assign EPCs</property>
+			<property key="ui.group">Handling read Items</property>
+			<property key="ui.required">true</property>
+			<property key="ui.list">
+				<![CDATA[
+	        <source="class:com.oatsystems.raf.config.LeafLocationBusinessLocationAllowEmptyListSource"/>
+	        ]]></property>
+		</var>
+		<var name="${process.transitLocationRP}" class="java.lang.String">
+			<property key="ui.label">Specify initial read point to assign EPCs</property>
+			<property key="ui.group">Handling read Items</property>
+			<property key="ui.required">true</property>
+			<property key="ui.list">
+				<![CDATA[
+		<source="class:com.oatsystems.workflow.config.SimpleReadPointListSource"/>
+		]]></property>
+		</var>
+
+
+		<var class="java.lang.String" name="${process.loggingLevel}">
+			<property key="doc">LOGLEVEL</property>
+			<property key="ui.group">Debug Settings</property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Data Logging Level</property>
+			<property key="ui.list">
+				<![CDATA[   
+            <option value="debug">DEBUG</option>
+            <option SELECTED value="info">INFO</option>
+            ]]></property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.testWithUI}">
+			<property key="doc">TESTWITHUI</property>
+			<property key="ui.group">Debug Settings</property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Generate (Simulate) Events through UI?</property>
+			<property key="ui.list">
+				<![CDATA[   
+            <option value="true">TRUE</option>
+            <option SELECTED value="false">FALSE</option>
+            ]]></property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.testWithWebService}">
+			<property key="doc">TESTWITHWEBSERVICE</property>
+			<property key="ui.group">Debug Settings</property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Simulate Web Services?</property>
+			<property key="ui.list">
+				<![CDATA[   
+            <option value="true">TRUE</option>
+            <option SELECTED value="false">FALSE</option>
+            ]]></property>
+			<property key="ui.required">true</property>
+		</var>
+		<var class="java.lang.String" name="${process.bypassReader}">
+			<property key="doc">BYPASSREADER</property>
+			<property key="ui.group">Debug Settings</property>
+			<property key="ui.isconfigurable">false</property>
+			<property key="ui.label">Bypass Reader?</property>
+			<property key="ui.list">
+				<![CDATA[   
+            <option value="true">TRUE</option>
+            <option SELECTED value="false">FALSE</option>
+            ]]></property>
+			<property key="ui.required">true</property>
+		</var>
+	</config>
+	<display>
+		<tile name="scenario_ui">
+			<property key="eventname">submit_ui</property>
+			<property key="ui.jsp">/workflow/floor_ui/display_tiles/dc_ship_recv.jsp
+			</property>
+		</tile>
+	</display>
+</scenario>

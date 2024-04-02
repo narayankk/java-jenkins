@@ -1,0 +1,120 @@
+//For EventHubs connectionstring is mandatory and we no more support accesskeyname and accesskeyvalue
+//For BLOB storages storageconnectionstring is mandatory and we no more support storagename and storagekey
+[
+    //EventHub(s) access config for halo-scenario-messages topic 
+    //with multiple topicelements/eventhubs and dedicated blob storages for each eventhub
+    {"topic" : "halo-scenario-messages",
+        "topicelements" :
+        [
+            {"topicelement" : "halo-scenario-message1",
+                "namespace"      : "HaloEHNamespace",
+                "eventhub"       : "halo-scenario-messages",
+                "connectionstring"        : "<connection string of haloscenario1messagingpolicy>",
+                "storageconnectionstring" : "<connection string of haloblobstorage1>"
+            }, 
+            
+            {"topicelement" : "halo-scenario-message2",
+                "namespace"      : "HaloEHNamespace",
+                "eventhub"       : "halo-scenario-messages2",
+                "connectionstring"        : "<connection string of haloscenario2messagingpolicy>",
+                "storageconnectionstring" : "<connection string of haloblobstorage2>"
+            }
+         ]        
+    },
+    
+    //EventHub(s) access config for halo-mv-messages topic
+    {"topic" : "halo-mv-messages",
+        "topicelements" :
+        [
+            //EventHub access config for halo-mv-messages1 topicelement 
+            //using connectionstring and storageconnectionstring
+            {"topicelement" : "halo-mv-messages1",
+                "namespace"        : "HaloEHNamespace",
+                "eventhub"         : "halo-mv-messages",
+                "connectionstring" : "<connection string of halomvmessagingpolicy>",
+                "storageconnectionstring" : "<connection string of haloblobstorage3>"
+            }
+        ]  
+    },
+    
+    //EventHub(s) access config for halo-core-messages topic
+    {"topic" : "halo-core-messages",
+        "topicelements" :
+        [
+            //EventHub access config for halo-core-messages1 topicelement
+            //all consumer groups of haol-core-messages EventHub share the same BLOB
+            {"topicelement" : "halo-core-message1",
+                "namespace"      : "HaloEHNamespace",
+                "eventhub"       : "halo-core-messages",
+                "connectionstring"        : "<connection string of halocoremessagingpolicy>",
+                "storageconnectionstring" : "<connection string of haloblobstorage4>"
+            }
+        ]
+    }
+
+    //EventHub(s) access config for halo-sample-topic with all configuration properties
+    //Except "namespace", "eventhub", "connectionstring" and "storageconnectionstring" all other configurations are optional
+    //The values defined for optional configurations are only sample, appropriate value should be decide based on the usecase
+    //{"topic" : "halo-sample-topic",
+    //    "topicelements" :
+    //    [
+    //        {"topicelement" : "halo-sample-message1",
+    //          "namespace"      : "HaloEHNamespace",
+    //          "eventhub"       : "halo-sample-messages",
+    //          "connectionstring"        : "<connection string of halosamplemessagingpolicy>",
+    //          "storageconnectionstring" : "<connection string of haloblobstorageS1>",
+    //          
+    //          //Optional: Retry cofigurations for producer
+    //          "producerproperties" : {
+    //              "maxretries" : 5,
+    //              "trytimeout" : 60
+    //              "maxdelay" : 30
+    //          },
+    //
+    //          //Optional: Consumer specific properties for all groups of halo-sample-topic topicelement
+    //          "consumerproperties" : {
+    //              "batchsize" : 10,
+    //              "maxwaittime" : 60
+    //              "leaserenewinterval" : 10,
+    //              "leaseduration": 60,
+    //          },
+    //          
+    //          //Optional: Consumer group specific properties for each consumer group of halo-sample-topic topicelement
+    //          "consumergroups"   :
+    //          [
+    //              //Optional: Consumer group "messages-to-group1" specific properties
+    //              {"group" : "messages-to-group1",
+    //                  "storageconnectionstring" : "<connection string of haloblobstorageS2>",
+    //                  "properties": {
+    //                      "batchsize" : 5,
+    //                      "maxwaittime" : 30
+    //                      "leaserenewinterval" : 20
+    //                      "leaseduration": 60,
+    //                  }
+    //              },
+    //              
+    //              //Optional: Consumer group "messages-to-group2" specific properties
+    //              {"group" : "messages-to-group2",
+    //                  "properties": {
+    //                      "batchsize" : 15,
+    //                      "maxwaittime" : 90
+    //                      "leaserenewinterval" : 30
+    //                      "leaseduration": 60,
+    //                  }
+    //              },
+    //              
+    //              //Optional: Consumer group "messages-many-to-many-<servername>" specific properties
+    //              {"group" : "messages-many-to-many-<servername>"
+    //                  "storageconnectionstring" : "<connection string of haloblobstorageSN>",
+    //                  "properties": {
+    //                      "batchsize" : 20,
+    //                      "maxwaittime" : 120
+    //                      "leaserenewinterval" : 30
+    //                      "leaseduration": 60,
+    //                  }
+    //              }
+    //          ]
+    //      }
+    //  ]
+    //}
+]

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://support.oatsystems.com/xsd/scenarios4_0.xsd">
+  <property key="version">8.2</property>
+  <property key="scenario.type">REPLENISHMENT_METRICS</property>
+  <property key="name">Capturing Replenishment Metrics</property>
+  <property key="description">This scenario logs the various metrics of a each replenishment done per session.</property>
+  <property key="poolable">true</property>
+  <process>
+    <start name="Start">
+      <target name="SetVariablesToNull" />
+    </start>
+    
+	<activity name="SetVariablesToNull" resource="primitive:SetVariablesToNull">
+      <target name="ProcessMessageIn" exit="done" />
+      <target name="ProcessMessageIn" exit="skip" />
+      <target name="RETRY_NEEDED" exit="error" />
+	  <output name="variable0" class="java.lang.Object">${process.siteEpc}</output>
+      <output name="variable1" class="java.lang.String">${process.user}</output>
+      <output name="variable2" class="java.lang.Object">${process.processStartTime}</output>
+      <output name="variable3" class="java.lang.Object">${process.processEndTime}</output>      
+      <output name="variable4" class="java.lang.Object">${process.elapsedTimeInSeconds}</output>
+      <output name="variable5" class="java.lang.Long">${process.expectedProducts}</output>
+	  <output name="variable6" class="java.lang.Long">${process.expectedItems}</output>
+      <output name="variable7" class="java.lang.Long">${process.pickedProducts}</output>	  
+	  <output name="variable8" class="java.lang.Long">${process.pickedItems}</output>	  
+    </activity>
+    
+    <activity name="ProcessMessageIn" resource="class:com.oatsystems.workflow.apparel.primitives.ProcessMessageIn">
+      <target name="StartAssociationProcess" exit="done" />
+      <target name="FAILURE" exit="error" />
+      <input name="payload" class="java.lang.Object">${process.payload}</input>
+      <output name="processType" class="java.lang.String">${process.processType}</output>
+      <output name="processSubType" class="java.lang.String">${process.processSubType}</output>
+      <output name="handheldID" class="java.lang.String">${process.handheldID}</output>
+      <output name="scenarioID" class="java.lang.String">${process.scenarioID}</output>
+      <output name="user" class="java.lang.String">${process.user}</output>
+      <output name="processStartTime" class="java.lang.String">${process.processStartTime}</output>
+      <output name="processEndTime" class="java.lang.String">${process.processEndTime}</output>
+      <output name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</output>
+      <output name="location" class="java.lang.String">${process.siteEpc}</output>
+      <output name="expectedProducts" class="java.lang.Long">${process.expectedProducts}</output>
+	  <output name="expectedItems" class="java.lang.Long">${process.expectedItems}</output>
+      <output name="pickedProducts" class="java.lang.Long">${process.pickedProducts}</output>
+      <output name="pickedItems" class="java.lang.Long">${process.pickedItems}</output>
+    </activity>
+	      
+	<activity name="StartAssociationProcess" resource="primitive:StartProcess">
+      <target name="StoreReplenishmentMetrics" exit="done" />
+      <target name="RETRY_NEEDED" exit="error" />
+      <input name="processMasterCode" class="java.lang.String">${process.processType}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+      <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="processData6" class="java.lang.String">${process.siteEpc}</input>      
+      <input name="processData7" class="java.lang.String">${process.handheldID}</input>      
+      <input name="processData8" class="java.lang.String">${process.scenarioID}</input>      
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+   
+	<activity name="StoreReplenishmentMetrics" resource="class:com.oatsystems.solutions.apparel.primitives.StoreReplenishmentMetrics">
+      <target name="CloseAssociationProcess" exit="done" />
+      <target name="CloseAssociationProcessForFailure" exit="error" />
+      <input  name="processID" class="java.lang.String">${process.processID}</input>
+	  <input  name="moduleName" class="java.lang.String">${process.processType}</input>
+      <input name="siteEpc" class="java.lang.String">${process.siteEpc}</input> 
+      <input name="expectedProducts" class="java.lang.Long">${process.expectedProducts}</input>
+	  <input name="expectedItems" class="java.lang.Long">${process.expectedItems}</input>
+      <input name="pickedProducts" class="java.lang.Long">${process.pickedProducts}</input>
+      <input name="pickedItems" class="java.lang.Long">${process.pickedItems}</input>	  
+      </activity>
+	 
+	<activity name="CloseAssociationProcess" resource="primitive:CloseProcess">
+      <target name="SUCCESS" exit="done" />
+      <target name="FAILURE" exit="error" />
+      <input name="processID" class="java.lang.String">${process.processID}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+      <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="processData5" class="java.lang.String">${process.siteEpc}</input>      
+      <input name="processData7" class="java.lang.String">${process.handheldID}</input>      
+      <input name="processData8" class="java.lang.String">${process.scenarioID}</input>      
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+	
+	<activity name="CloseAssociationProcessForFailure" resource="primitive:CloseProcess">
+      <target name="RETRY_NEEDED" exit="done" />
+      <target name="RETRY_NEEDED" exit="error" />
+      <input name="processID" class="java.lang.String">${process.processID}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+      <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="processData5" class="java.lang.String">${process.siteEpc}</input>      
+      <input name="processData7" class="java.lang.String">${process.handheldID}</input>      
+      <input name="processData8" class="java.lang.String">${process.scenarioID}</input>      
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+	
+    <end name="SUCCESS"></end>
+    <end name="RETRY_NEEDED"></end>
+    <end name="FAILURE"></end>
+  </process>
+  
+  <config>
+    <var name="${process.payload}"
+         class="java.lang.Object">
+      <property key="ui.required">false</property>
+    </var>
+  </config>
+  <display />
+</scenario>

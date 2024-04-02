@@ -1,0 +1,22 @@
+#! /bin/bash
+
+#  haloserver  This is an init script for starting and stopping OATxpress
+
+#  chkconfig: 345 90 10
+#  description: Starts and stops OATxpress
+
+source /usr/local/ofs/bin/set_classpath.sh
+
+#/usr/local/jdk1.8.0/bin/java -Dofs.home=/usr/local/OATxpress  com.oatsystems.service.status.monitor.ControlServiceStatus $@
+/opt/java/openjdk/bin/java -Dofs.home=/usr/local  com.oatsystems.service.status.monitor.ControlServiceStatus $@
+
+if [ "$1" == "stop" ]; then
+    javaCatalinaTasks=`ps -ef|grep java|grep catalina | grep "/usr/local"`
+    if [ -n "$javaCatalinaTasks" ]; then
+        pid=`echo $javaCatalinaTasks|cut -f2 -d' '`
+        if [ -n "$pid" ]; then
+            echo $"- Forcing Tomcat shutdown..."
+            kill -9 $pid
+        fi
+    fi
+fi

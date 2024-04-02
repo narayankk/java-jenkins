@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+<meta-data property-table="Physical">
+	<table name="device">
+        <!-- Impinj Encoder device node -->
+		<entity type="ImpinjEncoderDeviceNode" extends="RFDeviceNode">
+			<locator-option value="Impinj Encoder DeviceNode">Impinj Encoder DeviceNode</locator-option>
+			<label>Impinj Encoder DeviceNode Configuration</label>
+			<description>Impinj Encoder DeviceNode Configuration</description>
+			<property key="AntennaId" is-mandatory="true">
+				<label>Antenna ID</label>
+				<description>Antenna number</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="1" is-default="true">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+				</select>
+			</property>
+						
+			<!--  Receive sensitivity -->
+			<property key="ReceiveSensitivity" is-mandatory="false">
+				<label>Encoder receive sensitivity</label>
+				<description>Encoder receive sensitivity</description>
+				<type-definition>oat:ReceiveSensitivity</type-definition>
+				<select is-bound="false">
+					<option value="1" is-default="true">1</option>
+				</select>
+			</property>
+			
+			<!-- Power Level for Write, Kill -->
+			<property key="WritePowerLevel" is-mandatory="false">
+				<label>Power level</label>
+				<description>Power level </description>
+				<type-definition>oat:ImpinjPowerLevel</type-definition>
+				<select is-bound="false">
+					<option value="87" is-default="true">87</option>
+				</select>
+			</property>
+			
+			<!--  Receive sensitivity for read -->
+			<property key="ReadReceiveSensitivity" is-mandatory="false">
+				<label>Reader receive sensitivity</label>
+				<description>Reader receive sensitivity</description>
+				<type-definition>oat:ReceiveSensitivity</type-definition>
+				<select is-bound="false">
+					<option value="1" is-default="true">1</option>
+				</select>
+			</property>
+			
+			
+			<!-- Power Level for Read -->
+			<property key="ReadPowerLevel" is-mandatory="false">
+				<label>Read Power level</label>
+				<description>Read Power level </description>
+				<type-definition>oat:ImpinjPowerLevel</type-definition>
+				<select is-bound="false">
+					<option value="87" is-default="true">87</option>
+				</select>
+			</property>
+			
+			<!-- Power Level for Read -->
+			<property key="ReadPowerLevel2" is-mandatory="false">
+				<label>Non-RFID Read Power level</label>
+				<description>Non-RFID Read Power level </description>
+				<type-definition>oat:ImpinjPowerLevel</type-definition>
+				<select is-bound="false">
+					<option value="69" is-default="true">69</option>
+				</select>
+			</property>
+			
+			
+			<property key="TimeThreshold" is-mandatory="false">
+				<label>Time Threshold</label>
+				<description>The time threshold should exceed 100 milliseconds</description>
+				<type-definition>oat:TimeThreshold</type-definition>
+			</property>
+			<property key="LoopThreshold" is-mandatory="false">
+				<label>Loop Threshold</label>
+				<description>The loop threshold should exceed -1</description>
+				<type-definition>oat:LoopThreshold</type-definition>
+				<select is-bound="false">
+					<option value="999999" is-default="true">999999</option>
+				</select>
+			</property>
+			
+				<!-- Use the antenna for read -->
+			<property key="UseRead" is-mandatory="false">
+				<label>Use antenna for read</label>
+				<description>Use antenna for read</description>
+				<type-definition>xsd:boolean</type-definition>
+				<select is-bound="true">
+					<option value="true" is-default="true">Yes</option>
+					<option value="false">No</option>
+				</select>
+			</property>
+			
+			
+				<!-- Use the antenna for Encode -->
+			<property key="UseEncode" is-mandatory="false">
+				<label>Use antenna for encode</label>
+				<description>Use antenna for encode</description>
+				<type-definition>xsd:boolean</type-definition>
+				<select is-bound="true">
+					<option value="true" is-default="true">Yes</option>
+					<option value="false">No</option>
+				</select>
+			</property>
+		</entity>		
+	</table>
+</meta-data>

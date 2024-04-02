@@ -1,0 +1,66 @@
+package drools.OrderShipment;
+
+import com.oatsystems.asn.objects.OrderShipmentRuleData;
+import com.oatsystems.asn.service.ShipmentStatusEnum;
+import com.oatsystems.asn.service.OrderStatusEnum;
+import com.oatsystems.util.ModLog;
+
+
+rule "Check if Order status is not CREATED/CANCELLED" salience 10
+when
+   $data : OrderShipmentRuleData( getOrderStatus()!=null && (!getOrderStatus().equals(OrderStatusEnum.CREATED.getStatus()) && !getOrderStatus().equals(OrderStatusEnum.CANCELLED.getStatus())) )
+
+then
+   ModLog.info("in Rule: Check if Order status is not CREATED/CANCELLED");
+   $data.setMatched(true);
+   update($data);
+end
+
+rule "Check if Shipment status is CREATED" salience 10
+when
+   $data : OrderShipmentRuleData( getShipmentStatus().equals(ShipmentStatusEnum.CREATED.getStatus()))
+
+then
+   ModLog.info("in Rule: Check if Shipment status is CREATED");
+   $data.setMatched(true);
+   update($data);
+end
+
+
+
+rule "Check if Shipment status is SHIPPED" salience 10
+when
+   $data : OrderShipmentRuleData( getShipmentStatus().equals(ShipmentStatusEnum.SHIPPED.getStatus()))
+   
+then
+   ModLog.info("in Rule: Check if Shipment status is SHIPPED");
+   $data.setMatched(true);
+   update($data);
+end
+
+rule "Check if Shipment status is PARTIALLY_RECEIVED/RECEIVED/WRONGLY_RECEIVED" salience 10
+when
+   $data : OrderShipmentRuleData( getShipmentStatus().equals(ShipmentStatusEnum.PARTIALLY_RECEIVED.getStatus()) || getShipmentStatus().equals(ShipmentStatusEnum.RECEIVED.getStatus()) || getShipmentStatus().equals(ShipmentStatusEnum.WRONGLY_RECEIVED.getStatus()))
+   
+then
+   ModLog.info("in Rule: Check if Shipment status is PARTIALLY_RECEIVED/RECEIVED/WRONGLY_RECEIVED");
+   $data.setMatched(true);
+   update($data);
+end
+
+rule "Check if Shipment status is READY_FOR_PICKUP/CUSTOMER_PICKEDUP" 
+when
+   $data : OrderShipmentRuleData( getShipmentStatus().equals(ShipmentStatusEnum.READY_FOR_PICKUP.getStatus()) || getShipmentStatus().equals(ShipmentStatusEnum.CUSTOMER_PICKEDUP.getStatus()))
+   
+then
+   ModLog.info("in Rule: Check if Shipment status is READY_FOR_PICKUP/CUSTOMER_PICKEDUP");
+   $data.setMatched(true);
+   update($data);
+end
+
+
+
+
+query "getOrderShipmentRuleData"
+    $result: OrderShipmentRuleData()
+end

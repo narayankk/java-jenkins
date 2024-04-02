@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://support.oatsystems.com/xsd/scenarios4_0.xsd">
+  <property key="version">5.1</property>
+  <property key="scenario.type">Apparel_Auto_Retirement</property>
+  <property key="name">MV Auto Retirement Scenario</property>
+  <property key="description">This scenario retires an EPC if not seen for a configurable period of time.</property>
+  <process>
+    <start name="Start">
+      <target name="GetAutoRetirementEventName" />
+    </start>
+	<end name="End"></end>
+	<activity name="GetAutoRetirementEventName" resource="class:com.oatsystems.solutions.apparel.primitives.GetAutoRetirementEvent">
+       <target name="WaitForStartRetirement" exit="done"/>
+      <target name="End" exit="error"/> 
+      <input class="java.lang.String" constant="false" name="retirementType" required="true">${process.retirementType}</input>
+	  <output class="java.lang.String" name="retirementEvent">${process.retirementEvent}</output>
+    </activity>
+	<wait name="WaitForStartRetirement">
+      <event name="StartAutoRetireScenario" target="GetItemstateFromRetirementType">
+        <param class="java.lang.String" constant="false" name="fromCC">fromCC</param>
+		<param class="java.lang.String" constant="false" name="currentSite">currentSite</param>	
+		<param class="java.lang.String" constant="false" name="isAsnExpire">isAsnExpire</param>
+       <filter resource="class:com.oatsystems.wfe.filter.DefaultWorkflowFilter">
+			<argument class="java.lang.String" constant="false" name="EventFilter">${process.retirementEvent}</argument>
+		</filter>
+      </event>
+    </wait>
+
+    <activity name="GetItemstateFromRetirementType" resource="class:com.oatsystems.solutions.apparel.primitives.GetItemstateFromRetirementType">
+       <target name="DecideCallGetAllSiteLocations" exit="done"/>
+      <target name="WaitForStartRetirement" exit="error"/> 
+      <input class="java.lang.String" constant="false" name="retirementType" required="true">${process.retirementType}</input>
+	  <output class="java.lang.String" name="startItemState">${process.startItemState}</output>
+  	  <output class="java.lang.String" name="endItemState">${process.endItemState}</output>
+  	   <output class="java.lang.String" name="autoRetirementProductCategory">${process.autoRetirementProductCategory}</output>
+  	   <output class="java.lang.String" name="adjInvProductAttr">${process.adjInvProductAttr}</output>
+  	   <output class="java.lang.String" name="isAdjInvEnable">${process.isAdjInvEnable}</output>
+	   <output class="com.oatsystems.util.RetirementRule" name="autoRetirementRules">${process.rules}</output>
+       <output class="java.lang.String" name="processSubType">${process.processSubType}</output>
+       <output class="java.lang.String" name="retirementReason">${process.retirementReason}</output>
+    </activity>
+	
+	<decision name="DecideCallGetAllSiteLocations">
+      <case condition="${process.fromCC} eq 'TRUE'" label="If the call from CC " target="CCGetLocationForRetirementItemState"></case>
+      <default label="Call to GetAllSite locations" target="GetAllSiteLocations"></default>
+    </decision>
+	
+	<activity name="GetAllSiteLocations" resource="class:com.oatsystems.solutions.apparel.primitives.GetAllSiteLocations">
+       <target name="IterateOnSiteArray" exit="done"/>
+      <target name="WaitForStartRetirement" exit="error"/> 
+      <output class="java.util.Collection" name="siteID">${process.siteID}</output>
+    </activity>
+	
+	<activity name="IterateOnSiteArray" resource="primitive:IterateOnGenericCollection">
+        <target exit="break" name="ClearAllVars"></target>
+		<target exit="continue" name="GetLocationForRetirementItemState"></target>
+        <target exit="error" name="ClearAllVars"></target>
+        <input class="java.util.Collection" constant="false" name="collection" required="true">${process.siteID}</input>
+        <input class="java.util.Iterator" constant="false" name="iterator" required="false">${process.currentIterator}</input>
+        <output class="java.util.Iterator" constant="false" name="iterator">${process.currentIterator}</output>
+        <output class="java.lang.String" constant="false" name="currentValue">${process.currentSite}</output>
+    </activity>
+    
+	<activity name="GetLocationForRetirementItemState" resource="class:com.oatsystems.solutions.apparel.primitives.GetLocationForRetirementItemState">
+      <target name="DecideOnAsnRetireOrItemRetire" exit="done"/>
+      <target name="IterateOnSiteArray" exit="error"/> 
+      <input class="java.lang.String" constant="false" name="itemState" required="true">${process.endItemState}</input>
+      <input class="java.lang.String" constant="false" name="siteID" required="true">${process.currentSite}</input>
+      <output class="java.lang.String" name="parentLocationEPC">${process.parentLocationEPC}</output>
+	  <output class="java.lang.String" name="readPointLocationEPC">${process.readPointLocationEPC}</output>
+    </activity>
+	
+	<decision name="DecideOnAsnRetireOrItemRetire">
+      <case condition="${process.isAsnExpire} eq 'TRUE'" label="Call from ASN Auto Retire " target="GetRetiredAsnEpcs"></case>
+      <default label="Call from item Auto Retire" target="GetTags"></default>
+    </decision> 
+	
+	<!--TODO- get non active tags-->
+	
+	<activity name="GetRetiredAsnEpcs" resource="class:com.oatsystems.solutions.apparel.primitives.GetRetiredAsnEpcs">
+		<target name="StartAssociationProcess" exit="done"/>
+		<target name="ClearAllVars" exit="error"/>
+		<target name="ClearAllVars" exit="empty"/>
+		<output name="tags" class="[Lcom.oatsystems.workflow.objects.Containee;">${process.tags}</output>
+		<output name="genericshipmentID" class="java.lang.String">${process.genericshipmentID}</output>
+	</activity>
+	
+	<activity name="GetTags" resource="class:com.oatsystems.solutions.apparel.primitives.GetNonActiveTagsMD">
+      <target name="StartAssociationProcess" exit="done"/>
+      <target name="IterateOnSiteArray" exit="error"/> 
+      <target name="IterateOnSiteArray" exit="empty"/>     
+      <input name="retirementType" class="java.lang.String">${process.retirementType}</input>
+      <input name="siteID" class="java.lang.String">${process.currentSite}</input>
+      <input name="startItemState" class="java.lang.String">${process.startItemState}</input>
+      <input name="autoRetirementProductCategory" class="java.lang.String">${process.autoRetirementProductCategory}</input>
+      <input class="java.lang.String" name="adjInvProductAttr">${process.adjInvProductAttr}</input>
+      <input class="java.lang.String" name="isAdjInvEnable">${process.isAdjInvEnable}</input>
+      <input name="autoRetirementRules" class="com.oatsystems.util.RetirementRule">${process.rules}</input>	  
+      <output name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</output>
+    </activity>
+	
+	<activity name="StartAssociationProcess" resource="primitive:StartProcess">
+      <target name="IterateOnTagArrayBatch" exit="done" />
+      <target name="IterateOnTagArrayBatch" exit="error" />
+      <input name="processMasterCode" class="java.lang.String">ITEM_RETIRE</input>
+      <input name="processData1" class="java.lang.String">system</input>
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+	
+	<activity name="IterateOnTagArrayBatch" resource="class:com.oatsystems.workflow.primitives.IterateOnObjectArrayInBatch">
+       <target name="PrepareEPCList" exit="continue" />
+       <target name="CloseProcess" exit="break" />
+       <target name="CloseProcess" exit="error" />
+       <input name="iterationRange" class="[Ljava.lang.Object;">${process.tags}</input>
+       <input name="currentStartIndex" class="java.lang.String">${process.currentIndex}</input>
+       <input name="batchSize" class="java.lang.String">5</input>
+       <output name="currentEndIndex" class="java.lang.String">${process.currentIndex}</output>
+       <output name="currentValues" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+     </activity>
+	
+	<activity name="PrepareEPCList" resource="class:com.oatsystems.solutions.apparel.primitives.PrepareEPCListFromCurrBatch">
+	  <target name="AssociateTagWithParentLocation" exit="done"/> 
+      <target name="AssociateTagWithParentLocation" exit="error" />  
+      <input name="tagArray" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</input>
+      <output name="epcList" class="java.util.List">${process.epcList}</output>
+    </activity>
+	
+	<!--Tag will be associated to either null or appropriate parent location-->
+	<activity name="AssociateTagWithParentLocation" resource="class:com.oatsystems.workflow.primitives.AssociateEpcToLocationMDBatch">
+      <target name="IterateOnTagArrayBatch" exit="associated" />
+      <target name="IterateOnTagArrayBatch" exit="error" />
+      <input name="epcList" class="java.util.List">${process.epcList}</input>
+      <input name="checkEpcValidity" class="java.lang.String">FALSE</input>
+      <input name="associationLocationEpc" class="java.lang.String">${process.readPointLocationEPC}</input>
+      <input name="associationSiteId" class="java.lang.String">${process.currentSite}</input>
+      <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEPC}</input>
+      <input name="processId" class="java.lang.String">${process.processID}</input>
+      <input name="status" class="java.lang.String">${process.retirementReason}</input>
+      <input name="processType" class="java.lang.String">ITEM_RETIRE</input>
+      <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+	  <output name="invalidepcs" class="java.util.List">${process.invalidepcs}</output>
+    </activity>
+	
+	<decision name="CallForCloseProcess">
+      <case condition="${process.isAsnExpire} eq 'TRUE'" label="If the call from ASN Retire " target="UpdateGenericShipment"></case>
+	  <case condition="${process.fromCC} eq 'TRUE'" label="If the call from CC AutoRetire " target="CloseCCProcess"></case>
+      <default label="Call to CloseProcess" target="CloseProcess"></default>
+    </decision>
+	
+	<activity name="UpdateGenericShipment" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateGenericShipmentForAsnRetire">
+		<target exit="done" name="CloseProcess"></target>
+		<target exit="error" name="CloseProcess"></target>
+		<input name="genericshipmentID" class="java.lang.String">${process.genericshipmentID}</input>
+	</activity>
+
+    <activity name="CloseProcess" resource="primitive:CloseProcess">
+      <target name="CancelVars" exit="done" />
+      <target name="CancelVars" exit="error" />
+      <input name="processID" class="java.lang.String">${process.processID}</input>
+      <input name="processData0" class="java.lang.String">ITEM_RETIRE</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+    
+    <activity name="CancelVars" resource="primitive:SetVariablesToNull">
+      <target name="IterateOnSiteArray" exit="done" />
+      <target name="IterateOnSiteArray" exit="skip" />
+      <target name="IterateOnSiteArray" exit="error" />
+      <output name="variable0" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+      <output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+      <output name="variable2" class="java.lang.Object">${process.tags}</output>
+      <output name="variable3" class="java.lang.String">${process.parentLocationEPC}</output>      
+	  <output name="variable4" class="java.lang.String">${process.readPointLocationEPC}</output> 
+	  <output name="variable5" class="java.lang.String">${process.processID}</output>
+	  <output name="variable6" class="java.lang.Object">${process.epcList}</output>
+	  <output name="variable7" class="java.util.List">${process.invalidepcs}</output>
+    </activity>
+	
+	<activity name="ClearAllVars" resource="primitive:SetVariablesToNull">
+      <target name="WaitForStartRetirement" exit="done" />
+      <target name="WaitForStartRetirement" exit="skip" />
+      <target name="WaitForStartRetirement" exit="error" />
+      <output name="variable0" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+      <output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+      <output name="variable2" class="java.lang.Object">${process.tags}</output>
+      <output name="variable3" class="java.lang.String">${process.parentLocationEPC}</output>      
+	  <output name="variable4" class="java.lang.String">${process.readPointLocationEPC}</output>      
+	  <output name="variable5" class="java.lang.String">${process.startItemState}</output>      
+	  <output name="variable6" class="java.lang.String">${process.endItemState}</output>      
+	  <output name="variable7" class="java.util.Collection">${process.siteID}</output>      
+	  <output name="variable8" class="java.util.Iterator">${process.currentIterator}</output>      
+	  <output name="variable9" class="java.lang.String">${process.currentSite}</output>       
+    </activity>
+	<!--For autoretire is called from CC -->
+	<activity name="CCGetLocationForRetirementItemState" resource="class:com.oatsystems.solutions.apparel.primitives.GetLocationForRetirementItemState">
+      <target name="CCGetTags" exit="done"/>
+      <target name="ClearAllVars" exit="error"/> 
+      <input class="java.lang.String" constant="false" name="itemState" required="true">${process.endItemState}</input>
+      <input class="java.lang.String" constant="false" name="siteID" required="true">${process.currentSite}</input>
+      <output class="java.lang.String" name="parentLocationEPC">${process.parentLocationEPC}</output>
+	  <output class="java.lang.String" name="readPointLocationEPC">${process.readPointLocationEPC}</output>
+    </activity>
+	<activity name="CCGetTags" resource="class:com.oatsystems.solutions.apparel.primitives.GetNonActiveTagsMD">
+      <target name="StartAssociationProcess" exit="done"/>
+      <target name="ClearAllVars" exit="error"/> 
+      <target name="ClearAllVars" exit="empty"/>     
+      <input name="retirementType" class="java.lang.String">${process.retirementType}</input>
+      <input name="siteID" class="java.lang.String">${process.currentSite}</input>
+      <input name="startItemState" class="java.lang.String">${process.startItemState}</input>
+      <input name="autoRetirementProductCategory" class="java.lang.String">${process.autoRetirementProductCategory}</input>
+      <input class="java.lang.String" name="adjInvProductAttr">${process.adjInvProductAttr}</input>
+      <input class="java.lang.String" name="isAdjInvEnable">${process.isAdjInvEnable}</input>
+      <input name="autoRetirementRules" class="com.oatsystems.util.RetirementRule">${process.rules}</input>
+	  <input class="java.lang.String" name="fromCC">${process.fromCC}</input>
+      <output name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</output>
+    </activity>
+	
+	 <activity name="CloseCCProcess" resource="primitive:CloseProcess">
+      <target name="ClearAllVars" exit="done" />
+      <target name="ClearAllVars" exit="error" />
+      <input name="processID" class="java.lang.String">${process.processID}</input>
+      <input name="processData0" class="java.lang.String">ITEM_RETIRE</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+	
+  </process>
+  <config>
+    <var class="java.lang.String" name="${process.retirementType}">
+      <property key="doc">Retirement Type</property>
+      <property key="ui.group">Retirement Type</property>
+	  <property key="ui.list"><![CDATA[ 
+        <source="class:com.oatsystems.raf.config.RetirementTypeListSource"/>
+         ]]></property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Retirement Type</property>
+      <property key="ui.required">true</property>
+    </var>
+	<var class="java.lang.String" name="${process.fromCC}">
+      <property key="doc">fromCC</property>
+      <property key="ui.required">false</property>
+    </var>
+	<var class="java.lang.String" name="${process.currentSite}">
+      <property key="doc">currentSite</property>
+      <property key="ui.required">false</property>
+    </var>
+<var class="java.lang.String" name="${process.isAsnExpire}">
+      <property key="doc">isAsnExpire</property>
+      <property key="ui.required">false</property>
+    </var>
+
+
+  </config>    
+  <display />
+</scenario>

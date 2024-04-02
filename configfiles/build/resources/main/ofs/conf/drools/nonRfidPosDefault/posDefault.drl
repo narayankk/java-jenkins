@@ -1,0 +1,49 @@
+package drools.nonRfidPosDefault;
+
+import com.oatsystems.service.apparel.data.drools.POSResultObject;
+import com.oatsystems.service.apparel.data.drools.FullInventory;
+import com.oatsystems.service.apparel.data.drools.InventoryUnit;
+import com.oatsystems.spring.service.apparel.data.pos.POSTxn;
+import com.oatsystems.service.apparel.data.drools.POSTxnInfo;
+import com.oatsystems.spring.service.apparel.data.pos.POSTxnType;
+import com.oatsystems.spring.service.apparel.data.postxnv1.POSSkus;
+import com.oatsystems.pojo.SkuLevel;
+import java.util.List;
+import java.util.Map;
+import com.oatsystems.util.ModLog;
+
+rule "adjCount for POS SALE"
+no-loop
+when
+$txnInfo : POSTxnInfo(getTxnType().equals(POSTxnType.SALE.toString()), $txnTime : getTxnTime())
+$pos : POSSkus($sku : getSkuValue(), processed == false)
+$full : FullInventory($subLevelList : getSublevel() contains $sku, $invList : getInvList(), $productIdentifier : getProductIdentifier())
+$inv : InventoryUnit($businessLocation : getBusinessLocation(), getCcResetTime() < $txnTime) from $invList
+$posObject : POSResultObject( productIdentifier.equals( $productIdentifier ), businessLocation.equals( $businessLocation ) )
+then
+ModLog.debug("in Rule: adjCount for POS SALE");
+$posObject.setAdjCount($posObject.getAdjCount() + $pos.getQty());
+update($posObject);
+$pos.setProcessed(true);
+update($pos);
+end
+
+rule "adjCount for POS RETURN"
+no-loop
+when
+$txnInfo : POSTxnInfo(getTxnType().equals(POSTxnType.RETURN.toString()), $txnTime : getTxnTime())
+$pos : POSSkus($sku : getSkuValue(), processed == false)
+$full : FullInventory($subLevelList : getSublevel() contains $sku, $invList : getInvList(), $productIdentifier : getProductIdentifier())
+$inv : InventoryUnit($businessLocation : getBusinessLocation(), getCcResetTime() < $txnTime) from $invList
+$posObject : POSResultObject( productIdentifier.equals( $productIdentifier ), businessLocation.equals( $businessLocation ) )
+then
+ModLog.debug("in Rule: adjCount for POS RETURN");
+$posObject.setAdjCount($posObject.getAdjCount() - $pos.getQty());
+update($posObject);
+$pos.setProcessed(true);
+update($pos);
+end
+
+query "getObjectsOfPOSResultObject"
+    $result: POSResultObject()
+end

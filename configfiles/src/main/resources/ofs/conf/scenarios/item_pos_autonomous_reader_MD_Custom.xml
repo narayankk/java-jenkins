@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<scenario>
+    <property key="name">MV POS - Autonomous Reader with UI - MD Custom</property>
+    <property key="description">Autonomous reader reads EPCs, scenario marks them as sold</property>
+    <property key="scenario.type">OATAPPAREL_UIPOS</property>
+
+    <process>
+
+        <start name="Start">
+            <target exit="Exit Condition" name="CheckIsDeviceEnabled"></target>
+        </start>
+
+        <activity name="CheckIsDeviceEnabled" resource="class:com.oatsystems.workflow.primitives.CheckIsDeviceEnabled">
+            <target name="GetCollationConfiguration" exit="enabled"/>
+            <target name="End" exit="disabled"/>
+            <target name="End" exit="error"/>
+            <input  name="readerLocationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+        </activity>
+
+        <!-- Inject a timeout event BEFORE the looping starts at SetActionSales -->
+        <activity name="GetCollationConfiguration" resource="class:com.oatsystems.solutions.apparel.primitives.GetPOSEPCCollationConfiguration">
+            <target name="SetActionSales" exit="done"/>
+            <target name="SetActionSales" exit="error"/>
+            <output name="epcCollationTimeoutMs" class="java.lang.String">${process.epcCollationTimeoutMs}</output>
+            <output name="epcBatchSize" class="java.lang.Integer">${process.epcBatchSize}</output>
+        </activity>
+
+        <activity name="SetActionSales" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="SetEncodeStatus" exit="done"/>
+            <target name="SetEncodeStatus" exit="error"/>
+            <input name="value" class="java.lang.String">SALES</input>
+            <output name="variable" class="java.lang.String">${process.action}</output>
+        </activity>
+        
+        <activity name="SetEncodeStatus" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="SetReadTimeout" exit="done"/>
+            <target name="SetReadTimeout" exit="error"/>
+            <input name="value" class="java.lang.String">STATUS</input>
+            <output name="variable" class="java.lang.String">${process.encodeStatus}</output>
+        </activity>
+
+        <activity name="SetReadTimeout" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="SetProductId" exit="done"/>
+            <target name="SetProductId" exit="error"/>
+            <input name="value" class="java.lang.String">120000</input>
+            <output name="variable" class="java.lang.String">${process.timeWindowPerItem}</output>
+        </activity>    
+        
+        <activity name="SetProductId" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="GetSiteIdForLocation" exit="done"/>
+            <target name="GetSiteIdForLocation" exit="error"/>
+            <input name="value" class="java.lang.String">0</input>
+            <output name="variable" class="java.lang.String">${process.garmentProductId}</output>
+        </activity>
+
+        <activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+            <target name="WaitForEpcReads" exit="done" />
+            <target name="WaitForEpcReads" exit="error" />
+            <input  name="locationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+            <output name="siteId" class="java.lang.String">${process.siteId}</output>
+            <output name="siteName" class="java.lang.String">${process.siteName}</output>
+        </activity>
+
+        <wait name="WaitForEpcReads">    
+            <event name="epc_ui_enter" target="ReadSmootherCheckIfValidEPC">
+                <param name="epc" class="java.lang.String">${process.garmentEpc}</param>
+                <param class="java.util.Map" name="payload">${process.epcPayload}</param>
+                <property key="ui.invisibleWhenInactive">true</property>
+                <property key="ui.invisibleWhenWaitConditionFalse">true</property>
+                <property key="waitCondition">true</property>
+                <property key="ui.jsp">/workflow/floor_ui/event_tiles/enter_epc_encode_status.jsp</property>
+            </event>
+            
+            <event deferred="false" name="EPC_COLLATION_TIMEOUT" target="CheckForEPCsToSend"></event>
+
+            <event name="epc_add_read" target="ReadSmootherCheckIfValidEPC">                
+                <filter resource="filter:EpcAddEventFilter">
+                <argument name="locationEpc" class="java.lang.String">${process.readerLocationEpc}</argument>
+                </filter>
+                <param class="java.lang.String" name="epc">${process.garmentEpc}</param>
+                <param class="java.lang.String" name="timestamp">${process.timestamp}</param>
+                <param class="java.util.Map" name="payload">${process.epcPayload}</param>
+            </event>
+            
+            <event deferred="false" name="CLEAR_EPC_TIME_OUT" target="ClearEpcMap"></event>
+        </wait>
+        
+        <activity name="ReadSmootherCheckIfValidEPC" resource="class:com.oatsystems.project.workflow.primitives.ReadSmootherCheckIfValidEPC">
+            <target exit="valid" name="DeleteValidClearEPCTimeoutEvent"></target>
+            <target exit="invalid" name="DeleteClearEPCTimeoutEvent"></target>
+            <target exit="error" name="WaitForEpcReads"></target>
+            <input class="java.util.HashMap" constant="false" name="inputEpcMap" required="false">${process.epcLastSeenTimeMap}</input>
+            <input class="java.lang.String" constant="false" name="currentEpc" required="false">${process.garmentEpc}</input>
+            <input class="java.lang.String" constant="false" name="timeWindowPerItem" required="false">${process.timeWindowPerItem}</input>
+            <input class="java.lang.String" constant="false" name="inMaxTimestampSeen" required="false">${process.maxTimestampSeen}</input>
+            <output class="java.util.HashMap" constant="false" name="outputEpcMap">${process.epcLastSeenTimeMap}</output>
+            <output class="java.lang.String" constant="false" name="outMaxTimestampSeen">${process.maxTimestampSeen}</output>
+        </activity> 
+        
+
+        <!-- EPC_COLLATION_TIMEOUT flow-->
+
+        <decision name="CheckForEPCsToSend">
+            <!-- Processing should be triggered ONLY if epcArray has EPC(s); epcArray will be NULL until an epc arrives, and 
+                 epcArray is reset to NULL by CancelVars activity after processing the epcs in the array
+                 if epcArray is null or empty wait for EPCs, ideally this case should never be hit just a precaution -->
+            <case condition="${process.epcArray} eq null or ${process.epcArray}.size() lt 1" label="No EPCs in batch" target="DeleteEPCCollationTimeoutEventOnTimeout"></case>
+            <default label="EPCs in batch, process them" target="DeleteEPCCollationTimeoutEventAndStartProcessing"></default>
+        </decision>
+        
+        <!-- Deletion of timeout event after it has happened is probably not necessary.. Check! -->
+         <activity name="DeleteEPCCollationTimeoutEventOnTimeout" resource="class:com.oatsystems.workflow.primitives.DeleteTimedEvent">
+            <target name="WaitForEpcReads" exit="done"/>
+            <target name="WaitForEpcReads" exit="error"/>
+            <input name="eventID" class="java.lang.String">${process.epcCollationTimeoutEventID}</input>
+        </activity>
+
+        <!-- End EPC_COLLATION_TIMEOUT flow-->
+        
+
+        <!-- Valid EPC flow part 1-->
+        <activity name="DeleteValidClearEPCTimeoutEvent" resource="class:com.oatsystems.workflow.primitives.DeleteTimedEvent">
+            <target name="CheckEpcPayloadExist"     exit="done"/>
+            <target name="CheckEpcPayloadExist"     exit="error"/>
+            <input name="eventID" class="java.lang.String">${process.clearEPCTimeoutEventID}</input>
+        </activity>
+    
+        <!-- End Valid EPC flow part 1-->
+        
+        <!-- Invalid EPC flow-->
+        <activity name="DeleteClearEPCTimeoutEvent" resource="class:com.oatsystems.workflow.primitives.DeleteTimedEvent">
+            <target name="InjectClearEPCTimeoutEvent"     exit="done"/>
+            <target name="InjectClearEPCTimeoutEvent"     exit="error"/>
+            <input name="eventID" class="java.lang.String">${process.clearEPCTimeoutEventID}</input>
+        </activity>
+
+        <activity name="InjectClearEPCTimeoutEvent" resource="class:com.oatsystems.workflow.primitives.InjectTimedEvent">
+            <target exit="done" name="WaitForEpcReads"></target>
+            <target exit="error" name="WaitForEpcReads"></target>
+            <input class="java.lang.String" constant="true" name="eventName" required="false">CLEAR_EPC_TIME_OUT</input>
+            <input class="java.lang.String" constant="false" name="timeoutInMillis" required="false">${process.timeWindowPerItem}</input>
+            <output class="java.lang.String" constant="false" name="eventID">${process.clearEPCTimeoutEventID}</output>
+        </activity>
+    
+        <!-- End Invalid EPC flow-->
+        
+        
+        <!-- Clear EPC filter map-->
+        <!-- For 120 seconds, there has been no EPC seen, valid or invalid. Clear the read smoother map 
+            to prevent it accumulating EPCs indefinitely. -->
+        <activity name="ClearEpcMap" resource="primitive:SetVariablesToNull">
+            <target exit="done" name="WaitForEpcReads"></target>
+            <target exit="error" name="WaitForEpcReads"></target>
+            <target exit="skip" name="WaitForEpcReads"></target>
+            <output class="java.lang.Object" constant="false" name="variable0">${process.epcLastSeenTimeMap}</output>
+        </activity>  
+        <!-- End Clear EPC filter map-->
+
+<!-- Turn on Reader branch
+        <activity name="ClearDisplayVars" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">            
+            <target exit="done" name="WaitForEpcReads"></target>
+            <target exit="error" name="WaitForEpcReads"></target>
+            <target exit="skip" name="WaitForEpcReads"></target>
+            <output class="java.lang.Object" constant="false" name="variable0">${process.epcList}</output>
+            <output class="java.lang.Object" constant="false" name="variable1">${process.itemMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable2">${process.productMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable3">${process.movementWindowList}</output>
+            <output class="java.lang.Object" constant="false" name="variable4">${process.movementWindowMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable5">${process.epcArray}</output>
+            <output class="java.lang.Object" constant="false" name="variable6">${process.skuCount}</output>
+        </activity>
+-->
+
+<!-- Commenting out product inference
+        <call name="IdentifyGarmentProduct" resource="itemsub_recvidentifygarment_custom.xml" namespace="rcigInSession">
+            <target exit="PRODUCTFOUND" name="CheckEpcPayloadExist"/>
+            <target exit="PRODUCTNOTFOUND" name="WaitForEpcReads"/>
+            <target exit="ERROR" name="WaitForEpcReads"/>
+            <input name="epc" class="java.lang.String">${process.garmentEpc}</input>
+            <input name="putawayLocationEpc" class="java.lang.String"></input>
+            <input name="productLinkMethod" class="java.lang.String">${process.productLinkMethod}</input>
+            <output name="productId" class="java.lang.String">${process.garmentProductId}</output>
+            <input name="productMaster" class="java.util.HashMap">${process.productMaster}</input>
+            <output name="productMaster" class="java.util.HashMap">${process.productMaster}</output>
+        </call>
+-->
+        
+        <!-- Process EPC branch -->
+
+        <decision name="CheckEpcPayloadExist">
+            <case condition="${process.epcPayload} ne null and ${process.epcPayload}.size() ne 0 and ${process.epcPayload}.get(${process.encodeStatus}) ne null" label="payload_exist" target="CheckTagEncodeStatus"></case>
+            <default label="payload_not_exist" target="AddItemToCollection"></default>
+        </decision>
+        
+        <decision name="CheckTagEncodeStatus">
+            <case condition="${process.epcPayload}.get(${process.encodeStatus}).equalsIgnoreCase('failure')" label="tag_encoding_failed" target="SetAttributesForLogTagEncodeStatus"></case>
+            <default label="tag_encoded_succcessfully" target="AddItemToCollection"></default>
+        </decision>
+    
+        <activity name="SetAttributesForLogTagEncodeStatus" resource="primitive:CreateListOfStrings">
+          <target name="LogTagEncodeStatus" exit="done" />
+          <target name="LogTagEncodeStatus" exit="error" />
+          <input name="attribute0" class="java.lang.String">${process.garmentEpc}</input>
+          <input name="attribute1" class="java.lang.String">${process.epcPayload}.get(${process.encodeStatus})</input>
+          <input name="attribute2" class="java.lang.String">${process.epcPayload}.get("ERROR_MSG")</input>
+          <input name="attribute3" class="java.lang.String">${process.timestamp}</input>
+          <output name="outputList" class="java.util.List">${process.processErrorAtr}</output>
+        </activity>
+    
+        <activity name="LogTagEncodeStatus" resource="primitive:LogProcessError">
+          <target name="AddItemToCollection" exit="done" />
+          <target name="AddItemToCollection" exit="error" />
+          <input name="errorCode" class="java.lang.String">ENCODE_FAIL_ITEM</input>
+          <input name="errorDesc" class="java.lang.String">"POS tag encode failed"</input>
+          <input name="locationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+          <input name="attributes" class="java.util.List">${process.processErrorAtr}</input>
+        </activity>
+        
+        <activity name="AddItemToCollection" resource="class:com.oatsystems.solutions.apparel.primitives.AddItemToCollection">
+            <target name="DecideIfBatchSizeMet"     exit="done"/>
+            <target name="CancelVars"     exit="error"/>
+            <input name="epc" class="java.lang.String">${process.garmentEpc}</input>
+            <input name="productId" class="java.lang.String">${process.garmentProductId}</input>
+            <input name="movementBlockWindowSize" class="java.lang.String">10</input>
+            <input name="epcList" class="java.util.List">${process.epcList}</input>
+            <input name="itemMap" class="java.util.HashMap">${process.itemMap}</input>
+            <input name="productMap" class="java.util.HashMap">${process.productMap}</input>
+            <input name="movementWindowList" class="java.util.List">${process.movementWindowList}</input>
+            <input name="movementWindowMap" class="java.util.HashMap">${process.movementWindowMap}</input>
+            <output name="epcList" class="java.util.List">${process.epcList}</output>
+            <output name="itemMap" class="java.util.HashMap">${process.itemMap}</output>
+            <output name="productMap" class="java.util.HashMap">${process.productMap}</output>
+            <output name="movementWindowList" class="java.util.List">${process.movementWindowList}</output>
+            <output name="movementWindowMap" class="java.util.HashMap">${process.movementWindowMap}</output>
+            <output name="epcArray" class="[Ljava.lang.String;" >${process.epcArray}</output>
+            <output name="epcCount" class="java.lang.String" >${process.epcCount}</output>
+            <output name="skuCount" class="java.lang.String" >${process.skuCount}</output>
+        </activity>
+
+        <decision name="DecideIfBatchSizeMet">
+            <!-- On epcRead event flow, processing should be triggered ONLY if epcArray has the expected batch of EPC(s)
+                 Case 1:  on the epcRead event of first EPC and epcBatchSize is 1, i.e. batching is not needed process the EPC
+                 Case 2:  on the epcRead event of first EPC and epcBatchSize is greater than 1 start EPC_COLLATION_TIMEOUT event and wait for additional EPCs
+                 Case 3:  on the epcRead event of Nth EPC, where N is the epcBatchSize, delete EPC_COLLATION_TIMEOUT event an process the EPCs in the array
+                 default: on the epcRead event of 2nd to (N-1) EPC, wait for additional EPCs, 
+                 Incase Case 3 is not hit on the epcRead event flow, on EPC_COLLATION_TIMEOUT event CheckForEPCsToSend activity will trigger the processing -->
+            <case condition="${process.epcArray} ne null and ${process.epcBatchSize} eq 1 
+                                                         and ${process.epcArray}.size() eq ${process.epcBatchSize}" label="non batching start processing" target="SetProcessing"></case>
+            <case condition="${process.epcArray} ne null and ${process.epcBatchSize} gt 1 
+                                                         and ${process.epcArray}.size() eq 1" label="first epc in batch" target="InjectEPCCollationTimeoutEventOnFirstEPC"></case>
+            <case condition="${process.epcArray} ne null and ${process.epcArray}.size() eq ${process.epcBatchSize}" label="batch size met" target="DeleteEPCCollationTimeoutEventAndStartProcessing"></case>
+            <default label="batch size not met" target="WaitForEpcReads"></default>
+
+        </decision>
+        
+        <activity name="InjectEPCCollationTimeoutEventOnFirstEPC" resource="class:com.oatsystems.workflow.primitives.InjectTimedEvent">
+            <target exit="done" name="WaitForEpcReads"></target>
+            <target exit="error" name="WaitForEpcReads"></target>
+            <input class="java.lang.String" constant="true" name="eventName" required="false">EPC_COLLATION_TIMEOUT</input>
+            <input class="java.lang.String" constant="false" name="timeoutInMillis" required="false">${process.epcCollationTimeoutMs}</input>
+            <output class="java.lang.String" constant="false" name="eventID">${process.epcCollationTimeoutEventID}</output>
+        </activity>
+        
+        <!-- Delete EPC collation timeout before start processing -->
+         <activity name="DeleteEPCCollationTimeoutEventAndStartProcessing" resource="class:com.oatsystems.workflow.primitives.DeleteTimedEvent">
+            <target name="SetProcessing" exit="done"/>
+            <target name="SetProcessing" exit="error"/>
+            <input name="eventID" class="java.lang.String">${process.epcCollationTimeoutEventID}</input>
+        </activity>
+
+        <activity name="SetProcessing" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="LogEpcs" exit="done"/>
+            <target name="LogEpcs" exit="error"/>
+            <input name="value" class="java.lang.String">TRUE</input>
+            <output name="variable" class="java.lang.String">${process.processing}</output>
+        </activity>
+
+        <call name="LogEpcs" resource="item_pos_sub_process_MD_Custom.xml" namespace="logEpcsPos">
+            <target exit="DONE" name="SetFinishedProcessing"/>
+            <target exit="ERROR" name="SetFinishedProcessing"/>
+            <input name="epcArray" class="[Ljava.lang.String;">${process.epcArray}</input>
+            <input name="action" class="java.lang.String">${process.action}</input>
+            <input name="posRpEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+            <input name="soldReasonCodeId" class="java.lang.String">${process.soldReasonCodeId}</input>
+            <input name="siteId" class="java.lang.String">${process.siteId}</input>
+        </call>
+        
+        <!-- Valid EPC flow part 2-->
+
+        <activity name="SetFinishedProcessing" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="CancelVars" exit="done"/>
+            <target name="CancelVars" exit="error"/>
+            <input name="value" class="java.lang.String">FALSE</input>
+            <output name="variable" class="java.lang.String">${process.processing}</output>
+        </activity>
+
+        <activity name="CancelVars" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+            <target exit="done" name="InjectValidClearEPCTimeoutEvent"></target>
+            <target exit="error" name="InjectValidClearEPCTimeoutEvent"></target>
+            <target exit="skip" name="InjectValidClearEPCTimeoutEvent"></target>            
+            <output class="java.lang.Object" constant="false" name="variable0">${process.epcList}</output>
+            <output class="java.lang.Object" constant="false" name="variable1">${process.itemMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable2">${process.productMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable3">${process.movementWindowList}</output>
+            <output class="java.lang.Object" constant="false" name="variable4">${process.movementWindowMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable5">${process.epcArray}</output>
+            <output class="java.lang.Object" constant="false" name="variable6">${process.skuCount}</output>
+            <output class="java.lang.Object" constant="false" name="variable7">${process.action}</output>            
+            <output class="java.lang.Object" constant="false" name="variable8">${process.epcPayload}</output>
+        </activity>
+        
+<!-- 
+         <activity name="DeleteTimeoutEvent" resource="class:com.oatsystems.workflow.primitives.DeleteTimedEvent">
+            <target name="InjectValidClearEPCTimeoutEvent"     exit="done"/>
+            <target name="InjectValidClearEPCTimeoutEvent"     exit="error"/>
+            <input name="eventID" class="java.lang.String">${process.timeoutEventID}</input>
+        </activity>
+-->
+ 
+        <!-- Valid EPC flow part 2-->
+        <activity name="InjectValidClearEPCTimeoutEvent" resource="class:com.oatsystems.workflow.primitives.InjectTimedEvent">
+            <target exit="done" name="SetActionSales"></target>
+            <target exit="error" name="SetActionSales"></target>
+            <input class="java.lang.String" constant="true" name="eventName" required="false">CLEAR_EPC_TIME_OUT</input>
+            <input class="java.lang.String" constant="false" name="timeoutInMillis" required="false">${process.timeWindowPerItem}</input>
+            <output class="java.lang.String" constant="false" name="eventID">${process.clearEPCTimeoutEventID}</output>
+        </activity>
+        <!-- End Valid EPC flow part 2-->
+
+        <end name="End"></end>        
+    </process>
+    
+    <config>
+
+        <var class="java.lang.String" name="${process.readerLocationEpc}">
+            <property key="ui.group">Locations</property>
+            <property key="ui.label">RFID antenna readpoint location</property>
+            <property key="ui.list"><![CDATA[
+                <source="listsource:LocationWithDevicesListSource"/>
+            ]]></property>
+            <property key="ui.required">true</property>
+            <property key="doc">DEVICERFIDREADER</property>
+        </var>
+
+<!-- 
+        <var class="java.lang.String" name="${process.movementBlockWindowSize}">
+            <property key="ui.group">Display</property>
+            <property key="ui.label">For timeline view, garments received are displayed in blocks. Block size in minutes (Not really used in this application)</property>
+            <property key="ui.required">true</property>
+            <property key="ui.input"><![CDATA[
+            <textinput default="10" type="LongID"/>
+            ]]></property>
+        </var>
+ -->
+        <var class="java.lang.String" name="${process.soldReasonCodeId}">
+            <property key="ui.label">Sold Reason ID</property>
+            <property key="ui.group">Resason Codes</property>
+            <property key="ui.required">true</property>
+            <property key="ui.list"><![CDATA[
+                <source="class:com.oatsystems.raf.config.RetirementReasonIdListSource"/>
+            ]]></property>
+            <property key="doc">CONTAINEREPCREADASDETECTED</property>
+        </var>
+ 
+        <var class="java.lang.String" name="${process.maxReaderOnTime}">
+            <property key="doc">TIME_IN_MS</property>
+            <property key="ui.group">Display Config</property>
+            <property key="ui.input"><![CDATA[ 
+            <textinput default="10000" type="SmallerString"/>
+            ]]> </property>
+            <property key="ui.isconfigurable">true</property>
+            <property key="ui.label">Maximum Time in ms for automatically clearing the POS display screen</property>
+            <property key="ui.required">true</property>
+        </var>
+
+    </config>
+
+    <display/>
+<!-- 
+    <display>
+        <tile name="pos_main_ui">
+            <property key="ui.jsp">/workflow/floor_ui/display_tiles/app_pos_main_ui.jsp</property>
+        </tile>
+
+    </display>
+-->
+ 
+</scenario>
+

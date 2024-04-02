@@ -1,0 +1,518 @@
+<configuration>
+    <property name="epc">FFFFFFFFFFFFFFF0001F0001</property>
+    <property name="AMS_PARAM_LOOKUP_CLASS">com.oatsystems.ams.util.CMSproperties</property>
+    <property name="AMS_SLEEP_TIME">120000</property>
+    <property name="AMS_SMTP_HOST">localhost</property>
+    <property name="AMS_SMTP_PORT">25</property>
+    <property name="AMS_AUTHENTICATION">false</property>\
+   <!-- commented out because they are not mandatory, but if they are present they require strings longer then 5 caracters 
+    If somebody knows default values that can pass validation these two can be populate. They can not be empty strings per current validation -->
+   <!--
+    <property name="AMS_USER_NAME"/>
+    <property name="AMS_PASSWORD"/>
+    -->
+    <property name="AMS_SENDERS_EMAIL">postmaster@localhost.localdomain</property>
+    <property name="AMS_DB_CONN_CLASS">com.oatsystems.util.AMSUtil</property>
+    <property name="AMS_DB_CONN_METHOD">getAMSDBConnection</property>
+    <property name="AMS_DB_SERVER">sqlserver</property>
+    <property name="AMS_LOGGER_CLASS">com.oatsystems.util.ModLog</property>
+    <property name="AMS_USE_AMS_LOGGER">ON</property>
+    <property name="AMS_COLLATED_EMAIL_SIGNATURE">Administrator, Alert Management System</property>
+    <property name="AMS_MAX_NO_OF_TIMES_TO_SEND_FAILED_ALERTS">4</property>
+    <property name="AMS_ENTERPRISE_OID">1.3.6.1.4.1.18454</property>
+    <property name="AMS_AGENT_ADDRESS">localhost</property>
+    <property name="AMS_AGENT_PORT">161</property>
+    <property name="AMS_MANAGEMENT_HOST">192.168.1.61</property>
+    <property name="AMS_MANAGEMENT_PORT">162</property>
+    <property name="AMS_GENRIC_TRAP_TYPE">6</property>
+    <property name="AMS_SPECIFIC_TRAP_TYPE">22</property>
+    <property name="smx_alerts_threshold">60000</property>
+    <property name="smx_alerts_number">2</property>
+    <property name="smx_alerts_free_time">1800</property>
+    <property name="MonitoringHandlers">history,alerts,ems</property>
+    <property name="StatusQueue">main_queue</property>
+    
+    <group name="ems">
+        <group id="main_queue" name="queue">
+            <property name="sequence_number">29</property>
+            <property name="type">opaque</property>
+            <property name="size">100000</property>
+            <property name="scope">public</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">raw_logger</property>
+                </group>
+                <group id="2" name="consumer">
+                    <property name="name">Read-Smoother</property>
+                </group>
+                <group id="3" name="consumer">
+                    <property name="name">DigitalInputLogger</property>
+                </group>
+                <!-- <group name="consumer" id="4">
+                    <property name="name">RawReadFilter</property>
+                </group> -->
+            </group>
+        </group>
+        
+        <group id="dms_adapter_manager" name="dynamicUnit">
+            <property name="sequence_number">31</property>
+            <property name="class_name">com.oatsystems.dms.reader.adapter.EmsAdapterManagerProxy</property>
+            <property name="args"></property>
+            <group name="output"></group>
+        </group>
+        
+        <group id="raw_logger" name="logger">
+            <property name="description">raw logger</property>
+            <property name="sequence_number">27</property>
+            <property name="class_name">com.oatsystems.ems.logger.FileLogger</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.logger.FileLogger&quot; file_name=&quot;raw.log&quot; logger_type=&quot;FileLogger&quot;</property>
+            <property name="logger_type">FileLogger</property>
+            <property name="file_name">raw.log</property>
+            <group name="output"></group>
+        </group>
+        
+        <group id="_Read-Smoother__Add_Events" name="queue">
+            <property name="description">Hidden Queue For Filter Read-Smoother</property>
+            <property name="sequence_number">24</property>
+            <property name="type">opaque</property>
+            <property name="size">10000</property>
+            <property name="mode">synchronous</property>
+            <property name="scope">private</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">smooth_queue</property>
+                </group>
+            </group>
+        </group>
+        
+        <group id="_Read-Smoother__Remove_Events" name="queue">
+            <property name="description">Hidden Queue For Filter Read-Smoother</property>
+            <property name="sequence_number">25</property>
+            <property name="type">opaque</property>
+            <property name="size">10000</property>
+            <property name="mode">synchronous</property>
+            <property name="scope">private</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">smooth_queue</property>
+                </group>
+            </group>
+        </group>
+        
+        <group id="Read-Smoother" name="filter">
+            <property name="description">read smoother</property>
+            <property name="sequence_number">26</property>
+            <property name="class_name">com.oatsystems.ems.physical.ReadSmoother</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.physical.ReadSmoother&quot; db_conn_prefix=&quot;senseware&quot; default_loop_threshold=&quot;0&quot; default_time_threshold=&quot;5000&quot; filter_type=&quot;read_smoother&quot; poll_time=&quot;200&quot;</property>
+            <property name="filter_type">read_smoother</property>
+            <property name="default_time_threshold">5000</property>
+            <property name="poll_time">200</property>
+            <property name="db_conn_prefix">senseware</property>
+            <property name="default_loop_threshold">0</property>
+            <group name="output">
+               <group id="1" name="consumer">
+                    <property name="name">_Read-Smoother__Add_Events</property>
+                </group>
+                <group id="2" name="consumer">
+                    <property name="name">_Read-Smoother__Remove_Events</property>
+                </group>
+            </group>
+        </group>
+        
+        <group id="_location_filter__Add_Events" name="queue">
+            <property name="description">Hidden Queue For Filter location_filter</property>
+            <property name="sequence_number">20</property>
+            <property name="type">opaque</property>
+            <property name="size">10000</property>
+            <property name="mode">synchronous</property>
+            <property name="scope">private</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">Physical_Queue</property>
+                </group>
+            </group>
+            <property name="name">queue__location_filter__Add_Events</property>
+        </group>
+        
+        <group id="_location_filter__Remove_Events" name="queue">
+            <property name="description">Hidden Queue For Filter location_filter</property>
+            <property name="sequence_number">21</property>
+            <property name="type">opaque</property>
+            <property name="size">10000</property>
+            <property name="mode">synchronous</property>
+            <property name="scope">private</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">Physical_Queue</property>
+                </group>
+            </group>
+        </group>
+        
+        <group id="location_filter" name="filter">
+            <property name="description">loc filter</property>
+            <property name="sequence_number">22</property>
+            <property name="class_name">com.oatsystems.ems.physical.LocationFilter</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.physical.LocationFilter&quot; db_conn_prefix=&quot;senseware&quot; db_location_table=&quot;location&quot; filter_type=&quot;location_filter&quot;</property>
+            <property name="filter_type">location_filter</property>
+            <property name="db_location_table">location</property>
+            <property name="db_conn_prefix">senseware</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">_location_filter__Add_Events</property>
+                </group>
+                <group id="2" name="consumer">
+                    <property name="name">_location_filter__Remove_Events</property>
+                </group>
+            </group>
+        </group>
+        
+        <!-- <group name="filter" id="ZoneFilter">
+            <property name="filter_type">CustomFilter</property>
+            <property name="sequence_number">19</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.physical.zoning.ZoneFilter&quot;
+            </property>
+            <property name="description">
+                Zone filter for RTLS events
+            </property>
+            <property name="class_name">
+                com.oatsystems.ems.physical.zoning.ZoneFilter
+            </property>
+            <property name="unit_type">filter</property>
+            <property name="num_of_outputs">2</property>
+            <group name="output">
+                <group name="consumer" id="1">
+                    <property name="name">
+                        _ZoneFilter__Output_1
+                    </property>
+                </group>
+                <group name="consumer" id="2">
+                    <property name="name">
+                        _ZoneFilter__Output_2
+                    </property>
+                </group>
+            </group>
+        </group>
+        
+        <group name="queue" id="_ZoneFilter__Output_1">
+            <property name="type">opaque</property>
+            <property name="sequence_number">18</property>
+            <property name="scope">private</property>
+            <property name="mode">synchronous</property>
+            <property name="description">Queue for ZoneFilter</property>
+            <property name="unit_type">queue</property>
+            <property name="size">1000</property>
+            <group name="output">
+                <group name="consumer" id="1">
+                    <property name="name">Physical_Queue</property>
+                </group>
+            </group>
+        </group>
+        
+        <group name="queue" id="_ZoneFilter__Output_2">
+            <property name="type">opaque</property>
+            <property name="sequence_number">4</property>
+            <property name="scope">private</property>
+            <property name="mode">synchronous</property>
+            <property name="description">Queue for ZoneFilter</property>
+            <property name="unit_type">queue</property>
+            <property name="size">1000</property>
+            <group name="output">
+                <group name="consumer" id="1">
+                    <property name="name">visualization_logger</property>
+                </group>
+            </group>
+        </group>
+        
+        <group name="logger" id="visualization_logger">
+            <property name="sequence_number">3</property>
+            <property name="description"></property>
+            <property name="args"></property>
+            <property name="logger_type">CustomLogger</property>
+            <property name="unit_type">logger</property>
+            <property name="class_name">com.oatsystems.ems.physical.zoning.VisualizationLogger</property>
+            <group name="output"></group>
+        </group>
+        
+        <group id="_Association_Filter__Association_Events" name="queue">
+            <property name="description">Hidden Queue For Filter Association_Filter</property>
+            <property name="sequence_number">8</property>
+            <property name="type">opaque</property>
+            <property name="size">10000</property>
+            <property name="mode">asynchronous</property>
+            <property name="scope">private</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">Association_log</property>
+                </group>  -->
+                <!-- commented out for TWO-4510 -->
+                <!--                
+                <group id="2" name="consumer">
+                    <property name="name">Inventory_Filter</property>
+                </group>
+                -->
+                <!--
+                <group id="2" name="consumer">
+                    <property name="name">db_logger</property>
+                </group>
+                <group name="consumer" id="3">
+                    <property name="name">VirtualDeactivationLogger</property>
+                </group>
+            </group>
+        </group>
+        
+        <group id="Association_Filter" name="filter">
+            <property name="description">Assoc Filter</property>
+            <property name="sequence_number">9</property>
+            <property name="class_name">com.oatsystems.ems.logical.AssociationFilter2</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.logical.AssociationFilter2&quot; db_conn_prefix=&quot;senseware&quot; filter_type=&quot;association_filter&quot;</property>
+            <property name="filter_type">association_filter</property>
+            <property name="db_conn_prefix">senseware</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">_Association_Filter__Association_Events</property>
+                </group>
+            </group>
+        </group>
+
+        <group id="Association_log" name="logger">
+            <property name="description">Association Log</property>
+            <property name="sequence_number">7</property>
+            <property name="class_name">com.oatsystems.ems.logger.FileLogger</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.logger.FileLogger&quot; file_name=&quot;association.log&quot; logger_type=&quot;FileLogger&quot;</property>
+            <property name="logger_type">FileLogger</property>
+            <property name="file_name">association.log</property>
+            <group name="output"></group>
+        </group> -->
+        
+<!-- commented out for TWO-4510 -->
+<!--                
+        <group id="_Inventory_Filter__Inventory_Events" name="queue">
+            <property name="description">Hidden Queue For Filter Inventory_Filter</property>
+            <property name="sequence_number">5</property>
+            <property name="type">opaque</property>
+            <property name="size">10000</property>
+            <property name="mode">asynchronous</property>
+            <property name="scope">private</property>
+            <group name="output"></group>
+        </group>
+
+        <group id="Inventory_Filter" name="filter">
+            <property name="description">Inventory Filter</property>
+            <property name="sequence_number">6</property>
+            <property name="class_name">com.oatsystems.ems.logical.InventoryFilter</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.logical.InventoryFilter&quot; db_conn_prefix=&quot;senseware&quot; filter_type=&quot;inventory_filter&quot;</property>
+            <property name="filter_type">inventory_filter</property>
+            <property name="db_conn_prefix">senseware</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">_Inventory_Filter__Inventory_Events</property>
+                </group>
+            </group>
+        </group>
+-->
+        <group id="smooth_queue" name="queue">
+            <property name="sequence_number">23</property>
+            <property name="type">transparent</property>
+            <property name="size">10000</property>
+            <property name="mode">asynchronous</property>
+            <property name="scope">public</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">location_filter</property>
+                </group>
+            </group>
+        </group>
+        
+        <group id="_EPC_To_EMS_Convertor__Add_Remove_Events" name="queue">
+            <property name="description">Hidden Queue For Filter EPC_To_EMS_Convertor</property>
+            <property name="sequence_number">10</property>
+            <property name="type">opaque</property>
+            <property name="size">10000</property>
+            <property name="mode">asynchronous</property>
+            <property name="scope">private</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">db_logger</property>
+                </group>
+            </group>
+        </group>
+        
+        <group id="EPC_To_EMS_Convertor" name="filter">
+            <property name="description">EPCToEMSEventConvertor</property>
+            <property name="sequence_number">11</property>
+            <property name="class_name">com.oatsystems.ems.physical.EPCToEMSEventConverter</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.physical.EPCToEMSEventConverter&quot; filter_type=&quot;epc_to_ems_event_convertor&quot;</property>
+            <property name="filter_type">epc_to_ems_event_convertor</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">_EPC_To_EMS_Convertor__Add_Remove_Events</property>
+                </group>
+            </group>
+        </group>
+        
+        <group id="Physical_Queue" name="queue">
+            <property name="sequence_number">17</property>
+            <property name="type">transparent</property>
+            <property name="size">10000</property>
+            <property name="mode">asynchronous</property>
+            <property name="scope">public</property>
+            <group name="output">
+                <group id="1" name="consumer">
+                    <property name="name">add_remove_logger</property>
+                </group>
+                <group id="2" name="consumer">
+                    <property name="name">ScenariosLogger</property>
+                </group>
+                <group id="3" name="consumer">
+                    <property name="name">EPC_To_EMS_Convertor</property>
+                </group>
+                <!-- <group id="4" name="consumer">
+                    <property name="name">Association_Filter</property>
+                </group>
+                <group id="5" name="consumer">
+                    <property name="name">JMSListener</property>
+                </group>
+                <group name="consumer" id="6">
+                    <property name="name">MiddlewareAPILogger</property>
+                </group> -->
+            </group>
+        </group>
+        
+        <group id="db_logger" name="logger">
+            <property name="description">EMS Event DB Logger</property>
+            <property name="sequence_number">6</property>
+            <property name="class_name">com.oatsystems.ems.logger.EMSEventDBLogger</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.logger.EMSEventDBLogger&quot; db_conn_prefix=&quot;senseware&quot; logger_type=&quot;EMSEventDBLogger&quot;</property>
+            <property name="logger_type">EMSEventDBLogger</property>
+            <property name="db_conn_prefix">senseware</property>
+           <group name="output"></group>
+        </group>
+        
+        <group id="add_remove_logger" name="logger">
+            <property name="description">Logs add and remove events</property>
+            <property name="sequence_number">1</property>
+            <property name="class_name">com.oatsystems.ems.logger.FileLogger</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.logger.FileLogger&quot; file_name=&quot;add_remove.log&quot; logger_type=&quot;FileLogger&quot;</property>
+            <property name="file_name">add_remove.log</property>
+            <property name="logger_type">FileLogger</property>
+            <group name="output"></group>
+        </group>
+        
+        <!-- <group id="MiddlewareAPILogger" name="logger">
+            <property name="description">Logger that sends notifications to external listenners through API</property>
+            <property name="sequence_number">5</property>
+            <property name="class_name">com.oatsystems.service.dquery.notification.MiddlewareAPILogger</property>
+            <property name="args">class_name=&quot;com.oatsystems.service.dquery.notification.MiddlewareAPILogger&quot; db_conn_prefix=&quot;senseware&quot; logger_type=&quot;MiddlewareAPILogger&quot;</property>
+            <property name="logger_type">MiddlewareAPILogger</property>
+            <property name="db_conn_prefix">senseware</property>
+            <group name="output"></group>
+        </group> -->
+        
+        <group id="ScenariosLogger" name="logger">
+          <property name="description">Logger that sends ems events to Deployed Scenarios</property>
+          <property name="sequence_number">14</property>
+          <property name="class_name">com.oatsystems.wfe.event.EMSRegistrar</property>
+          <property name="args"></property>
+          <property name="logger_type">CustomLogger</property>
+          <group name="output"></group>
+        </group>
+        
+       <group id="DigitalInputLogger" name="logger">
+            <property name="description">Logger that process actions taken on a specifig digital input event</property>
+            <property name="sequence_number">28</property>
+            <property name="class_name">com.oatsystems.ems.physical.dio.DigitalInputLogger</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.physical.dio.DigitalInputLogger&quot; db_conn_prefix=&quot;senseware&quot; logger_type=&quot;DigitalInputLogger&quot;</property>
+            <property name="logger_type">DigitalInputLogger</property>
+            <property name="db_conn_prefix">senseware</property>
+            <group name="output"></group>
+        </group>
+        
+        <!-- <group name="filter" id="JMSListener">
+            <property name="filter_type">CustomFilter</property>
+            <property name="sequence_number">13</property>
+            <property name="args">class_name=&quot;com.oatsystems.ems.physical.MQListenerFilter&quot; unit_type=&quot;filter&quot;</property>
+            <property name="description">Listen for events in MQ</property>
+            <property name="class_name">com.oatsystems.ems.physical.MQListenerFilter</property>
+            <property name="unit_type">filter</property>
+            <property name="num_of_outputs">1</property>
+            <group name="output">
+                <group name="consumer" id="1">
+                    <property name="name">_JMSListener__Output_1</property>
+                </group>
+            </group>
+        </group>
+        
+        <group name="queue" id="_JMSListener__Output_1">
+            <property name="type">opaque</property>
+            <property name="sequence_number">12</property>
+            <property name="scope">private</property>
+            <property name="mode">asynchronous</property>
+            <property name="description">Queue for JMSListener</property>
+            <property name="unit_type">queue</property>
+            <property name="size">10000</property>
+            <group name="output">
+                <group name="consumer" id="1">
+                    <property name="name">db_logger</property>
+                </group>
+            </group>
+       </group>
+       
+       <group name="filter" id="RawReadFilter">
+           <property name="epc">[0-9A-F]+</property>
+           <property name="filter_type">default_event_filter</property>
+           <property name="sequence_number">16</property>
+           <property name="args">class_name=&quot;org.autoidcenter.ems.filter.DefaultEventFilter&quot; epc=&quot;[0-9A-F]+&quot; event_type=&quot;(epc)&quot; filter_type=&quot;default_event_filter&quot;</property>
+           <property name="description"></property>
+           <property name="class_name">org.autoidcenter.ems.filter.DefaultEventFilter</property>
+           <property name="unit_type">filter</property>
+           <property name="event_type">(epc)</property>
+           <group name="output">
+               <group name="consumer" id="1">
+                   <property name="name">_RawReadFilter__Filtered_Events</property>
+               </group>
+           </group>
+       </group>
+       
+       <group name="queue" id="_RawReadFilter__Filtered_Events">
+           <property name="type">opaque</property>
+           <property name="sequence_number">15</property>
+           <property name="scope">private</property>
+           <property name="mode">asynchronous</property>
+           <property name="description">Queue for RawReadFilter</property>
+           <property name="unit_type">queue</property>
+           <property name="size">10000</property>
+           <group name="output">
+               <group name="consumer" id="1">
+                   <property name="name">MiddlewareAPILogger</property>
+               </group>
+           </group>
+       </group>
+       
+       <group name="logger" id="VirtualDeactivationLogger">
+           <property name="sequence_number">2</property>
+           <property name="description">Send EMS events to VirtualDeactivationService</property>
+           <property name="args"></property>
+           <property name="logger_type">CustomLogger</property>
+           <property name="unit_type">logger</property>
+           <property name="class_name">com.oatsystems.ems.logical.VirtualDeactivationLogger</property>
+           <group name="output">
+           </group>
+       </group> -->
+    </group>
+    
+    <group name="locations"></group>
+    
+    <group name="DMS">
+        <group name="Adapters"></group>
+        <group name="Devices"></group>
+        <group id="default" name="Schedule">
+
+            <group name="Resources"></group>
+           <group name="Constraints"></group>
+           <group name="Tasks"></group>
+        </group>
+    </group>
+
+    <group name="template"><group name="location"></group></group>
+</configuration>
+

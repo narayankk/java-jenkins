@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenario>
+	<property key="name">dc_session_handler subscenario for handling session</property>
+	<property key="description">Scenario session handler is a sub-scenario responsible to handle session input of scenario.</property>
+	<property key="sub_scenario">true</property>
+	<property key="parent_access">RW</property>
+	<property key="namespace">dc-recv-ship-session-sub-proc-wirama</property>
+	<property key="exits">DONE,ERROR</property>
+	<property key="inputs">logicalState, eventReceived, noOfBoxes, stationId, scenarioType, scenarioName, sessionID, sessionStopOutput, sessionStartedOutput
+	</property>
+	<property key="outputs">sessionID, noOfBoxes</property>
+
+	<process>
+		<start name="Start">
+			<target exit="All Cases" name="CheckReceivedInput"/>
+		</start>
+
+		<decision name="CheckReceivedInput">
+			<case condition="${process.eventReceived}!=null and ${process.eventReceived} eq 'SessionStarted'" label="ProcessSessionStart" target="ProcessSessionStart"/>
+			<case condition="${process.eventReceived}!=null and ${process.eventReceived} eq 'SessionStopped'" label="ProcessSessionStop" target="ProcessSessionStop"/>
+			<default label="DoNothing" target="DONE"/>
+		</decision>
+
+		<activity name="ProcessSessionStart" resource="class:com.oatsystems.solutions.apparel.primitives.StartDCSession">
+			<target exit="done" name="DecideOnPublishOutput"/>
+			<target exit="error" name="ERROR"/>
+			<target exit="handleException" name="TakeErrorAction"/>
+			<input class="java.lang.String" constant="false" name="scenarioName" required="true">${process.scenarioName}</input>
+			<input class="java.lang.String" constant="false" name="stationId" required="true">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="noOfBoxes">${process.noOfBoxes}</input>
+			<input class="java.lang.String" constant="false" name="sessionID">${process.sessionID}</input>			
+			<output class="java.lang.String" constant="false" name="noOfBoxes">${process.noOfBoxes}</output>
+			<output class="java.lang.String" constant="false" name="sessionID">${process.sessionID}</output>			
+			<output class="java.lang.String" constant="false" name="eventErrCode">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="errorDesc">${process.errorDesc}</output>			
+		</activity>
+
+		<activity name="ProcessSessionStop" resource="class:com.oatsystems.solutions.apparel.primitives.StopDCSession">
+			<target exit="done" name="DecideOnPublishOutput"/>
+			<target exit="error" name="ERROR"/>
+			<target exit="handleException" name="TakeErrorAction"/>
+			<input class="java.lang.String" constant="false" name="scenarioName" required="true">${process.scenarioName}</input>
+			<input class="java.lang.String" constant="false" name="stationId" required="true">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="noOfBoxes">${process.noOfBoxes}</input>
+			<input class="java.lang.String" constant="false" name="sessionID">${process.sessionID}</input>			
+			<output class="java.lang.String" constant="false" name="noOfBoxes">${process.noOfBoxes}</output>
+			<output class="java.lang.String" constant="false" name="sessionID">${process.sessionID}</output>			
+			<output class="java.lang.String" constant="false" name="eventErrCode">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="errorDesc">${process.errorDesc}</output>			
+		</activity>
+		
+		<activity name="TakeErrorAction" resource="class:com.oatsystems.solutions.apparel.primitives.CallErrorHandler">
+			<target exit="done" name="ResetError"/>
+			<target exit="error" name="ResetError"/>
+			<input class="java.lang.String" constant="false" name="eventErrCode" required="true">${process.eventErrCode}</input>
+			<input class="java.lang.String" constant="false" name="errorDesc" required="true">${process.errorDesc}</input>
+		</activity>	
+
+		<activity name="ResetError" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+			<target exit="done" name="DecideOnPublishOutput"/>
+			<target exit="skip" name="DecideOnPublishOutput"/>
+			<target exit="error" name="DecideOnPublishOutput"/>
+			<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="variable1">${process.errorDesc}</output>
+		</activity>
+		
+		<decision name="DecideOnPublishOutput">
+			<case condition="${process.eventReceived}!=null and ${process.eventReceived} eq 'SessionStarted'" label="PublishSessionStartOutput" target="PublishSessionStartOutput"/>
+			<case condition="${process.eventReceived}!=null and ${process.eventReceived} eq 'SessionStopped'" label="PublishSessionStopOutput" target="PublishSessionStopOutput"/>
+			<default label="DoNothing" target="DONE"/>
+		</decision>
+
+		<activity name="PublishSessionStartOutput" resource="primitive:PublishDigitalOutput">
+			<target exit="done" name="DONE"/>
+			<target exit="error" name="DONE"/>
+			<input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.sessionStartedOutput}</input>
+		</activity>
+		
+		<activity name="PublishSessionStopOutput" resource="primitive:PublishDigitalOutput">
+			<target exit="done" name="DONE"/>
+			<target exit="error" name="DONE"/>
+			<input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.sessionStopOutput}</input>
+		</activity>
+		
+		<end name="ERROR"/>
+		<end name="DONE"/>
+	</process>
+	<config/>
+	<display/>
+</scenario>  
+ 

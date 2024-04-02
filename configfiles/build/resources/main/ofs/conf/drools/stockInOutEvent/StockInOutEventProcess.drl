@@ -1,0 +1,318 @@
+package drools.stockInOutEvent;
+
+import com.oatsystems.service.inventory.event.TrackEPCEvent;
+import com.oatsystems.workflow.ApparelConstants;
+import com.oatsystems.service.utils.State;
+import com.oatsystems.util.ModLog;
+import com.oatsystems.util.ExternalSystemConstants;
+
+rule "Cross Site Inventory changes: Saleable EPCs are Counted/Received" salience 10
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.SALEABLE.getState()),
+    getDestinationState().equals(State.SALEABLE.getState()), isCrossSiteMovement(), 
+    (getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_TRACK.toString())  || 
+    getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RECV.toString())))
+   
+then
+   ModLog.info("in Rule: Cross Site Inventory changes: Saleable EPCs are Counted/Received");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN_OUT);
+  update($epcEvent);
+end
+
+rule "Cross Site Inventory changes: EPCs are Counted/Received"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.MISSING.getState()) || getSourceState().equals(State.INTRANSIT.getState()) || getSourceState().equals(State.LOANED.getState()) 
+   || getSourceState().equals(State.SHIPPED.getState()) || getSourceState().equals(State.NEW.getState()) || getSourceState().equals(State.XRECEIVED.getState())
+   ||  getSourceState().equals(State.EXITED.getState())),
+    getDestinationState().equals(State.SALEABLE.getState()), isCrossSiteMovement(), 
+    (getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_TRACK.toString())  || 
+    getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RECV.toString())))
+   
+then
+   ModLog.info("in Rule: Cross Site Inventory changes: EPCs are Counted/Received");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN);
+  update($epcEvent);
+end
+
+rule "EPCs are Missed"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.UNSEEN.getState()),
+    getDestinationState().equals(State.MISSING.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_TRACK.toString()))
+   
+then
+   ModLog.info("in Rule: EPCs are Missed");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT);
+  update($epcEvent);
+end
+
+rule "Missing EPCs are Counted"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.MISSING.getState()),
+    getDestinationState().equals(State.SALEABLE.getState()), (getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_TRACK.toString()) 
+    || getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RECV.toString()))) 
+ then
+   ModLog.info("in Rule: Missing EPCs are Counted");
+   $epcEvent.setMatched(true);
+   $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN);
+  update($epcEvent);
+end
+
+rule "Unseen EPCs is Counted/Received"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.UNSEEN.getState()),
+    getDestinationState().equals(State.SALEABLE.getState()), (getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_TRACK.toString()) 
+    	|| getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RECV.toString())))
+   
+then
+   ModLog.info("in Rule: Unseen EPCs is Counted/Received");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN);
+  update($epcEvent);
+end
+
+rule "New EPCs is Counted/Received"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.NEW.getState()),
+    getDestinationState().equals(State.SALEABLE.getState()), (getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_TRACK.toString()) 
+    || getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RECV.toString())))
+   
+then
+   ModLog.info("in Rule: New EPCs is Counted/Received");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN);
+  update($epcEvent);
+end
+
+rule "Exited EPCs is Counted/Received"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.EXITED.getState()),
+    getDestinationState().equals(State.SALEABLE.getState()), (getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_TRACK.toString()) 
+    || getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RECV.toString())))
+   then
+   ModLog.info("in Rule: Exited EPCs is Counted/Received");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN);
+  update($epcEvent);
+end
+
+rule "Retired EPC is Received"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.RETIRED.getState()),
+    getDestinationState().equals(State.SALEABLE.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RECV.toString()))
+   
+then
+   ModLog.info("in Rule: Retired EPC is Received");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN);
+  update($epcEvent);
+end
+
+rule "Non Inventory changes EPCs are Counted/Received"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.SALEABLE.getState())  || getSourceState().equals(State.INTRANSIT.getState()) || getSourceState().equals(State.LOANED.getState())),
+    getDestinationState().equals(State.SALEABLE.getState()), !isCrossSiteMovement(), 
+    (getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_TRACK.toString())  || 
+    getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RECV.toString())))
+   
+then
+   ModLog.info("in Rule: Non Inventory changes EPCs are Counted");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN_EPC);
+  update($epcEvent);
+end
+
+rule "Unseen EPC is Commissioned"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.UNSEEN.getState()),
+    getDestinationState().equals(State.SALEABLE.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_ENCODE.toString()))
+then
+   ModLog.info("in Rule: Unseen EPC is Commissioned");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN);
+  update($epcEvent);
+end
+
+
+rule "Non Inventory changes EPCs are Retired"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.UNSEEN.getState()) ||  getSourceState().equals(State.INTRANSIT.getState())  ||
+   getSourceState().equals(State.EXITED.getState())  || getSourceState().equals(State.NEW.getState()) || getSourceState().equals(State.RESERVED.getState())
+   || getSourceState().equals(State.SHIPPED.getState())), 
+   getDestinationState().equals(State.RETIRED.getState()), (getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RETIRE.toString()) ||
+   getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_POS.toString())) )
+
+then
+   ModLog.info("in Rule: Non Inventory changes EPCs are Retired");
+  $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT_EPC);
+  update($epcEvent);
+end
+
+rule "Non Inventory changes EPCs are Exited"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.UNSEEN.getState()) ||  getSourceState().equals(State.INTRANSIT.getState())  ||
+   getSourceState().equals(State.EXITED.getState())  || getSourceState().equals(State.NEW.getState()) ||  getSourceState().equals(State.MISSING.getState())
+   || getSourceState().equals(State.SHIPPED.getState()) || getSourceState().equals(State.LOANED.getState()) || getSourceState().equals(State.RESERVED.getState())), 
+   getDestinationState().equals(State.EXITED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_EXIT.toString())  )
+
+then
+   ModLog.info("in Rule: Non Inventory changes EPCs are Exited");
+  $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT_EPC);
+  update($epcEvent);
+end
+
+rule "Inventory changes EPCs are Exited"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.SALEABLE.getState()) , 
+   getDestinationState().equals(State.EXITED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_EXIT.toString())  )
+
+then
+   ModLog.info("in Rule: Non Inventory changes EPCs are Exited");
+  $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT);
+  update($epcEvent);
+end
+
+
+rule "Intransit EPCs is Retired"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.INTRANSIT.getState()), getDestinationState().equals(State.RETIRED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RETIRE.toString()) )
+   
+then
+   ModLog.info("in Rule: Intransit EPCs is Retired");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT);
+  update($epcEvent);
+end
+
+rule "Saleable EPCs is Retired"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.SALEABLE.getState()) || getSourceState().equals(State.MISSING.getState())), getDestinationState().equals(State.RETIRED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RETIRE.toString()) )
+   
+then
+   ModLog.info("in Rule: Saleable EPCs is Retired");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT);
+  update($epcEvent);
+end
+
+rule "Saleable EPCs is Sold"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.SALEABLE.getState()) || getSourceState().equals(State.MISSING.getState())), getDestinationState().equals(State.RETIRED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_POS.toString()) )
+   
+then
+   ModLog.info("in Rule: Saleable EPCs is Sold");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT);
+  update($epcEvent);
+end
+
+rule "EPCs are Shipped"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.SALEABLE.getState()) , 
+   getDestinationState().equals(State.SHIPPED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_SHIP.toString()) )
+   
+then
+   ModLog.info("in Rule: EPCs are Shipped");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT);
+  update($epcEvent);
+end
+
+rule "Non Inventory changes for ITEM_SHIP"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.UNSEEN.getState()) || getSourceState().equals(State.XRECEIVED.getState()) || getSourceState().equals(State.RESERVED.getState()) 
+   || getSourceState().equals(State.EXITED.getState()) || getSourceState().equals(State.MISSING.getState())) , 
+   getDestinationState().equals(State.SHIPPED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_SHIP.toString()) )
+   
+then
+   ModLog.info("in Rule: Non Inventory changes for ITEM_SHIP");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT);
+  update($epcEvent);
+end
+
+rule "EPCs are Returned"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.UNSEEN.getState())  || getSourceState().equals(State.SHIPPED.getState()) 
+   || getSourceState().equals(State.RETIRED.getState()) || getSourceState().equals(State.XRECEIVED.getState()) || getSourceState().equals(State.RESERVED.getState()) 
+   || getSourceState().equals(State.EXITED.getState()) || getSourceState().equals(State.MISSING.getState())) , 
+   (getDestinationState().equals(State.SALEABLE.getState()) || getDestinationState().equals(State.RESERVED.getState())
+   || getDestinationState().equals(State.XRECEIVED.getState())), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RETURN.toString()) )
+   
+then
+   ModLog.info("in Rule: EPCs are Returned");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN);
+  update($epcEvent);
+end
+
+rule "Loaned EPCs is Retired"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.LOANED.getState()), getDestinationState().equals(State.RETIRED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RETIRE.toString()) )
+   
+then
+   ModLog.info("in Rule: Loaned EPCs is Retired");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT);
+  update($epcEvent);
+end
+
+rule "Non Inventory Changes: EPCs are Reserved"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.UNSEEN.getState()) || getSourceState().equals(State.MISSING.getState())
+   || getSourceState().equals(State.EXITED.getState())), !isCrossSiteMovement(), 
+    getDestinationState().equals(State.RESERVED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RESERVE.toString()))
+   
+then
+   ModLog.info("in Rule: Non Inventory Changes: EPCs are Reserved");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT_EPC);
+  update($epcEvent);
+end
+
+rule "Cross Site EPCs are Reserved"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.UNSEEN.getState()) || getSourceState().equals(State.SHIPPED.getState()) 
+   || getSourceState().equals(State.XRECEIVED.getState()) 
+   || getSourceState().equals(State.MISSING.getState()) || getSourceState().equals(State.EXITED.getState())), isCrossSiteMovement(), 
+    getDestinationState().equals(State.RESERVED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RESERVE.toString()))
+   
+then
+   ModLog.info("in Rule: Cross Site EPCs are Reserved");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT_EPC);
+  update($epcEvent);
+end
+
+rule "Saleable EPCs are Reserved"
+when
+   $epcEvent : TrackEPCEvent( getSourceState().equals(State.SALEABLE.getState()), 
+   getDestinationState().equals(State.RESERVED.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_RESERVE.toString()) )
+   
+then
+   ModLog.info("in Rule: Saleable EPCs are Reserved");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_OUT);
+  update($epcEvent);
+end
+
+rule "EPCs are Un-Reserved"
+when
+   $epcEvent : TrackEPCEvent( (getSourceState().equals(State.UNSEEN.getState()) || getSourceState().equals(State.RESERVED.getState())), 
+    getDestinationState().equals(State.SALEABLE.getState()), getProcessType().equals(ApparelConstants.PROCESS_TYPE_ITEM_UNRESERVE.toString()))
+   
+then
+   ModLog.info("in Rule: EPCs are Un-Reserved");
+   $epcEvent.setMatched(true);
+  $epcEvent.setEventType(ExternalSystemConstants.EVENT_TYPE_IN);
+  update($epcEvent);
+end
+
+query "getEpcEventObject"
+    $result: TrackEPCEvent()
+end

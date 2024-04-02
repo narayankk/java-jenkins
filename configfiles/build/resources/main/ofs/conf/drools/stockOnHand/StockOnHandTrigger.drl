@@ -1,0 +1,31 @@
+package drools.stockOnHand;
+import com.checkpt.rest.service.StockOnHandTriggers;
+import com.oatsystems.util.ModLog;
+
+
+rule "All Triggers Enabled"
+no-loop
+when
+$obj : StockOnHandTriggers(totalCount > failedCount)
+then
+$obj.setICREnabled(true);
+$obj.setDTViaSOHEnabled(true);
+ModLog.info("StockOnHandTriggerDroolsService: triggers enabled");
+update($obj);
+end
+
+rule "All Triggers Disabled"
+no-loop
+when
+$obj : StockOnHandTriggers(totalCount == failedCount)
+then
+$obj.setICREnabled(false);
+$obj.setDTViaSOHEnabled(false);
+ModLog.info("StockOnHandTriggerDroolsService: triggers disabled as all the records of SOH are invalid");
+update($obj);
+end
+
+
+query "getAllSOHTriggers"
+    $result: StockOnHandTriggers()
+end

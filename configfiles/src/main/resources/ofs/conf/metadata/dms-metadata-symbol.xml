@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+  <table name="dms_device">
+
+    <entity type="SymbolScannerLS4000i" extends="BarcodeScanner">
+      <locator-option value="Symbol Scanner LS4000i" is-default="true">Symbol Scanner LS4000i</locator-option>
+
+      <label>Symbol Scanner LS4000i</label>
+      <description>Symbol Scanner LS4000i Configuration </description>
+      <property key="DefaultTimeOut" is-mandatory="false">
+	<label>Default Time Out</label>
+	<description>Default time-out value.  Integer between 1 and 60000</description>
+	<type-definition>oat:ScannerTimeoutMillis</type-definition>
+	<select is-bound="false">
+	  <option value="2000" is-default="true">2000</option>
+	</select>
+      </property>
+      <property key="PollInterval" is-mandatory="false">
+	<label>Poll Interval</label>
+	<description>Time to Sleep between two consecutive polls. Integer between 1 and 60000.</description>
+	<type-definition>oat:SymbolPollInterval</type-definition>
+	<select is-bound="false">
+	  <option value="20" is-default="true">20</option>
+	</select>
+      </property>
+    </entity>
+
+  </table>
+</meta-data>

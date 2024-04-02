@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<scenario>
+  <property key="name">item_all_cc subscenario for processing counted and stored EPCs</property>
+  <property key="description">Associate a set of tags to the specified location.</property>
+  <property key="sub_scenario">true</property>
+  <property key="parent_access">RW</property>
+  <property key="namespace">all_cc-sub-proc</property>
+  <property key="exits">DONE,ERROR</property>
+  <property key="inputs">
+     tags,processType,processSubType,user,
+     parentLocationEpc,readPointEpc,
+     processStartTime,processEndTime,
+     ccDetailID,
+     isCombined,isCCAcceptanceFromUI,acceptedByUser,acceptanceStatus,
+     isWholeStoreCC,defaultBLLocEpcForSite,defaultRPLocEpcForSite,
+     useStoredProc,isAuthoritative,
+     processedMap,filterExpression,filterName,msgRecvTimeMillis,isManualAcceptance,intInvAdjList,processID,callAutoretirement
+  </property>
+  <property key="outputs">failedEpcs,processedMap,isWholeStoreCC</property>
+  
+  <process>
+
+    <start name="Start">
+        <target exit="All Cases" name="DecideIfWholeStoreCCSet"></target>
+    </start>
+
+    <!-- If isWholeStoreCC is already set to true, this was an auto-accepted whole store CC.
+    	 If not set, check if it could be a whole store CC accepted from CC Acceptance report. -->
+    <decision name="DecideIfWholeStoreCCSet">
+      <!-- If whole store CC, do not use the stored proc. Stored proc slows down quite a bit if used with a list of locations
+           instead of at one location. -->
+      <case condition="(${process.isWholeStoreCC} eq 'T')" label="Whole Store CC, auto-accepted" target="DecideOnGettingMissingBLRPs"></case>
+      <default label="May or may not be whole store CC; need to check" target="GetSiteIdForLocation"></default>
+    </decision>
+
+    <activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+      <target name="DecideIfCCLocIsSite" exit="done" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+      <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+      <output name="siteId" class="java.lang.String">${process.ccLocSiteId}</output>
+      <output name="siteEpc" class="java.lang.String">${process.ccLocSiteEpc}</output>
+      <output name="siteName" class="java.lang.String">${process.ccLocSiteName}</output>
+      <output name="locSubtype" class="java.lang.String">${process.ccLocSubtype}</output>
+    </activity>
+
+    <decision name="DecideIfCCLocIsSite">
+      <case condition="(${process.parentLocationEpc} eq ${process.ccLocSiteEpc})" label="CC loc is site; whole store CC with manual acceptance" target="SetCCWholeStore"></case>
+      <default label="CC loc is not site; normal processing" target="DecideOnGettingMissingBLRPs"></default>
+    </decision>
+
+    <activity name="SetCCWholeStore" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+      <target name="GetDefaultLocForSite" exit="done"/>
+      <target name="GetDefaultLocForSite" exit="error"/>
+      <input  name="value" class="java.lang.String">T</input>
+      <output name="variable" class="java.lang.String">${process.isWholeStoreCC}</output>
+    </activity>
+
+    <activity name="GetDefaultLocForSite" resource="class:com.oatsystems.solutions.apparel.primitives.GetDefaultLocForSite" >
+      <!-- If whole store CC, do not use the stored proc. Stored proc slows down quite a bit if used with a list of locations
+           instead of at one location. -->
+      <target name="DecideOnGettingMissingBLRPs" exit="done" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+      <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+      <output name="defaultBLLocEpcForSite" class="java.lang.String">${process.defaultBLLocEpcForSite}</output>
+      <output name="defaultRPLocEpcForSite" class="java.lang.String">${process.defaultRPLocEpcForSite}</output>
+     </activity>   
+
+    <activity name="ProcessCCData" resource="class:com.oatsystems.solutions.apparel.primitives.ProcessCCData">
+      <target name="CloseCCDetail" exit="done" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+      <input  name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+      <input name="processID" class="java.lang.String">${process.processID}</input>
+	  <input  name="processType" class="java.lang.String">${process.processType}</input>
+      <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+      <input name="missingItemBL" class="java.lang.String" constant="false" required="false">${process.missingItemBLs}.get(0)</input>
+      <input name="missingItemRP" class="java.lang.String" constant="false" required="false">${process.missingItemRPs}.get(0)</input>
+	  <input  name="filterExpression" constant="false" class="java.lang.String">${process.filterExpression}</input>
+	  <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+	  <!-- MV-17398 -->
+	<input name="epcListSize" class="java.lang.String" required="false">${process.epcListSize}</input>
+    </activity>
+    
+    
+    <!-- non-SP processing starts here -->
+    
+    <decision name="DecideOnGettingMissingBLRPs">
+      <case condition="(${process.isAuthoritative}.equalsIgnoreCase('TRUE'))" label="NeedMissingBLRPs" target="GetMissingBLRPs"></case>
+      <default target="RejectOlderCCsForJava"></default>
+ 	</decision>
+
+    <activity name="GetMissingBLRPs" resource="class:com.oatsystems.solutions.apparel.primitives.GetLocationsForStateSite">	 
+      <target name="RejectOlderCCsForJava" exit="done" />	 
+      <target name="SetVariablesToNullOnError" exit="error" />	 
+      <input  name="itemState" class="java.lang.String">'Missing'</input>	 
+      <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>	 
+      <output name="blLocIds" class="java.util.List" constant="false">${process.missingItemBLIds}</output>
+      <output name="rpLocIds" class="java.util.List" constant="false">${process.missingItemRPIds}</output>
+      <output name="blLocEpcs" class="java.util.List" constant="false">${process.missingItemBLs}</output>
+      <output name="rpLocEpcs" class="java.util.List" constant="false">${process.missingItemRPs}</output>
+    </activity>	 
+ 	 
+    <activity name="RejectOlderCCsForJava" resource="class:com.oatsystems.solutions.apparel.primitives.RejectOlderCCs">
+      <target name="ProcessCCData" exit="done" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+      <input name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+      <input name="isCombined" class="java.lang.Boolean">${process.isCombined}</input>
+      <input name="acceptedProcessId" class="java.lang.String">${process.processID}</input>
+      <input name="useStoredProc" class="java.lang.String">${process.useStoredProc}</input>
+      <input name="isWholeStoreCC" class="java.lang.String">${process.isWholeStoreCC}</input>
+	  <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+    </activity>
+
+    
+    <activity name="CloseCCDetail" resource="class:com.oatsystems.solutions.apparel.primitives.CloseCCDetail">
+      <target name="DecideToCallAutoretirement" exit="done" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+      <input name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+      <input name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</input>
+      <input name="acceptedUser" class="java.lang.String">${process.acceptedByUser}</input>
+      <input name="useStoredProc" class="java.lang.String">${process.useStoredProc}</input>
+      <input  name="filterExpression" constant="false" class="java.lang.String">${process.filterExpression}</input>
+      <input name="isWholeStoreCC" class="java.lang.String">${process.isWholeStoreCC}</input>
+      <input name="isAcceptanceFromUI" class="java.lang.String">${process.isCCAcceptanceFromUI}</input>
+    </activity>
+	<decision name="DecideToCallAutoretirement">
+      <case condition="${process.callAutoretirement}.equalsIgnoreCase('TRUE') and ${process.isAuthoritative}.equalsIgnoreCase('FALSE')or ${process.isAuthoritative}.equalsIgnoreCase('F')" label="Autoretirement should be called or not" target="ProcessAutoretirement"></case>
+      <default target="RemoveCCDetailIdFromMap"/>
+ 	</decision>
+	
+	 <activity name="ProcessAutoretirement" resource="class:com.oatsystems.solutions.apparel.primitives.ProcessAutoretirement">
+      <target exit="done" name="RemoveCCDetailIdFromMap"></target>     
+      <target exit="error" name="RemoveCCDetailIdFromMap"></target>      
+      <input class="java.lang.String" constant="false" name="siteID">${process.ccLocSiteId}</input>
+	  <input name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+	  <input class="java.lang.String" constant="false" name="location">${process.parentLocationEpc}</input>
+      <input class="java.lang.String" constant="false" name="readPointEpc">${process.readPointEpc}</input>
+    </activity>
+
+    <activity name="RemoveCCDetailIdFromMap" resource="class:com.oatsystems.solutions.apparel.primitives.RemoveMapEntry">
+      <target name="SetVariablesToNull" exit="done" />
+      <input name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+      <input name="msgRecvTimeMillis" class="java.lang.Long">${process.msgRecvTimeMillis}</input>
+      <input name="processedMap" class="java.util.Map">${process.processedMap}</input>
+      <output name="processedMap" class="java.util.Map">${process.processedMap}</output>
+    </activity>
+
+    <activity name="SetVariablesToNull" resource="primitive:SetVariablesToNull">
+      <target name="DONE" exit="done" />
+      <target name="DONE" exit="skip" />
+      <target name="ERROR" exit="error" />
+      <output name="variable0" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currTag}</output>
+      <output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+      <output name="variable3" class="java.lang.Object">${process.parentLocationEpcForAssociation}</output>
+      <output name="variable4" class="java.lang.Object">${process.inferredParentLocationEpc}</output>
+      <output name="variable5" class="java.util.Collection">${process.expectedEpcs}</output>
+      <output name="variable6" class="java.lang.String">${process.childLocationCount}</output>
+      <output name="variable7" class="java.util.HashMap">${process.childLocationMap}</output>
+      <output name="variable8" class="java.lang.String">${process.defaultBLLocEpcForSite}</output>
+      <output name="variable9" class="java.lang.String">${process.defaultRPLocEpcForSite}</output>
+    </activity>
+    
+    <activity name="SetVariablesToNullOnError" resource="primitive:SetVariablesToNull">
+      <target name="ERROR" exit="done" />
+      <target name="ERROR" exit="skip" />
+      <target name="ERROR" exit="error" />
+      <output name="variable0" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currTag}</output>
+      <output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+      <output name="variable3" class="java.lang.Object">${process.parentLocationEpcForAssociation}</output>
+      <output name="variable4" class="java.lang.Object">${process.inferredParentLocationEpc}</output>
+      <output name="variable5" class="java.util.Collection">${process.expectedEpcs}</output>
+      <output name="variable6" class="java.lang.String">${process.childLocationCount}</output>
+      <output name="variable7" class="java.lang.String">${process.defaultBLLocEpcForSite}</output>
+      <output name="variable8" class="java.lang.String">${process.defaultRPLocEpcForSite}</output>
+    </activity>
+    <end name="ERROR"></end>
+    <end name="DONE"></end>
+    
+    </process>
+
+    <config/>
+
+    <display/>
+</scenario>

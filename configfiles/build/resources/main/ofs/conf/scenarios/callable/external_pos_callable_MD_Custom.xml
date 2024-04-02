@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://support.oatsystems.com/xsd/scenarios4_0.xsd">
+  <property key="version">5.1</property>
+  <property key="scenario.type">Apparel_Association</property>
+  <property key="name">External POS Retirement Callable Scenario - MD Custom</property>
+  <property key="description">This scenario associates an EPC with a given location and an appropriate status.</property>
+  
+  
+  <process>
+	<start name="Start">
+	  <target name="ResetCurrentIndex"></target>
+	</start>
+	
+	
+	<activity name="ResetCurrentIndex" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+	  <target name="ResetAdjustInventory" exit="done"/>
+	  <target name="ResetAdjustInventory" exit="error"/>
+	  <input  name="value" class="java.lang.String">''</input>
+	  <output name="variable" class="java.lang.String">${process.currentIndex}</output>  
+	</activity>
+	
+	<activity name="ResetAdjustInventory" resource="primitive:SetVariablesToNull">
+	  <target name="DecideOnInferringLocation" exit="done"/>
+	  <target name="DecideOnInferringLocation" exit="error"/>
+	  <target name="DecideOnInferringLocation" exit="skip" />
+	  <output name="variable0" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</output>
+	</activity>	
+	
+	<decision name="DecideOnInferringLocation">
+	  <case target="GetSiteIdForLocation" condition="${process.processType}.equalsIgnoreCase('ITEM_RETURN')" /> 
+	  <default target="GetSiteIdForRPLocation" />
+	</decision>
+	
+	<activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation"> 
+	   <target name="GetInferredRetirementBusinessLocation" exit="done" /> 
+	   <target name="SetError" exit="error" /> 
+	   <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input> 
+	   <output name="siteId" class="java.lang.String">${process.receivingLocSiteId}</output> 
+	   <output name="siteEpc" class="java.lang.String">${process.siteEpc}</output> 
+	   <output name="siteName" class="java.lang.String">${process.siteName}</output>
+	</activity> 
+
+	<activity name="GetSiteIdForRPLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation"> 
+	   <target name="GetInferredRetirementBusinessLocation" exit="done" /> 
+	   <target name="SetError" exit="error" /> 
+	   <input  name="locationEpc" class="java.lang.String">${process.readPointEpc}</input> 
+	   <output name="siteId" class="java.lang.String">${process.receivingLocSiteId}</output> 
+	   <output name="siteEpc" class="java.lang.String">${process.siteEpc}</output> 
+	   <output name="siteName" class="java.lang.String">${process.siteName}</output>
+	</activity>
+	
+	<activity name="GetInferredRetirementBusinessLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetInferredLocation">
+           <target name="SetParentLocationEPC" exit="done" />
+           <target name="SetError" exit="error" />
+           <input  name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+           <input  name="siteEpc" class="java.lang.String">${process.siteEpc}</input>
+           <output name="inferredParentLocationEpc" class="java.lang.String">${process.inferredParentLocationEpc}</output>
+           <output name="readPointEpc" class="java.lang.String">${process.posRpEpcDiscard}</output>
+    </activity>
+	
+	<activity name="SetParentLocationEPC" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+		<target name="StartAssociationProcess" exit="done"/>
+		<target name="SetError" exit="error"/>
+		<input  name="value" class="java.lang.String">${process.inferredParentLocationEpc}</input>
+		<output name="variable" class="java.lang.String">${process.parentLocationEpc}</output>
+	</activity>
+	
+	<activity name="StartAssociationProcess" resource="primitive:StartProcess">
+      <target name="InitialiseFailedEpcsList" exit="done" />
+      <target name="SetError" exit="error" />
+      <input name="processMasterCode" class="java.lang.String">${process.processType}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+      <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="processData6" class="java.lang.String">${process.siteEpc}</input>      
+      <input name="processData7" class="java.lang.String">${process.handheldID}</input>      
+      <input name="processData8" class="java.lang.String">${process.scenarioID}</input>      
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+	
+	<activity name="InitialiseFailedEpcsList" resource="primitive:SetVariablesToNull" >
+	  <target name="SetRPLocationBatch" exit="done" />
+	  <target name="SetRPLocationBatch" exit="skip" />
+	  <target name="SetRPLocationBatch" exit="error" />
+	  <output name="variable0" class="java.util.Set">${process.failedEpcs}</output>
+	</activity>
+	
+	<!-- Start SP Chagnes For BAtch-->
+	<activity name="SetRPLocationBatch" resource="class:com.oatsystems.solutions.apparel.primitives.SetRPLocationBatch">
+	  <target name="AssociateTagWithNullParentLocationSold" exit="done"/> 
+      <target name="AssociateTagWithNullParentLocationSold" exit="error" />
+	  <input name="readPointEpc" class="java.lang.String">${process.readPointEpc}</input>     
+      <input name="epcListArray" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</input>
+      <input name="failedEpcs" class="java.util.Set">${process.failedEpcs}</input>
+      <output name="failedEpcs" class="java.util.Set">${process.failedEpcs}</output>
+      <output name="epcList" class="java.util.List">${process.newEpcList}</output>
+    </activity>
+	
+	<!--<activity name="IterateOnTagArrayBatch" resource="class:com.oatsystems.workflow.primitives.IterateOnObjectArrayInBatch">
+       <target name="AssignContaneeListObj" exit="continue" />
+       <target name="CloseAssociationProcess" exit="break" />
+       <target name="CloseAssociationProcess" exit="error" />
+       <input name="iterationRange" class="[Ljava.lang.Object;">${process.tags}</input>
+       <input name="currentStartIndex" class="java.lang.String">${process.currentIndex}</input>
+       <input name="batchSize" class="java.lang.String">5</input>
+       <output name="currentEndIndex" class="java.lang.String">${process.currentIndex}</output>
+       <output name="currentValues" class="[Ljava.lang.String;">${process.currBatch}</output>
+     </activity>
+	<activity name="AssignContaneeListObj" resource="class:com.oatsystems.workflow.primitives.AssignContaneeListObj">
+			<target name="AssociateTagWithNullParentLocationSold" exit="done"/>
+			<target name="AssociateTagWithNullParentLocationSold" exit="error"/>     
+			<input name="epcObject" class="[Ljava.lang.String;">${process.currBatch}</input>
+			<output name="epcList" class="java.util.List">${process.epcList}</output>
+	</activity>	-->
+	
+	<activity name="AssociateTagWithNullParentLocationSold" resource="class:com.oatsystems.workflow.primitives.AssociateEpcToLocationMDBatch">
+	      <target name="PopulatePOSHistory" exit="associated" />	      
+	      <target name="CloseAssociationProcess" exit="error" />
+	      <input name="epcList" class="java.util.List">${process.newEpcList}</input>
+		  <input name="associationLocationEpc" class="java.lang.String">${process.readPointEpc}</input>	 
+	      <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>	      
+	      <input  name="processId" class="java.lang.String">${process.processID}</input>
+	      <input  name="status" class="java.lang.String">${process.soldReasonCodeId}</input>
+	      <!--<input  name="processMasterCode" class="java.lang.String">${process.processType}</input>-->
+	      <input class="java.lang.String" constant="false" name="processType" required="false">ITEM_POS</input>
+	      <input class="java.lang.String" constant="false" name="processSubType" required="false">FR</input>            
+		  <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+          <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+          <output name="invalidepcs" class="java.util.List">${process.invalidEpcs}</output>
+	    </activity>
+		
+		<activity name="PopulatePOSHistory" resource="class:com.oatsystems.solutions.apparel.primitives.PopulatePOSHistory">
+		<target  exit="done" name="CloseAssociationProcess"/>
+		<target  exit="error" name="CloseAssociationProcess" />
+		<input name="epcList" class="java.util.List">${process.newEpcList}</input>		
+		<input name="readerLocationEpc" class="java.lang.String">${process.readPointEpc}</input>
+		</activity>
+	
+	
+	
+
+	
+	<activity name="CloseAssociationProcess" resource="primitive:CloseProcess">
+      <target name="SetSuccess" exit="done" />
+      <target name="SetError" exit="error" />
+      <input name="processID" class="java.lang.String">${process.processID}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+      <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="processData6" class="java.lang.String">${process.siteEpc}</input>      
+      <input name="processData7" class="java.lang.String">${process.handheldID}</input>      
+      <input name="processData8" class="java.lang.String">${process.scenarioID}</input>      
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+	
+	
+		
+	<activity name="SetError" resource="primitive:SetVariableValue">
+      <target exit="done" name="DONE"></target>
+      <target exit="error" name="ERROR"></target>
+      <input class="java.lang.String" constant="false" name="value" required="false">"ERROR"</input>
+      <output class="java.lang.String" constant="false" name="variable">${process.errorMessage}</output>
+    </activity>
+		
+	<activity name="SetSuccess" resource="primitive:SetVariableValue">
+      <target exit="done" name="DONE"></target>
+      <target exit="error" name="ERROR"></target>
+      <input class="java.lang.String" constant="false" name="value" required="false">"SUCCESS"</input>
+      <output class="java.lang.String" constant="false" name="variable">${process.successMessage}</output>
+    </activity>
+    
+	<end name="ERROR"></end>	
+    <end name="DONE"></end>
+  </process>
+  
+  <config>
+	<var class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;" name="${process.tags}">
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.processType}">
+      <property key="ui.required">false</property>
+    </var>
+	 <var class="java.lang.String" name="${process.processSubType}">
+      <property key="ui.required">false</property>
+    </var>
+	 <var class="java.lang.String" name="${process.parentLocationEpc}">
+      <property key="ui.required">false</property>
+    </var>
+	 <var class="java.lang.String" name="${process.readPointEpc}">
+      <property key="ui.required">false</property>
+    </var>	
+	<var class="java.lang.String" name="${process.user}">
+      <property key="ui.required">false</property>
+    </var>
+	 <var class="java.lang.String" name="${process.processStartTime}">
+      <property key="ui.required">false</property>
+    </var>
+	 <var class="java.lang.String" name="${process.processEndTime}">
+      <property key="ui.required">false</property>
+    </var>
+	 <var class="java.lang.String" name="${process.elapsedTimeInSeconds}">
+      <property key="ui.required">false</property>
+    </var>
+	<var class="java.lang.String" name="${process.siteEpc}">
+      <property key="ui.required">false</property>
+    </var>
+	 <var class="java.lang.String" name="${process.handheldID}">
+      <property key="ui.required">false</property>
+    </var>
+	 <var class="java.lang.String" name="${process.scenarioID}">
+      <property key="ui.required">false</property>
+    </var>
+  </config>
+  <display/>
+</scenario>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://support.oatsystems.com/xsd/scenarios4_0.xsd">
+  <property key="version">5.1</property>
+  <property key="scenario.type">Apparel_Association</property>
+  <property key="name">POS Retirement Callable Scenario</property>
+  <property key="description">This scenario associates an EPC with a given location and an appropriate status.</property>
+  <process>
+    <start name="Start">
+      <target name="ProcessMessageIn" />
+    </start>
+
+    <activity name="ProcessMessageIn" resource="class:com.oatsystems.workflow.apparel.primitives.ProcessMessageIn">
+      <target name="SubsItemAssn" exit="done" />
+      <target name="SetFailureResult" exit="error" />
+      <input name="payload" class="java.lang.Object">${process.payload}</input>
+      <output name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</output>
+      <output name="processType" class="java.lang.String">${process.processType}</output>
+      <output name="user" class="java.lang.String">${process.user}</output>
+      <output name="processStartTime" class="java.lang.String">${process.processStartTime}</output>
+      <output name="processEndTime" class="java.lang.String">${process.processEndTime}</output>
+      <output name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</output>
+      <output name="location" class="java.lang.String">${process.parentLocationEpc}</output>
+      <output name="scenarioType" class="java.lang.String">${process.scenarioType}</output>
+    </activity>
+    
+    <call name="SubsItemAssn" resource="item_assn_sub.xml">
+      <target name="SetSuccessResult" exit="DONE"/>
+      <target name="SetFailureResult" exit="ERROR"/>
+      
+      <!--  parameters devired from message -->
+      <input name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</input>
+      <input name="processType" class="java.lang.String">${process.processType}</input>
+      <input name="user" class="java.lang.String">${process.user}</input>
+      <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input name="scenarioType" class="java.lang.String">${process.scenarioType}</input>
+      <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      
+      <!--  configure parameters -->
+      <input name="moveMissingItems" class="java.lang.String">${process.moveMissingItems}</input>
+      <input name="missingItemRP" class="java.lang.String">${process.missingItemRP}</input>
+      <input name="missingItemBL" class="java.lang.String">${process.missingItemBL}</input>
+    </call>
+	
+    <activity name="SetSuccessResult" resource="primitive:SetVariableValue">
+      <target name="End" exit="done"/>
+      <target name="End" exit="error"/>
+      <input name="value" class="java.lang.String">SUCCESS</input>
+      <output name="variable" class="java.lang.String">${process.result}</output>
+    </activity>
+	
+    <activity name="SetFailureResult" resource="primitive:SetVariableValue">
+      <target name="End" exit="done"/>
+      <target name="End" exit="error"/>
+      <input name="value" class="java.lang.String">FAILURE</input>
+      <output name="variable" class="java.lang.String">${process.result}</output>
+    </activity>
+		
+    <end name="End"></end>
+  </process>
+  <config>
+    <var name="${process.moveMissingItems}" class="java.lang.String">
+        <property key="ui.label">Should missing items be moved to another location after a cycle count?</property>
+        <property key="ui.group">Handling Missing Items</property>
+        <property key="ui.required">true</property>
+        <property key="ui.list"><![CDATA[
+            <option SELECTED value="FALSE">No</option>
+            <option value="TRUE">Yes</option>
+        ]]></property>
+        <property key="ui.enabler">moveMissingItems</property>
+        <property key="doc">CONTAINEREPCREADASDETECTED</property>
+    </var>
+    <var name="${process.missingItemBL}" class="java.lang.String">
+        <property key="ui.label">Specify business location to assign items found missing during a cycle count</property>
+        <property key="ui.group">Handling Missing Items</property>
+        <property key="ui.required">true</property>
+        <property key="ui.list"><![CDATA[
+        <source="class:com.oatsystems.workflow.config.LeafLocationBusinessLocationListSource"/>
+        ]]></property>
+        <property key="ui.enable.on">moveMissingItems:TRUE</property>
+    </var>
+    <var name="${process.missingItemRP}" class="java.lang.String">
+        <property key="ui.label">Specify read point to assign items found missing during a cycle count</property>
+        <property key="ui.group">Handling Missing Items</property>
+        <property key="ui.required">true</property>
+        <property key="ui.list"><![CDATA[
+        <source="class:com.oatsystems.workflow.config.SimpleReadPointListSource"/>
+        ]]></property>
+        <property key="ui.enable.on">moveMissingItems:TRUE</property>
+    </var>
+    <var name="${process.payload}" class="java.lang.Object"></var>
+
+  </config>
+  <display/>
+</scenario>

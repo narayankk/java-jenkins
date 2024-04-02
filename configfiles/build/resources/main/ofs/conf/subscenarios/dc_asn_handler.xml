@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+   <scenario>
+
+    <property key="name">dc_asn_handler subscenario for handling ASN</property>
+
+    <property key="description">Scenario Input handler is a sub-scenario responsible to handle configured UI input of scenario.</property>
+
+    <property key="sub_scenario">true</property>
+
+    <property key="parent_access">RW</property>
+
+    <property key="namespace">dc-recv-ship-asn-sub-proc</property>
+
+    <property key="exits">DONE,ERROR,InProgress.Reading,InProgress.StartTriggerReceived,PublishReadStopOutput,ASNCreated,StopSessionExit</property>
+
+    <property key="inputs">
+
+   logicalState,boxID,stationId,scenarioType,scenarioName,rcvPayload,asnExpected,transitLocation,processID,shipment,origNode,asnMode,checkForASN,inComingBoxID,siteName,isStopTriggerRcvd,isDelayedASN,shipToDescBarcodeMode,uiAction,allowDatabaseTransaction,publishDataToSubscribers,processEndTime,processStartTime,dummyProcessID
+
+    </property>
+
+    <property key="outputs">
+
+      shipment,boxID,logicalState,eventErrCode,errorDesc,systemCreatedPayload,origNode,isOriginalASN
+
+    </property>
+
+    
+
+    <process>
+
+  
+
+      <start name="Start">
+
+          <target exit="All Cases" name="CheckScenarioState"></target>
+
+    </start>
+
+   
+
+    <decision name="CheckScenarioState">
+
+     	<case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.Reading'" label="CreateASN" target="LoadASNFromDB"/>
+
+     	<case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.EpcAddReadUI'" label="CreateASN" target="LoadASNFromDB"/>
+
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ProcessStarted.BarcodeScanDone'" label="LoadASNFromBoxID" target="LoadASNFromDB"/>
+
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.StartTriggerReceived'" label="StartTriggerEvent" target="LoadASNFromDB"/>
+
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.ProcessStarted'" label="AddASNToQueue" target="LoadASNFromDB"/>
+
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ASNDone.ASNFound'" label="ASNMsgInEvent" target="LoadASNFromPayload"/>   
+
+       <case condition="(${process.eventErrCode}!=null and ${process.eventErrCode} eq 'MISSING_CARTON_INFO') or (${process.origNode}!=null and ${process.origNode} eq 'MISSING_CARTON_INFO_ERR') " label="UnExpectedStartTriggerEvent" target="LoadASNFromDB"/>
+
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ProcessClosed' and ${process.origNode}!=null and ${process.origNode} eq 'END_TRIGGER_POINT7'" label="UpdateASNWithProcessID" target="UpdateASN"/>
+
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'SessionStopped' and ${process.isDelayedASN}!=null and ${process.isDelayedASN} eq 'true'" label="UpdateASNWithProcessID" target="UpdateASN"/>
+
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ProcessClosed' and ${process.checkForASN} eq 'CHECK_FOR_QUEUED_ASN'" label="LoadASNFromQueue" target="LoadASNFromQueue"/>
+
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ProcessClosed'" label="UpdateASNWithProcessID" target="UpdateASN"/>
+
+       <default label="DoNothing" target="DONE"></default>
+
+    </decision> 
+
+   <activity name="LoadASNFromQueue" resource="class:com.oatsystems.solutions.apparel.primitives.CheckASNQueue">
+
+	<target exit="done" name="DecideLogicalState"></target>
+
+	<target exit="error" name="SetInternalError"></target>
+
+	<target exit="emptyQueue" name="DONE"></target>
+
+	<input class="java.lang.String" constant="false" name="asnExpected" required="true">${process.asnExpected}</input>
+
+	<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+
+	<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+
+	<input class="java.lang.String" constant="false" name="scenarioName" required="false">${process.scenarioName}</input>
+
+	<input class="java.lang.String" constant="false" name="siteName">${process.siteName}</input>
+
+	<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+
+			<input class="java.lang.String" constant="false" name="allowDatabaseTransaction" required="false">${process.allowDatabaseTransaction}</input>
+
+	<output class="java.lang.String" constant="false" name="boxID">${process.boxID}</output>
+
+	<output class="java.lang.Boolean" constant="false" name="isOriginalASN">${process.isOriginalASN}</output>
+
+	<output class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</output>
+
+	<output class="java.util.Map" constant="false" name="systemCreatedPayload">${process.systemCreatedPayload}</output>
+
+    </activity>    
+
+ <!--   <activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+
+	<target exit="done" name="LoadASNFromDB"></target>
+
+	<target exit="error" name="SetInternalError"></target>
+
+	<input class="java.lang.String" constant="false" name="locationEpc" required="true">${process.transitLocation}</input>
+
+	<output class="java.lang.String" constant="false" name="siteId">${process.siteId}</output>
+
+	<output class="java.lang.String" constant="false" name="siteEpc">${process.siteEpc}</output>
+
+	<output class="java.lang.String" constant="false" name="siteName">${process.siteName}</output>
+
+    </activity>    -->
+
+   <activity name="LoadASNFromDB" resource="class:com.oatsystems.solutions.apparel.primitives.LoadASNFromDB">
+
+	<target exit="done" name="DecideLogicalState"></target>
+
+	<target exit="queued" name="ASNCreated"></target>
+
+	<target exit="error" name="SetASNNotFoundError"></target>
+
+	<input class="java.lang.String" constant="false" name="currentBoxID" required="false">${process.boxID}</input>
+
+	<input class="java.lang.String" constant="false" name="boxID" required="false">${process.inComingBoxID}</input>
+
+	<input class="java.lang.String" constant="false" name="asnExpected" required="false">${process.asnExpected}</input>
+
+	<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+
+	<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+
+	<input class="java.lang.String" constant="false" name="scenarioName" required="false">${process.scenarioName}</input>
+
+	<input class="java.lang.String" constant="false" name="siteName">${process.siteName}</input>
+
+	<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+
+	<input class="java.lang.String" constant="false" name="processID" required="false">${process.processID}</input>
+
+	<input class="java.lang.String" constant="false" name="shipToDesc">${process.shipToDesc}</input>
+
+	<input class="java.lang.String" constant="false" name="locSubType">${process.locSubType}</input>
+
+	<input class="java.lang.String" constant="false" name="shipToDescBarcodeMode">${process.shipToDescBarcodeMode}</input>
+
+			<input class="java.lang.String" constant="false" name="allowDatabaseTransaction" required="false">${process.allowDatabaseTransaction}</input>
+
+	<output class="java.lang.String" constant="false" name="boxID">${process.boxID}</output>
+
+	<output class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</output>
+
+	<output class="java.util.Map" constant="false" name="systemCreatedPayload">${process.systemCreatedPayload}</output>
+
+    </activity>
+
+   <activity name="LoadASNFromPayload" resource="class:com.oatsystems.solutions.apparel.primitives.LoadASNFromPayload">
+
+	<target exit="done" name="DecideLogicalState"></target>
+
+	<target exit="error" name="SetASNNotFoundError"></target>
+
+	<input class="java.lang.String" constant="false" name="processID" required="true">${process.processID}</input>
+
+	<input class="java.util.Map" constant="false" name="rcvPayload">${process.rcvPayload}</input>
+
+	<input class="java.lang.String" constant="false" name="asnExpected" required="true">${process.asnExpected}</input>
+
+	<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+
+	<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+
+	<input class="java.lang.String" constant="false" name="scenarioName" required="false">${process.scenarioName}</input>	
+
+	<output class="java.lang.String" constant="false" name="boxID">${process.boxID}</output>
+
+	<output class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</output>
+
+	<output class="java.util.Map" constant="false" name="systemCreatedPayload">${process.systemCreatedPayload}</output>
+
+    </activity>   
+
+ <!--   <activity name="GetSiteIdForLocationForPayload" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+
+	<target exit="done" name="DecideLogicalState"></target>
+
+	<target exit="error" name="SetInternalError"></target>
+
+	<input class="java.lang.String" constant="false" name="locationEpc" required="true">${process.transitLocation}</input>
+
+	<output class="java.lang.String" constant="false" name="siteId">${process.siteId}</output>
+
+	<output class="java.lang.String" constant="false" name="siteEpc">${process.siteEpc}</output>
+
+	<output class="java.lang.String" constant="false" name="siteName">${process.siteName}</output>
+
+    </activity>    -->
+
+	<!-- Commented by Anurag - Fix for UpdateASN async 
+    <activity name="UpdateASN" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateASN"> -->
+	
+	<activity name="UpdateASN" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateASNAsync"> 
+
+	<target exit="done" name="ResetProcessErrorVars"></target>
+
+	<target exit="noread" name="SetNoEPCReadError"></target>
+
+	<target exit="error" name="SetInternalError"></target>
+
+	<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+
+	<input class="java.lang.String" constant="false" name="scenarioName">${process.scenarioName}</input>
+
+	<input class="java.lang.String" constant="false" name="boxID">${process.boxID}</input>
+
+	<input class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</input>
+
+	<input class="java.lang.String" constant="false" name="asnExpected" required="true">${process.asnExpected}</input>
+
+	<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+
+	<input class="java.lang.String" constant="false" name="origNode">${process.origNode}</input>
+
+	<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+
+	<input class="java.lang.String" constant="false" name="sessionID">${process.sessionID}</input>
+
+	<input class="java.lang.String" constant="false" name="generateASN">${process.generateASN}</input>
+
+	<input class="java.lang.String" constant="false" name="uiAction">${process.uiAction}</input>
+
+			<input class="java.lang.String" constant="false" name="allowDatabaseTransaction" required="false">${process.allowDatabaseTransaction}</input>
+
+			<input class="java.lang.String" constant="false" name="publishDataToSubscribers"  required="false">${process.publishDataToSubscribers}</input>
+
+			<input class="java.lang.Long" constant="false" name="processStartTime"  required="false">${process.processStartTime}</input>
+
+			<input class="java.lang.Long" constant="false" name="processEndTime"  required="false">${process.processEndTime}</input>
+
+    </activity>  
+
+   <activity name="ResetProcessErrorVars" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+
+    	<target exit="done" name="isDelayedASNUpdate"></target>
+
+    	<target exit="error" name="isDelayedASNUpdate"></target>
+
+    	<target exit="skip" name="DONE"></target>
+
+    	<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+
+    	<output class="java.lang.String" constant="false" name="variable1">${process.checkForASN}</output>
+
+	<output class="java.lang.String" constant="false" name="variable2">${process.isStopTriggerRcvd}</output>
+
+    </activity>  
+
+    <decision name="isDelayedASNUpdate">
+
+    		 <case condition="${process.isDelayedASN}!=null and ${process.isDelayedASN} eq 'true'" label="UpdateDelayedASN" target="ResetSessionErrorVars"/>
+
+    		 <default label="DoNothing" target="PublishReadStopOutput"></default>
+
+    </decision> 
+
+   <activity name="ResetSessionErrorVars" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+
+    	<target exit="done" name="StopSessionExit"></target>
+
+    	<target exit="error" name="StopSessionExit"></target>
+
+    	<target exit="skip" name="DONE"></target>
+
+    	<output class="java.lang.String" constant="false" name="variable0">${process.isDelayedASN}</output>
+
+     </activity>      
+
+    <decision name="DecideLogicalState">
+
+    	  <case condition="(${process.eventErrCode}!=null and ${process.eventErrCode} eq 'MISSING_CARTON_INFO') or (${process.origNode}!=null and ${process.origNode} eq 'MISSING_CARTON_INFO_ERR') " label="UnExpectedStartTriggerEvent" target="InProgress.StartTriggerReceived"/>
+
+    	  <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ProcessStarted.BarcodeScanDone' and ${process.scenarioType} eq 'ITEM_PACK'" label="ProcessStarted.BarcodeScanDone" target="EnsureRfidOperationMode"/>
+
+    	  <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.StartTriggerReceived'" label="InProgress.StartTriggerReceived" target="InProgress.StartTriggerReceived"/>
+
+    	  <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.Reading'" label="InProgress.Reading" target="SetUnwantedReadError"/>
+
+    	  <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.EpcAddReadUI'" label="InProgress.EpcAddReadUI" target="SetUnwantedReadError"/>
+
+     	 <default label="ProcessStarted.BarcodeScanDone" target="ProcessStarted.BarcodeScanDone"/>
+
+  </decision>
+
+    <activity name="SetUnwantedReadError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+
+	<target exit="done" name="InProgress.Reading"></target>
+
+	<target exit="error" name="InProgress.Reading"></target>
+
+	<input class="java.lang.String" constant="true" name="inArg0" required="false">UNWANTED_READ</input>
+
+	<output class="java.lang.String" constant="false" name="outArg0">${process.eventErrCode}</output>
+
+	<input class="java.lang.String" constant="true" name="inArg1" required="false">"The read occurred while the reader is expected inactive"</input>
+
+	<output class="java.lang.String" constant="false" name="outArg1">${process.errorDesc}</output>
+
+	<input class="java.lang.String" constant="true" name="inArg2" required="false">UNEXPECTED_EPC_ERR</input>
+
+	<output class="java.lang.String" constant="false" name="outArg2">${process.origNode}</output>
+
+<!--	<input class="java.lang.String" constant="false" name="inArg3" required="false">${process.eventErrCode}</input>
+
+	<output class="java.lang.String" constant="false" name="outArg3">${process.eventErrCode}</output> -->
+
+    </activity>  
+
+    <activity name="ProcessStarted.BarcodeScanDone" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+
+    	<target exit="done" name="DONE"></target>
+
+    	<target exit="error" name="DONE"></target>
+
+    	<input class="java.lang.String" constant="true" name="inArg0" required="false">ASNDone.ASNFound</input>
+
+    	<output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+
+    	<output class="java.lang.String" constant="false" name="outArg1">${process.eventErrCode}</output>
+
+    	<output class="java.lang.String" constant="false" name="outArg2">${process.checkForASN}</output>
+
+    </activity>      
+
+    <activity name="InProgress.StartTriggerReceived" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+
+	<target exit="done" name="InProgress.StartTriggerReceived"></target>
+
+	<target exit="error" name="DONE"></target>
+
+	<input class="java.lang.String" constant="true" name="inArg0" required="false">InProgress.StartTriggerReceived</input>
+
+	<output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+
+	<output class="java.lang.String" constant="false" name="outArg1">${process.eventErrCode}</output>
+
+	<output class="java.lang.String" constant="false" name="outArg2">${process.checkForASN}</output>
+
+    </activity> 
+
+    <activity name="SetASNNotFoundError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+
+    	<target exit="done" name="ERROR"></target>
+
+    	<target exit="error" name="ERROR"></target>
+
+    	<input class="java.lang.String" constant="false" name="inArg0">ASNDone.ASNNotFound</input>
+
+    	<output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+
+    	<input class="java.lang.String" constant="false" name="inArg1">ASN_EXPECTED_NOT_FOUND</input>
+
+    	<output class="java.lang.String" constant="false" name="outArg1">${process.eventErrCode}</output>
+
+    	<input class="java.lang.String" constant="true" name="inArg2">"As per scenario configuration, ASN was expected for comparison but no matching ASN was found."</input>
+
+    	<output class="java.lang.String" constant="false" name="outArg2">${process.errorDesc}</output>    
+
+    	<input class="java.lang.String" constant="false" name="inArg3">ASN_NOT_FOUND_INTERNAL_ERROR</input>
+
+	<output class="java.lang.String" constant="false" name="outArg3">${process.origNode}</output>
+
+    </activity>    
+
+    <activity name="SetInternalError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+
+    	<target exit="done" name="ERROR"></target>
+
+    	<target exit="error" name="ERROR"></target>
+
+    	<input class="java.lang.String" constant="false" name="inArg0">ASNDone.ASNNotFound</input>
+
+    	<output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+
+    	<input class="java.lang.String" constant="false" name="inArg1">INTERNAL_ERROR</input>
+
+    	<output class="java.lang.String" constant="false" name="outArg1">${process.eventErrCode}</output>
+
+    	<input class="java.lang.String" constant="true" name="inArg2">"Internal error occurred during ASN processing."</input>
+
+    	<output class="java.lang.String" constant="false" name="outArg2">${process.errorDesc}</output>    
+
+    </activity>     
+
+    <activity name="SetNoEPCReadError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+
+    	<target exit="done" name="PublishReadStopOutput"></target>
+
+    	<target exit="error" name="PublishReadStopOutput"></target>
+
+    	<input class="java.lang.String" constant="false" name="inArg1">NO_EPC_READ</input>
+
+    	<output class="java.lang.String" constant="false" name="outArg1">${process.eventErrCode}</output>
+
+    	<input class="java.lang.String" constant="true" name="inArg2">"No EPC read between the start and stop trigger"</input>
+
+    	<output class="java.lang.String" constant="false" name="outArg2">${process.errorDesc}</output>    
+
+    </activity>  
+
+    
+
+    	<decision name="EnsureRfidOperationMode">
+
+    	    <case condition="${process.rfidOperation}==null or ${process.rfidOperation} eq 'false'" label="FirstCartonInfo" target="StartRfidBulkRead"></case>
+
+	    <default label="Continue" target="DecideOnStartRfidProcess"/>
+
+    	</decision>
+
+    	<activity name="StartRfidBulkRead" resource="class:com.oatsystems.solutions.apparel.primitives.StartBulkRead">
+
+    	  <target exit="done" name="SetRfidOperationMode"></target>
+
+    	  <target exit="error" name="ERROR"></target>
+
+    	  <input class="java.lang.String" constant="false" name="deviceEpc" required="true">${process.readerEpc}</input>
+
+    	  <input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+
+    	</activity>
+
+    	<activity name="SetRfidOperationMode" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+
+    	    <target exit="done" name="DecideTocreateProcessorNot"></target>
+
+    	    <target exit="error" name="DecideTocreateProcessorNot"></target>
+
+    	    <input class="java.lang.String" constant="true" name="inArg0" required="false">true</input>
+
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.rfidOperation}</output>
+
+	</activity>
+
+	    <decision name="DecideTocreateProcessorNot">
+
+	    	  <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ProcessStarted.BarcodeScanDone' and ${process.processID} == null" label="ProcessStarted.BarcodeScanDone" target="DecideOnStartRfidProcess"/>
+
+	    	  <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ProcessStarted.BarcodeScanDone' and ${process.processID} != null" label="ProcessStarted" target="ASNCreated"/>
+
+			<default label="ProcessStarted.BarcodeScanDone" target="DecideOnStartRfidProcess"/>
+
+		</decision>
+
+		<decision name="DecideOnStartRfidProcess">
+
+			<case condition="${process.allowDatabaseTransaction}!=null and ${process.allowDatabaseTransaction} eq 'true'" label="StartRfidProcess" target="StartRfidProcess"/>
+
+			<default label="StartDummyRfidProcess" target="StartDummyRfidProcess"/>
+
+  </decision>
+
+     <activity name="StartRfidProcess" resource="primitive:StartProcess">
+
+    	      <target name="SetRfidProcessState" exit="done" />
+
+    	      <target name="SetRfidProcessState" exit="error" />
+
+    	      <input  name="processMasterCode" class="java.lang.String">${process.scenarioType}</input>
+
+    	      <input  name="processData0" class="java.lang.String">${process.scenarioType}</input>
+
+    	      <input  name="processData1" class="java.lang.String">sys</input>
+
+    	      <input  name="processData2" class="java.lang.String">${process.sessionID}</input>
+
+    	      <input  name="processData3" class="java.lang.String">${process.boxID}</input>
+
+			  <input  name="processData4" class="java.lang.String">${process.asnMode}</input>
+
+    	      <input  name="processData5" class="java.lang.String">${process.transitLocation}</input>
+
+    	      <input  name="processData6" class="java.lang.String">${process.siteEpc}</input>
+
+    	      <input  name="processData7" class="java.lang.String">${process.stationId}</input>
+
+    	      <input  name="processData8" class="java.lang.String">${process.scenarioName}</input>
+
+        	      <input  name="processData9" class="java.lang.String">${process.scenarioDeviceType}</input>
+
+    	      <output name="processID" class="java.lang.String">${process.processID}</output>
+
+		</activity>
+
+		<activity name="StartDummyRfidProcess" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+
+			<target exit="done" name="SetRfidProcessState"/>
+
+			<target exit="error" name="SetRfidProcessState"/>
+
+			<input class="java.lang.String" constant="false" name="inArg0">${process.dummyProcessID}</input>
+
+			<output class="java.lang.String" constant="false" name="outArg0">${process.processID}</output>
+
+		</activity> 		
+
+		<activity name="SetRfidProcessState" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+
+			<target exit="done" name="GetRFIDProcessEndTime"/>
+
+			<target exit="error" name="GetRFIDProcessEndTime"/>
+
+			<input class="java.lang.String" constant="true" name="inArg0" required="false">TRUE</input>
+
+			<input class="java.lang.String" constant="true" name="inArg1" required="false">InProgress.ProcessStarted</input>
+
+			<output class="java.lang.String" constant="false" name="outArg0">${process.rfidSessionVar}</output>
+
+			<output class="java.lang.String" constant="false" name="outArg1">${process.logicalState}</output>
+
+			<output class="java.lang.String" constant="false" name="outArg2">${process.eventErrCode}</output>
+
+		</activity>
+
+		<activity name="GetRFIDProcessEndTime" resource="class:com.oatsystems.workflow.apparel.primitives.GetCurrentTimestamp">
+
+			<target exit="done" name="ASNCreated"/>
+
+			<target exit="error" name="ASNCreated"/>
+
+			<output class="java.lang.Long" constant="false" name="currTimestamp">${process.processEndTime}</output>
+
+		</activity> 		
+
+   <end name="ERROR"></end>
+
+   <end name="DONE"></end>
+
+   <end name="ASNCreated"></end>
+
+   <end name="InProgress.Reading"></end>
+
+   <end name="InProgress.StartTriggerReceived"></end>
+
+   <end name="PublishReadStopOutput"></end>
+
+   <end name="StopSessionExit"></end>
+
+</process>
+
+<config/>
+
+<display/>
+
+</scenario>   
+
+   	

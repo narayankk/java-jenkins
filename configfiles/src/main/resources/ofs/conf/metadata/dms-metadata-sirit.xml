@@ -1,0 +1,413 @@
+<?xml version="1.0"?>
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+    <table name="dms_device">
+        <entity type="SiritInfinity510Reader" extends="RFReader">
+            <locator-option value="Sirit Infinity 510 Reader" is-default="true">Sirit Infinity 510 Reader</locator-option>
+            <label>Sirit Infinity 510 Reader</label>
+            <description>Sirit Infinity 510  Reader Configuration</description>
+     
+            <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+            <label>Maximum number of antennas</label>
+            <description>Maximum number of antennas for a Sirit Reader.It has to be 4.</description>
+            <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="4" is-default="true">4</option>
+                </select>
+            </property>
+
+            <property key="EventPort" is-mandatory="true">
+                <label>Notification Port</label>
+                <description>Event Notification Port</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                    <option value="50008" is-default="true">50008</option>
+                </select>
+            </property>
+
+            <property key="LBTType" is-mandatory="false">
+                <label>LBT Type </label>
+                <description>LBT Type</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="-1" is-default="true">No Action</option>
+                    <option value="0">NO_LBT</option>
+                    <option value="1">STANDARD</option>
+                </select>
+            </property>
+
+            <property key="LBTListenPort" is-mandatory="false">
+                <label>LBT Listen Port</label>
+                <description>LBT Listen Port</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="-1" is-default="true">No Action</option>
+                    <option value="0">LBT_ANTENNA1</option>
+                    <option value="1">LBT_ANTENNA2</option>
+                    <option value="2">LBT_ANTENNA3</option>
+                    <option value="3">LBT_ANTENNA4</option>
+                    <option value="4">LBT_ANTENNA_ALL</option>
+                    <option value="5">LBT_DEDICATED_ANTENNA</option>
+                </select>
+            </property>
+
+            <property key="InterrogatorMode" is-mandatory="false">
+                <label>Interrogator Mode </label>
+                <description>Reader's Interrogator Mode</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="-1" is-default="true">No Action</option>
+                    <option value="0">SINGLE</option>
+                    <option value="1">MULTIPLE</option>
+                    <option value="2">DENSE</option>
+                </select>
+            </property>
+
+            <property key="InitialQ" is-mandatory="false">
+                <label>Initial Q Value </label>
+                <description>Initial Q Value</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="-1">No Action</option>
+                    <option value="0">00</option>
+                    <option value="1">01</option>
+                    <option value="2">02</option>
+                    <option value="3">03</option>
+                    <option value="4" is-default="true">04</option>
+                    <option value="5">05</option>
+                    <option value="6">06</option>
+                    <option value="7">07</option>
+                    <option value="8">08</option>
+                    <option value="9">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                </select>
+            </property>
+              
+            <property key="IncrementQ" is-mandatory="false">
+                <label>Maximum increment Q Value </label>
+                <description>Maximum increment Q Value</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="-1">No Action</option>
+                    <option value="0">00</option>
+                    <option value="1">01</option>
+                    <option value="2">02</option>
+                    <option value="3">03</option>
+                    <option value="4">04</option>
+                    <option value="5">05</option>
+                    <option value="6">06</option>
+                    <option value="7">07</option>
+                    <option value="8">08</option>
+                    <option value="9">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15" is-default="true">15</option>
+                </select>
+            </property>
+
+            <property key="Session" is-mandatory="false">
+                <label>Session </label>
+                <description>Session </description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                    <option value="0">SESSION 0</option>
+                    <option value="1">SESSION 1</option>
+                    <option value="2" is-default="true">SESSION 2</option>
+                    <option value="3">SESSION 3</option>
+                </select>
+            </property>
+
+            <property key="UcodeEpcLength" is-mandatory="false">
+                <label>Epc Length for UCODE Tags</label>
+                <description>Epc Length for UCODE Tags for ISOB protocol </description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                    <option value="0">Disable</option>
+                    <option value="1">64 Bits</option>
+                    <option value="2" is-default="true">96 Bits</option>
+                </select>
+            </property>
+
+            <property key="InstallType" is-mandatory="false">
+                <label>Install Type</label>
+                <description>Type of installation</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                    <option value="-1" is-default="true">No Action</option>
+                    <option value="0">Portal</option>
+                    <option value="1">Conveyor Belt</option>
+                    <option value="2">Point of sale</option>
+                    <option value="3">Label Applicator</option>
+                </select>
+            </property>
+
+            <property key="OperatingMode" is-mandatory="false">
+                <label>Operating Mode</label>
+                <description>Mode of Operation</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                    <option value="0">POLLED</option>
+                    <option value="1" is-default="true">STANDBY</option>
+                </select>
+            </property>
+
+            <property key="ScanDuration" is-mandatory="false">
+                <label>Scan Duration(ms)</label>
+                <description>Scan duration for standby mode</description>
+                <type-definition>oat:ScanDuration</type-definition>
+                <select is-bound="false">
+                    <option value="1000" is-default="true">1000</option>
+                </select>
+            </property>
+
+            <property key="TagType" is-mandatory="false">
+                <label>Tag Type </label>
+                <description>Type of Tags used</description>
+                <type-definition>oat:RegExp</type-definition>
+                <select is-bound="false">
+                    <option value="0,1" is-default="true">0,1</option>
+                </select>
+            </property>
+
+            <property key="OutputPorts" is-mandatory="false">
+                <label>Output Ports</label>
+                <description>Output Ports used</description>
+                <type-definition>oat:RegExp</type-definition>
+                <select is-bound="false">
+                    <option value="1,2,3,4" is-default="true">1,2,3,4</option>
+                </select>
+            </property>
+
+            <property key="InputPorts" is-mandatory="false">
+                <label>Input Ports</label>
+                <description>Input Ports used</description>
+                <type-definition>oat:RegExp</type-definition>
+                <select is-bound="false">
+                    <option value="1,2,3,4" is-default="true">1,2,3,4</option>
+                </select>
+            </property>
+
+        </entity>
+        
+        <!--  Sirit notification reader -->
+        <entity type="SiritInfinity510NotificationReader" extends="RFReader">
+            <locator-option value="Sirit Infinity 510 Notification Reader" is-default="true">Sirit Infinity 510 Notification Reader</locator-option>
+            <label>Sirit Infinity 510 Notification Reader</label>
+            <description>Sirit Infinity 510 Notification Reader Configuration</description>
+     
+            <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+            <label>Maximum number of antennas</label>
+            <description>Maximum number of antennas for a Sirit Reader.It has to be 4.</description>
+            <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="4" is-default="true">4</option>
+                </select>
+            </property>
+
+            <property key="DepartTime" is-mandatory="true">
+                <label>Time to generate depart event</label>
+                <description> Parameter controls when the reader considers the tag to have departed</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                    <option value="1000" is-default="true">10000</option>
+                </select>
+            </property>
+            
+            <property key="EventPort" is-mandatory="true">
+                <label>Notification Port</label>
+                <description>Event Notification Port</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                    <option value="50008" is-default="true">50008</option>
+                </select>
+            </property>
+
+            <property key="LBTType" is-mandatory="false">
+                <label>LBT Type </label>
+                <description>LBT Type</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="-1" is-default="true">No Action</option>
+                    <option value="0">NO_LBT</option>
+                    <option value="1">STANDARD</option>
+                </select>
+            </property>
+
+            <property key="LBTListenPort" is-mandatory="false">
+                <label>LBT Listen Port</label>
+                <description>LBT Listen Port</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="-1" is-default="true">No Action</option>
+                    <option value="0">LBT_ANTENNA1</option>
+                    <option value="1">LBT_ANTENNA2</option>
+                    <option value="2">LBT_ANTENNA3</option>
+                    <option value="3">LBT_ANTENNA4</option>
+                    <option value="4">LBT_ANTENNA_ALL</option>
+                    <option value="5">LBT_DEDICATED_ANTENNA</option>
+                </select>
+            </property>
+
+            <property key="InterrogatorMode" is-mandatory="false">
+                <label>Interrogator Mode </label>
+                <description>Reader's Interrogator Mode</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="-1" is-default="true">No Action</option>
+                    <option value="0">SINGLE</option>
+                    <option value="1">MULTIPLE</option>
+                    <option value="2">DENSE</option>
+                </select>
+            </property>
+
+            <property key="InitialQ" is-mandatory="false">
+                <label>Initial Q Value </label>
+                <description>Initial Q Value</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="-1">No Action</option>
+                    <option value="0">00</option>
+                    <option value="1">01</option>
+                    <option value="2">02</option>
+                    <option value="3">03</option>
+                    <option value="4" is-default="true">04</option>
+                    <option value="5">05</option>
+                    <option value="6">06</option>
+                    <option value="7">07</option>
+                    <option value="8">08</option>
+                    <option value="9">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                </select>
+            </property>
+              
+            <property key="IncrementQ" is-mandatory="false">
+                <label>Maximum increment Q Value </label>
+                <description>Maximum increment Q Value</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="true">
+                    <option value="-1">No Action</option>
+                    <option value="0">00</option>
+                    <option value="1">01</option>
+                    <option value="2">02</option>
+                    <option value="3">03</option>
+                    <option value="4">04</option>
+                    <option value="5">05</option>
+                    <option value="6">06</option>
+                    <option value="7">07</option>
+                    <option value="8">08</option>
+                    <option value="9">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15" is-default="true">15</option>
+                </select>
+            </property>
+
+            <property key="Session" is-mandatory="false">
+                <label>Session </label>
+                <description>Session </description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                    <option value="0">SESSION 0</option>
+                    <option value="1">SESSION 1</option>
+                    <option value="2" is-default="true">SESSION 2</option>
+                    <option value="3">SESSION 3</option>
+                </select>
+            </property>
+
+            <property key="UcodeEpcLength" is-mandatory="false">
+                <label>Epc Length for UCODE Tags</label>
+                <description>Epc Length for UCODE Tags for ISOB protocol </description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                    <option value="0">Disable</option>
+                    <option value="1">64 Bits</option>
+                    <option value="2" is-default="true">96 Bits</option>
+                </select>
+            </property>
+
+            <property key="InstallType" is-mandatory="false">
+                <label>Install Type</label>
+                <description>Type of installation</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                    <option value="-1" is-default="true">No Action</option>
+                    <option value="0">Portal</option>
+                    <option value="1">Conveyor Belt</option>
+                    <option value="2">Point of sale</option>
+                    <option value="3">Label Applicator</option>
+                </select>
+            </property>
+
+            <property key="OperatingMode" is-mandatory="false">
+                <label>Operating Mode</label>
+                <description>Mode of Operation</description>
+                <type-definition>xsd:int</type-definition>
+                <select is-bound="false">
+                     <option value="2" is-default="true">AUTONOMOUS</option>
+                </select>
+            </property>
+
+            <property key="ScanDuration" is-mandatory="false">
+                <label>Scan Duration(ms)</label>
+                <description>Scan duration for standby mode</description>
+                <type-definition>oat:ScanDuration</type-definition>
+                <select is-bound="false">
+                    <option value="1000" is-default="true">1000</option>
+                </select>
+            </property>
+
+            <property key="TagType" is-mandatory="false">
+                <label>Tag Type </label>
+                <description>Type of Tags used</description>
+                <type-definition>oat:RegExp</type-definition>
+                <select is-bound="false">
+                    <option value="0,1" is-default="true">0,1</option>
+                </select>
+            </property>
+
+            <property key="OutputPorts" is-mandatory="false">
+                <label>Output Ports</label>
+                <description>Output Ports used</description>
+                <type-definition>oat:RegExp</type-definition>
+                <select is-bound="false">
+                    <option value="1,2,3,4" is-default="true">1,2,3,4</option>
+                </select>
+            </property>
+
+            <property key="InputPorts" is-mandatory="false">
+                <label>Input Ports</label>
+                <description>Input Ports used</description>
+                <type-definition>oat:RegExp</type-definition>
+                <select is-bound="false">
+                    <option value="1,2,3,4" is-default="true">1,2,3,4</option>
+                </select>
+            </property>
+ 			
+ 			<property key="EventType" is-mandatory="false">
+                <label>Events to process</label>
+                <description>Events to process</description>
+                <type-definition>oat:RegExp</type-definition>
+                <select is-bound="false">
+                    <option value="0,1" is-default="true">0,1</option>
+                </select>
+            </property>
+        </entity>
+    </table>
+</meta-data>

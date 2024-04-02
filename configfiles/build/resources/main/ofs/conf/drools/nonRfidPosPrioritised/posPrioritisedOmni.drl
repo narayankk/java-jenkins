@@ -1,0 +1,63 @@
+package drools.nonRfidPosPrioritised;
+
+import com.oatsystems.service.apparel.data.drools.POSResultObject;
+import com.oatsystems.service.apparel.data.drools.FullInventory;
+import com.oatsystems.service.apparel.data.drools.InventoryUnit;
+import com.oatsystems.spring.service.apparel.data.pos.POSTxn;
+import com.oatsystems.service.apparel.data.drools.POSTxnInfo;
+import com.oatsystems.spring.service.apparel.data.pos.POSTxnType;
+import com.oatsystems.spring.service.apparel.data.postxnv1.POSSkus;
+import com.oatsystems.pojo.SkuLevel;
+import java.util.List;
+import java.util.Map;
+import java.lang.Math;
+import com.oatsystems.util.ModLog;
+
+rule "adjCount for POS OMNI SALE in Backroom" salience 10
+no-loop
+when
+$txnInfo : POSTxnInfo(getTxnType().equals(POSTxnType.OMNI_CHANNEL_SALE.toString()), $txnTime : getTxnTime())
+$pos : POSSkus($sku : getSkuValue(), $qty : qty > 0)
+$full : FullInventory($subLevelList : getSublevel() contains $sku, $invList : getInvList(), $productIdentifier : getProductIdentifier())
+$inv : InventoryUnit($adjInvCount : adjInvCount > 0, "Backroom".equals(locationSubtype), $businessLocation : getBusinessLocation(), getCcResetTime() < $txnTime) from $invList
+$posObject : POSResultObject( productIdentifier.equals( $productIdentifier ), businessLocation.equals( $businessLocation ) )
+then
+ModLog.debug("in Rule: adjCount for POS OMNI SALE in Backroom");
+$posObject.setAdjCount($posObject.getAdjCount() + Math.min($adjInvCount, $qty));
+update($posObject);
+$pos.setQty(Math.max($qty - $adjInvCount, 0l));
+update($pos);
+end
+
+rule "complete remaining OMNI POS in Sales Floor" salience 9
+no-loop
+when
+$txnInfo : POSTxnInfo(getTxnType().equals(POSTxnType.OMNI_CHANNEL_SALE.toString()), $txnTime : getTxnTime())
+$pos : POSSkus($sku : getSkuValue(), $qty : qty > 0)
+$full : FullInventory($subLevelList : getSublevel() contains $sku, $invList : getInvList(), $productIdentifier : getProductIdentifier())
+$inv : InventoryUnit($adjInvCount : adjInvCount > 0, "Sales Floor".equals(locationSubtype), $businessLocation : getBusinessLocation(), getCcResetTime() < $txnTime) from $invList
+$posObject : POSResultObject( productIdentifier.equals( $productIdentifier ), businessLocation.equals( $businessLocation ) )
+then
+ModLog.debug("in Rule: complete remaining OMNI POS in Sales Floor");
+$posObject.setAdjCount($posObject.getAdjCount() + Math.min($adjInvCount, $qty));
+update($posObject);
+$pos.setQty(Math.max($qty - $adjInvCount, 0l));
+update($pos);
+end
+
+rule "adjCount for POS OMNI SALE final clearance in Backroom" salience 8
+no-loop
+when
+$txnInfo : POSTxnInfo(getTxnType().equals(POSTxnType.OMNI_CHANNEL_SALE.toString()), $txnTime : getTxnTime())
+$pos : POSSkus($sku : getSkuValue(), $qty : qty > 0)
+$full : FullInventory($subLevelList : getSublevel() contains $sku, $invList : getInvList(), $productIdentifier : getProductIdentifier())
+$inv : InventoryUnit($adjInvCount : adjInvCount, "Backroom".equals(locationSubtype), $businessLocation : getBusinessLocation(), getCcResetTime() < $txnTime) from $invList
+$posObject : POSResultObject( productIdentifier.equals( $productIdentifier ), businessLocation.equals( $businessLocation ) )
+then
+ModLog.info("in Rule: adjCount for POS OMNI SALE final clearance in Backroom");
+$posObject.setAdjCount($posObject.getAdjCount() + $pos.getQty());
+update($posObject);
+$pos.setQty(0l);
+update($pos);
+end
+

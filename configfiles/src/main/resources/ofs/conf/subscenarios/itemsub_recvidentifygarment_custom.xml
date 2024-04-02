@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<scenario>
+    <property key="name">OATapparel - subscenario - Identify the garment</property>
+    <property key="description"></property>
+    <property key="scenario.type">SUB_SCENARIO</property>
+    <property key="sub_scenario">true</property>
+    <property key="fragment.scenario.exits">PRODUCTFOUND, PRODUCTNOTFOUND</property>
+    <property key="fragment.scenario.expected_inputs">
+    epc,putawayLocationEpc,productLinkMethod,productMaster
+    </property>
+    <property key="fragment.scenario.expected_outputs">
+    productId,productMaster
+    </property>
+
+    <process>
+    
+        <start name="Start">
+                <target exit="Exit Condition" name="DecideOnProductLinkMethod"></target>
+        </start>
+
+        <decision name="DecideOnProductLinkMethod">
+            <case condition="${process.productLinkMethod}.equalsIgnoreCase('LINK_USING_ENCODING_SCHEME')" label="useEncScheme" target="NullifiedFindProductForItem"></case>
+            <case condition="${process.productLinkMethod}.equalsIgnoreCase('LINK_USING_OBJECT_PRODUCT')" label="useObjProduct" target="NullifiedFindProductForItem"></case>
+            <default label="default" target="NullifiedFindProductForItem"></default>
+        </decision>
+        
+		<!-- Fix for MV-362 - Changed the package name-->
+        <activity name="NullifiedFindProductForItem" resource="class:com.oatsystems.solutions.apparel.primitives.NullifiedFindProductForItem">
+            <target name="PRODUCTFOUND"     exit="productFound"/>
+            <target name="PRODUCTNOTFOUND"     exit="productNotFound"/>
+            <target name="ERROR"     exit="error"/>
+            <input  name="epc" class="java.lang.String">${process.epc}</input>
+            <input  name="recvLocationepc" class="java.lang.String">${process.putawayLocationEpc}</input>
+            <output name="productId" class="java.lang.String">${process.productId}</output>
+            <input name="productMaster" class="java.util.HashMap">${process.productMaster}</input>
+            <output name="productMaster" class="java.util.HashMap">${process.productMaster}</output>
+
+        </activity>
+        
+        <end name="PRODUCTFOUND"></end> 
+        <end name="PRODUCTNOTFOUND"></end> 
+        <end name="ERROR"></end> 
+    </process>
+
+    <config>
+    </config>
+
+    <display>
+
+    </display>
+</scenario>        

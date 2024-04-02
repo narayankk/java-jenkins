@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+  <table name="dms_device">
+     <entity type="Mojix" extends="RTLS">
+      <locator-option value="Mojix">Mojix</locator-option>
+      <label>Mojix</label>
+      <description>Mojix</description>
+      <property key="HostName" is-mandatory="true">
+        <label>Server IP address</label>
+        <description>Mojix Server IP Address</description>
+        <type-definition>oat:Host</type-definition>
+      </property>
+      <property key="CommandPort" is-mandatory="true">
+        <label>Port number</label>
+        <description>Mojix Server Port</description>
+        <type-definition>oat:Port</type-definition>
+        <select is-bound="false">
+          <option value="8080" is-default="true">8080</option>
+        </select>
+      </property>
+      <property key="DefaultTimeOut" is-mandatory="false">
+		<label>Default Time-Out(ms)</label>
+		<description>Default command time-out value is used unless command specific time-out value defined.</description>
+		<type-definition>oat:TimeoutMillis</type-definition>
+		<select is-bound="false">
+		  <option value="1000" is-default="true">1000</option>
+		</select>
+      </property>
+      <property key="UseDeviceTime" is-mandatory="false">
+	    <label>Time for logging tag events</label>
+	    <description>Which time to use for logging the tags, default OFS</description>
+	    <type-definition>xsd:boolean</type-definition>
+	    <select is-bound="true">
+	      <option value="false" is-default="true">OFS</option>
+	      <option value="true" >Device</option>
+	    </select>
+      </property>
+      <property key="ReportingInterval" is-mandatory="true">
+        <label>Reporting Interval (ms)</label>
+        <description>Reporting Interval for location reports</description>
+        <type-definition>oat:TimeThreshold</type-definition>
+        <select is-bound="false">
+          <option value="2000" is-default="true">2000</option>
+        </select>
+      </property>
+      <property key="DistanceThreshold" is-mandatory="false">
+        <label>Distance Threshold (ft)</label>
+        <description>The time threshold should exceed 100 milliseconds</description>
+        <type-definition>xsd:int</type-definition>
+        <select is-bound="false">
+          <option value="5" is-default="true">5</option>
+        </select>
+      </property>
+      <property key="NotificationPort" is-mandatory="true">
+        <label>Notification Port</label>
+        <description>Notification port</description>
+        <type-definition>oat:Port</type-definition>
+        <select is-bound="false">
+          <option value="8008" is-default="true">8008</option>
+      </select>
+      </property>
+      </entity>
+  </table>
+</meta-data> 

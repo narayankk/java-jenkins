@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenario>
+	<property key="name">dc_barcode_handler subscenario for handling Barcode</property>
+	<property key="description">Scenario barcode handler is a sub-scenario responsible to handle barcode input of scenario.</property>
+	<property key="sub_scenario">true</property>
+	<property key="parent_access">RW</property>
+	<property key="namespace">dc-recv-ship-barcode-sub-proc-wirama</property>
+	<property key="exits">DONE,ERROR</property>
+	<property key="inputs">logicalState, eventReceived, readBarcode, stationId, scenarioType, scenarioName, defaultShipToDescBarcodeMode, barcodeReadTime, siteName, shipToDesc, asnMode,defaultShipToDescBarcodeMode,prevBarcode
+	</property>
+	<property key="outputs">prevBarcode</property>
+
+	<process>
+		<start name="Start">
+			<target exit="All Cases" name="FilterNoReads"/>
+		</start>
+
+		<decision name="FilterNoReads">
+			<case condition="${process.readBarcode} eq 'NOREAD' or ${process.readBarcode} eq 'NOREAD;NOREAD'" label="skip" target="ConstructAsnFromBarcode"/>
+			<default label="process" target="ConstructAsnFromBarcode"/>
+		</decision>
+
+		<activity name="ConstructAsnFromBarcode" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructAsnFromBarcode">
+			<target exit="done" name="SetPrevBarcodeForAddAsnToQueue"/>
+			<target exit="error" name="SetPrevBarcodeForDone"/>
+			<target exit="handleException" name="SetPrevBarcodeForError"/>
+			<input class="java.lang.String" constant="false" name="readBarcode">${process.readBarcode}</input>
+			<input class="java.lang.String" constant="false" name="barcodeReadTime">${process.barcodeReadTime}</input>
+			<input class="java.lang.String" constant="false" name="delimitter">;</input>
+			<input class="java.lang.String" constant="false" name="defaultShipToDescBarcodeMode">${process.defaultShipToDescBarcodeMode}</input>
+			<input class="java.lang.String" constant="false" name="shipToDesc">${process.shipToDesc}</input>
+			<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+			<input class="java.lang.String" constant="false" name="scenarioName" required="true">${process.scenarioName}</input>
+			<input class="java.lang.String" constant="false" name="stationId" required="true">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="asnMode" required="true">${process.asnMode}</input>
+			<input class="java.lang.String" constant="false" name="siteName">${process.siteName}</input>
+			<input class="java.lang.String" constant="false" name="prevBarcode">${process.prevBarcode}</input>
+			<output class="com.oatsystems.solutions.apparel.objects.DCAdjustedProcessInfo" constant="false" name="asn" required="false">${process.asn}</output>
+			<output class="java.lang.String" constant="false" name="eventErrCode">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="errorDesc">${process.errorDesc}</output>
+			<output class="java.lang.String" constant="false" name="newPrevBarcode">${process.newPrevBarcode}</output>
+		</activity>
+		
+		<activity name="SetPrevBarcodeForAddAsnToQueue" resource="primitive:SetVariableValue">
+          <target name="AddAsnToQueue" exit="done"/>
+          <target name="AddAsnToQueue" exit="error"/>
+          <input name="value" class="java.lang.String">${process.newPrevBarcode}</input>
+          <output name="variable" class="java.lang.String">${process.prevBarcode}</output>
+		</activity>
+
+		<activity name="SetPrevBarcodeForDone" resource="primitive:SetVariableValue">
+          <target name="DONE" exit="done"/>
+          <target name="DONE" exit="error"/>
+          <input name="value" class="java.lang.String">${process.newPrevBarcode}</input>
+          <output name="variable" class="java.lang.String">${process.prevBarcode}</output>
+		</activity>
+		
+		<activity name="SetPrevBarcodeForError" resource="primitive:SetVariableValue">
+          <target name="TakeErrorAction" exit="done"/>
+          <target name="TakeErrorAction" exit="error"/>
+          <input name="value" class="java.lang.String">${process.newPrevBarcode}</input>
+          <output name="variable" class="java.lang.String">${process.prevBarcode}</output>
+		</activity>
+		
+		<activity name="TakeErrorAction" resource="class:com.oatsystems.solutions.apparel.primitives.CallErrorHandler">
+			<target exit="done" name="ResetError"/>
+			<target exit="error" name="ResetError"/>
+			<input class="java.lang.String" constant="false" name="eventErrCode" required="true">${process.eventErrCode}</input>
+			<input class="java.lang.String" constant="false" name="errorDesc" required="true">${process.errorDesc}</input>
+		</activity>	
+
+		<activity name="ResetError" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+			<target exit="done" name="AddAsnToQueue"/>
+			<target exit="skip" name="AddAsnToQueue"/>
+			<target exit="error" name="AddAsnToQueue"/>
+			<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="variable1">${process.errorDesc}</output>
+		</activity>
+		
+		<activity name="AddAsnToQueue" resource="class:com.oatsystems.solutions.apparel.primitives.AddAsnToQueue">
+			<target exit="done" name="DONE"/>
+			<target exit="error" name="DONE"/>  
+			<input class="com.oatsystems.solutions.apparel.objects.DCAdjustedProcessInfo" constant="false" name="asn" required="false">${process.asn}</input>
+			<input class="java.lang.String" constant="false" name="scenarioName" required="true">${process.scenarioName}</input>
+			<input class="java.lang.String" constant="false" name="stationId" required="true">${process.stationId}</input>
+		</activity>
+		
+		<end name="ERROR"/>
+		<end name="DONE"/>
+	</process>
+	<config/>
+	<display/>
+</scenario>  
+ 

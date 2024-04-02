@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scenario>
+	<property key="name">DC Process initializer subscenario for initializing station and scenario variables</property>
+	<property key="description">This sub-scenario will set all data structure to initial values and will change Controller state to 'WAIT'.</property>
+	<property key="sub_scenario">true</property>
+	<property key="parent_access">RW</property>
+	<property key="namespace">dc-recv-ship-initializer-sub-proc-wirama</property>
+	<property key="exits">DONE,ERROR</property>
+	<property key="inputs">stationId,criticalErrorOutput, scenarioName, distBtwScannerAndTrigger, distBtwLots, lotLength, readerEpc, maintenanceDoneOutput, asnMode, scenarioType, scenarioDeviceType, locSubType, asnExpected, generateASN, transitLocation, transitLocationRP, publishDelay, shipToDesc, defaultShipToDescBarcodeMode, historyLength, logEPCLevel, tunnelType, barcodeReadsTimeDiff
+	</property>
+	<property key="outputs">logicalState, dataContainer, siteName
+	</property>
+
+	<process>
+
+		<start name="Start">
+			<target exit="All Cases" name="InitializeStation"/>
+		</start>
+		<activity name="InitializeStation" resource="class:com.oatsystems.solutions.apparel.primitives.InitializeStation">
+			<target exit="done" name="GetSiteIdForLocation"/>
+			<target exit="error" name="ERROR"/>
+			<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.criticalErrorOutput}</input>
+		</activity>
+		<activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+			<target exit="done" name="setVar"/>
+			<target exit="error" name="ERROR"/>
+			<input class="java.lang.String" constant="false" name="locationEpc" required="true">${process.transitLocationRP}</input>
+			<output class="java.lang.String" constant="false" name="siteName">${process.siteName}</output>
+			<output class="java.lang.String" constant="false" name="siteEpc">${process.siteEpc}</output>
+		</activity> 
+		<activity name="setVar" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="CheckReaderBypassMode"/>
+			<target exit="error" name="CheckReaderBypassMode"/>
+			<input class="java.lang.Boolean" constant="false" name="inArg1">true</input>
+			<output class="java.lang.Boolean" constant="false" name="outArg1">${process.isOnline}</output>
+		</activity>		
+		<decision name="CheckReaderBypassMode">
+			<case condition="${process.bypassReader}!=null and ${process.bypassReader} eq 'true'" label="ByPassDevice" target="InitializeDCDataContainer"/>
+			<default label="CheckDevice" target="IsDeviceOnline"/>
+		</decision>
+		<activity name="IsDeviceOnline" resource="primitive:IsDeviceOnline">
+			<target exit="done" name="InitializeDCDataContainer"/>
+			<target exit="error" name="ERROR"/>
+			<input class="java.lang.String" constant="false" name="deviceEpc" required="true">${process.readerEpc}</input>
+			<output class="java.lang.Boolean" constant="false" name="isOnline">${process.isOnline}</output>
+		</activity>		
+		<activity name="InitializeDCDataContainer" resource="class:com.oatsystems.solutions.apparel.primitives.InitializeDCDataContainer">
+			<target exit="done" name="DCSendFailedMessages"/>
+			<target exit="error" name="ERROR"/>
+			<input class="java.lang.String" constant="false" name="distBtwScannerAndTrigger">${process.distBtwScannerAndTrigger}</input>
+			<input class="java.lang.String" constant="false" name="publishDelay">${process.publishDelay}</input>
+			<input class="java.lang.String" constant="false" name="distBtwLots">${process.distBtwLots}</input>
+			<input class="java.lang.String" constant="false" name="lotLength">${process.lotLength}</input>
+			<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="scenarioName" required="false">${process.scenarioName}</input>
+			<input class="java.lang.String" constant="false" name="publishRecoveredData" required="false">TRUE</input>
+			<input class="java.lang.String" constant="false" name="clearAsnQueue">TRUE</input>
+			<input class="java.lang.Boolean" constant="false" name="isDeviceOnline">${process.isOnline}</input>
+			<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+			<input class="java.lang.String" constant="false" name="scenarioType">${process.scenarioType}</input>
+			<input class="java.lang.String" constant="false" name="readerEpc">${process.readerEpc}</input>			
+			<input class="java.lang.String" constant="false" name="scenarioDeviceType">${process.scenarioDeviceType}</input>
+			<input class="java.lang.String" constant="false" name="locSubType">${process.locSubType}</input>
+			<input class="java.lang.String" constant="false" name="asnExpected">${process.asnExpected}</input>
+			<input class="java.lang.String" constant="false" name="generateASN">${process.generateASN}</input>
+			<input class="java.lang.String" constant="false" name="transitLocation">${process.transitLocation}</input>
+			<input class="java.lang.String" constant="false" name="transitLocationRP">${process.transitLocationRP}</input>
+			<input class="java.lang.String" constant="false" name="defaultShipToDescBarcodeMode">${process.defaultShipToDescBarcodeMode}</input>
+			<input class="java.lang.String" constant="false" name="shipToDesc">${process.shipToDesc}</input>
+			<input class="java.lang.String" constant="false" name="siteName">${process.siteName}</input>
+			<input class="java.lang.String" constant="false" name="siteEpc">${process.siteEpc}</input>
+			<input class="java.lang.String" constant="false" name="historyLength">${process.historyLength}</input>
+			<input class="java.lang.String" constant="false" name="logEPCLevel">${process.logEPCLevel}</input>
+			<input class="java.lang.String" constant="false" name="tunnelType">${process.tunnelType}</input>
+			<input class="java.lang.String" constant="false" name="barcodeReadsTimeDiff">${process.barcodeReadsTimeDiff}</input>
+			<output class="java.lang.String" constant="false" name="logicalState">${process.logicalState}</output>
+		</activity>
+		<activity name="DCSendFailedMessages" resource="class:com.oatsystems.solutions.apparel.primitives.DCSendFailedMessages">
+			<target exit="done" name="DecideOnPublishOutput"/>
+			<target exit="error" name="ERROR"/>
+			<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="scenarioName" required="false">${process.scenarioName}</input>
+		</activity>
+		<decision name="DecideOnPublishOutput">
+			<case condition="${process.bypassReader}!=null and ${process.bypassReader} eq 'false' and ${process.isOnline}!=null and ${process.isOnline} eq 'false'" label="ReaderUnreachableOutput" target="ReaderUnreachableOutput"/>
+			<case condition="${process.bypassReader}!=null and ${process.bypassReader} eq 'false' and ${process.isOnline}!=null and ${process.isOnline} eq 'true'" label="MaintenanceDoneOutput" target="MaintenanceDoneOutput"/>
+			<default label="DoNothing" target="DONE"/>
+		</decision>		
+		<activity name="ReaderUnreachableOutput" resource="primitive:PublishDigitalOutput">
+			<target exit="done" name="DONE"/>
+			<target exit="error" name="DONE"/>
+			<input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.criticalErrorOutput}</input>
+		</activity>
+		<activity name="MaintenanceDoneOutput" resource="primitive:PublishDigitalOutput">
+			<target exit="done" name="DONE"/>
+			<target exit="error" name="DONE"/>
+			<input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.maintenanceDoneOutput}</input>
+		</activity>
+		<end name="ERROR"/>
+		<end name="DONE"/>
+	</process>
+
+	<config/>
+
+	<display/>
+</scenario>

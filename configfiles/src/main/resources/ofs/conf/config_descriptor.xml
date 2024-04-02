@@ -1,0 +1,236 @@
+
+<configuration>
+
+    <self_reference>
+		<self_refered_table name="location" entity_fields="parent" delay="true"></self_refered_table>
+		<xPath name="locations" references="parent"></xPath>
+	</self_reference>
+
+	<self_reference>
+		<self_refered_table name="dms_adapter" entity_fields="readAlgorithmAdapter,writeAlgorithmAdapter,tagCacheAdapter"></self_refered_table>
+		<xPath name="DMS/Schedule:default/Adapters" references="ReadAlgorithm/Reference,WriteAlgorithm/Reference,TagCache/Reference"></xPath>
+	</self_reference>
+	<unit_interface name="OatEdgeProperties">
+		<table name="senseware_install" holds_deleted="true">
+			<selection_group>
+				<entity_type>Senseware</entity_type>
+				<properties class_name="com.oatsystems.service.config.cmsapi.OatEdgePropertiesImpl" Xpath="">
+				</properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name="Location">
+		<table name="location" holds_deleted="true">
+			<selection_group>
+				<entity_type>Location</entity_type>
+				<properties class_name="com.oatsystems.service.config.cmsapi.LocationImpl" Xpath="locations">
+				</properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name="AssociationHandler">
+		<table name="assn_handler" holds_deleted="false">
+			<selection_group>
+				<entity_type>Associations</entity_type>
+				<properties class_name="com.oatsystems.service.config.cmsapi.AssociationHandlerImpl" Xpath="associations">
+				</properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name="EmsUnit">
+		<table name="ems_unit" holds_deleted="true">
+			<selection_group>
+				<entity_type>EMSUnit</entity_type>
+				<properties class_name="com.oatsystems.service.config.cmsapi.EmsUnitImpl" Xpath="ems">
+				</properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "DataChannel">
+		<table name="dms_data_channel" holds_deleted="true">
+			<selection_group>
+				<entity_type>DataChannel</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.DataChannelImpl" Xpath="DMS/Devices">
+					<property key="DeviceCategory">data_channel</property>
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "Device">
+		<table name="dms_device" holds_deleted="true">
+			<selection_group>
+				<entity_type>RFReader</entity_type>
+				<properties class_name="com.oatsystems.service.config.cmsapi.DeviceImpl" Xpath="DMS/Devices">
+					<property key="DeviceCategory">rf_reader</property>
+				</properties>
+			</selection_group>
+			<selection_group>
+				<entity_type>DigitalIODevice</entity_type>
+				<properties class_name="com.oatsystems.service.config.cmsapi.DigIoDeviceImpl" Xpath="DMS/Devices">
+					<property key="DeviceCategory">digital_io_device</property>
+				</properties>
+			</selection_group>
+			<selection_group>
+				<entity_type>BarcodeScanner</entity_type>
+				<properties class_name="com.oatsystems.service.config.cmsapi.ScannerDeviceImpl" Xpath="DMS/Devices">
+					<property key="DeviceCategory">barcode_scanner</property>
+				</properties>
+			</selection_group>
+			<selection_group>
+				<entity_type>Applicator</entity_type>
+				<properties class_name="com.oatsystems.service.config.cmsapi.ScannerDeviceImpl" Xpath="DMS/Devices">
+					<property key="DeviceCategory">applicator</property>
+				</properties>
+			</selection_group>
+			<selection_group>
+				<entity_type>RTLS</entity_type>
+				<properties class_name="com.oatsystems.service.config.cmsapi.RTLSDeviceImpl" Xpath="DMS/Devices">
+					<property key="DeviceCategory">rtls</property>
+				</properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "Resource">
+		<table name="dms_resource" holds_deleted="true">
+			<selection_group>
+				<entity_type>Resource</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.ResourceImpl" Xpath="DMS/Schedule:default/Resources">
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "Task">
+		<table name="dms_task" holds_deleted="true">
+			<selection_group>
+				<entity_type>Task</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.TaskImpl" Xpath="DMS/Schedule:default/Tasks">
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "Adapter">
+		<table name="dms_adapter" holds_deleted="true">
+			<selection_group>
+				<entity_type>Adapter</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.DigIoAdapterImpl" Xpath="DMS/Adapters">
+				<property key="AdapterType">DioAdapter</property>
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+    <unit_interface name = "Adapter">
+        <table name="dms_adapter" holds_deleted="true">
+            <selection_group>
+                <entity_type>Adapter</entity_type>
+                <properties class_name="com.oatsystems.service.config.cmsapi.DigIoAdapterImpl" Xpath="DMS/Adapters">
+                <property key="AdapterType">OpcAdapter</property>
+                </properties>
+            </selection_group>
+        </table>
+    </unit_interface>
+	<unit_interface name = "Adapter">
+		<table name="dms_adapter" holds_deleted="true">
+			<selection_group>
+				<entity_type>Adapter</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.AdapterImpl" Xpath="DMS/Adapters">
+				<property key="AdapterType">TagReader</property>
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+         <unit_interface name = "Adapter">
+		<table name="dms_adapter" holds_deleted="true">
+			<selection_group>
+				<entity_type>Adapter</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.AdapterImpl" Xpath="DMS/Adapters">
+				<property key="AdapterType">CombinedTagReader</property>
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "Adapter">
+		<table name="dms_adapter" holds_deleted="true">
+			<selection_group>
+				<entity_type>Adapter</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.AdapterImpl" Xpath="DMS/Adapters">
+				<property key="AdapterType">NotificationTagReader</property>
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "Adapter">
+		<table name="dms_adapter" holds_deleted="true">
+			<selection_group>
+				<entity_type>Adapter</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.AdapterImpl" Xpath="DMS/Adapters">
+				<property key="AdapterType">ReadAlgorithm</property>
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "Adapter">
+		<table name="dms_adapter" holds_deleted="true">
+			<selection_group>
+				<entity_type>Adapter</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.AdapterImpl" Xpath="DMS/Adapters">
+				<property key="AdapterType">TagCache</property>
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "Adapter">
+		<table name="dms_adapter" holds_deleted="true">
+			<selection_group>
+				<entity_type>Adapter</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.AdapterImpl" Xpath="DMS/Adapters">
+				<property key="AdapterType">WriteAlgorithm</property>
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "Adapter">
+		<table name="dms_adapter" holds_deleted="true">
+			<selection_group>
+				<entity_type>Adapter</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.AdapterImpl" Xpath="DMS/Adapters">
+				<property key="AdapterType">BarcodeScannerAdapter</property>
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "Constraint">
+		<table name="dms_constraint" holds_deleted="true">
+			<selection_group>
+				<entity_type>Constraint</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.ConstraintImpl" Xpath="DMS/Schedule:default/Constraints">
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "MsAction">
+		<table name="ms_action" holds_deleted="true">
+			<selection_group>
+				<entity_type>Action</entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.MsActionImpl" Xpath="actions">
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<unit_interface name = "WorkflowDeployment">
+		<table name="workflow_deployment" holds_deleted="true">
+			<selection_group>
+				<!--  entity_type is empty because worklow setings does not use properties metadata. You can not specify a property inside properties element -->
+				<entity_type></entity_type>
+		 		<properties class_name="com.oatsystems.service.config.cmsapi.WorkflowDeploymentImpl" Xpath="workflow_deployments">
+	            </properties>
+			</selection_group>
+		</table>
+	</unit_interface>
+	<delete_policy>
+		<mark_as_delete>ems_output,ems_unit,dms_adapter,dms_adapter_reader,dms_task,dms_task_resource,dms_resource,device,dms_device,dms_data_channel,dms_constraint,dms_constraint_resource,location,senseware_install,ms_action,ms_action_target,dms_adapter_feedback,dms_adapter_input,workflow_deployment,workflow_parameter,workflow_instance</mark_as_delete>
+
+		<delete>assn_handler_location,assn_handler</delete>
+	
+	</delete_policy>
+
+</configuration>

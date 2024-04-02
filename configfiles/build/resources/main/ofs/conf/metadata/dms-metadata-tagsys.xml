@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+  <table name="dms_device">
+
+    <entity type="TagsysReaderL200" extends="RFReader">
+      <locator-option value="Tagsys Reader L200">Tagsys Reader L200</locator-option>
+
+      <label>Tagsys Reader L200</label>
+      <description>Tagsys Reader L200 Configuration</description>
+      <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+	<label>Maximum number of antennas</label>
+	<description>Maximum number of antennas for a tagsys reader</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="4" is-default="true">4</option>
+	</select>
+      </property>
+      <property key="ReaderNodeId" is-mandatory="false">
+	<label>Reader Node Id </label>
+	<description>Reader address</description>
+	<type-definition>oat:ReaderNodeID</type-definition>
+	<select is-bound="false">
+	  <option value="01" is-default="true">01</option>
+	</select>
+      </property>
+      <property key="PowerLevel" is-mandatory="true">
+	<label>Power level</label>
+	<description>RF power level for the reader (in percentage)</description>
+	<type-definition>oat:Percentage</type-definition>
+	<select is-bound="false">
+	  <option value="30" is-default="true">30%</option>
+	</select>
+      </property>
+      <property key="ReadDuration" is-mandatory="false">
+	<label>Read Duration</label>
+	<description>Time-out value used during read operations. </description>
+	<type-definition>oat:ReadDuration</type-definition>
+	<select is-bound="false">
+	  <option value="1000" is-default="true">1000</option>
+	</select>
+      </property>
+      <property key="Modulation" is-mandatory="false">
+	<label>Modulation</label>
+	<description>10% - DetectSof is disabled 100% - DetectSof is enabled</description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="10%" is-default="true">DetectSof disabled</option>
+	  <option value="100%">DetectSof enabled</option>
+	</select>
+      </property>
+      <property key="DataCodding" is-mandatory="false">
+	<label>Data Codding</label>
+	<description>1/256 - Quiet mode is disabled 1/4 - Quiet Mode is enabled</description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="1/256" is-default="true">Quiet mode disabled</option>
+	  <option value="1/4">Quiet Mode enabled</option>
+	</select>
+      </property>
+      <property key="DecoddingProcess" is-mandatory="false">
+	<label>Decdding Process</label>
+	<description>Mode:1 subcarrier : decoding Process #1 2 subcarriers : decoding Process #2</description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="2 subcarriers" is-default="true">2 subcarriers</option>
+	  <option value="1 subcarrier">1 subcarrier</option>
+	</select>
+      </property>
+      <property key="Timeslots" is-mandatory="true">
+	<label>Time slotts</label>
+	<description>Defines the Number of Time Slots</description>
+	<type-definition>oat:Timeslots</type-definition>
+	<select is-bound="false">
+	  <option value="4" is-default="true">4</option>
+	</select>
+      </property>
+      <property key="RestoreIOPortsOnReset" is-mandatory="true">
+	<label>Restore I/O ports after device reset</label>
+	<description>Restore I/O ports after device reset</description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="true" is-default="true">true</option>
+	  <option value="false">false</option>
+	</select>
+      </property>
+      <property key="ReadPullIntervalDivider" is-mandatory="true">
+	<label>Read Pull Interval Divider</label>
+	<description>This value used to calculate pull time, while waiting for new tags in continues read mode. Pause is ReadTimeDuration divided by this value</description>
+	<type-definition>oat:ReadPullIntervalDivider</type-definition>
+	<select is-bound="false">
+	  <option value="3" is-default="true">3</option>
+	</select>
+      </property>
+    </entity>
+
+  </table>
+</meta-data>

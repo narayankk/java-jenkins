@@ -1,0 +1,101 @@
+  <table name="epc_detect_term_reason">
+    <column name="epc_detect_term_reason_id" type="NUMERIC">
+      <primary-key sequence="epc_detect_term_reason_seq"/>
+    </column>
+    <column name="reason" type="VARCHAR">
+      <!-- UPDATE epc_detect_term_reason SET guid = reason -->
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="event_type" type="VARCHAR">
+    </column>
+    <column name="was_not_read" type="BOOLEAN">
+    </column>
+    <column name="was_read_elsewhere" type="BOOLEAN">
+    </column>
+    <column name="was_reader_offline" type="BOOLEAN">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="epc_detection">
+    <column name="epc_detection_id" type="NUMERIC">
+      <primary-key sequence="epc_detection_seq"/>
+    </column>
+    <column name="epc" type="VARCHAR">
+    </column>
+    <column name="epc_product_info_id" type="NUMERIC">
+      <foreign-key table="epc_product_info" column="epc_product_info_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="epc_serial_number" type="NUMERIC">
+    </column>
+    <column name="location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="epc_detect_term_reason_id" type="NUMERIC">
+      <foreign-key table="epc_detect_term_reason" column="epc_detect_term_reason_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_millis" type="NUMERIC">
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="end_millis" type="NUMERIC">
+    </column>
+    <column name="end_ts" type="TIMESTAMP">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+<!--
+  <table name="device_alert_state_code">
+    <column name="device_alert_state_code_id" type="NUMERIC">
+      <primary-key sequence="device_alert_state_code_seq"/>
+    </column>
+    <column name="device_alert_state_code" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="device_status">
+    <column name="device_status_id" type="NUMERIC">
+      <primary-key sequence="device_status_seq"/>
+    </column>
+    <column name="device_id" type="NUMERIC">
+      <foreign-key table="device" column="device_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="dms_device_id" type="NUMERIC">
+      <foreign-key table="dms_device" column="dms_device_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_time" type="TIMESTAMP">
+    </column>
+    <column name="end_time" type="TIMESTAMP">
+    </column>
+    <column name="is_online" type="BOOLEAN">
+    </column>
+    <column name="device_error_code" type="NUMERIC">
+    </column>
+    <column name="additional_error_message" type="VARCHAR">
+    </column>
+    <column name="device_alert_state_code_id" type="NUMERIC">
+      <foreign-key table="device_alert_state_code" column="device_alert_state_code_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+-->
+

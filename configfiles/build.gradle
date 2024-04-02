@@ -1,0 +1,69 @@
+buildscript {
+    apply from: '../gradlecommon/dependencies.gradle'
+    apply from: '../gradlecommon/repositories.gradle'
+
+    dependencies {
+        classpath "org.ajoberstar.grgit:grgit-core:4.1.1"
+    }
+}
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'com.jfrog.artifactory' version '4.29.2'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+
+sourceCompatibility = javaSourceVersion
+targetCompatibility = javaTargetVersion
+
+group = "$ofsGroup"
+version = "$ofsVersion"
+
+
+
+dependencies {
+
+}
+
+task resourcesZip (type: Zip) {
+    from "$buildDir/resources/main"
+    archiveFileName = 'ConfigFiles.zip'
+    destinationDirectory = file("$buildDir/dist")
+
+}
+
+task customJar( type: Jar ) {
+	from "$buildDir/resources/main/ofs/conf"
+	archiveName  = "ConfigFiles.jar"
+}
+
+build.dependsOn resourcesZip,customJar
+
+project.afterEvaluate { proj ->
+    proj.configure(proj.publishing) {
+        publications {
+            ConfigFilesZip(MavenPublication) {
+                artifactId = "${project.name}-$flavour"
+                artifact "$buildDir/dist/ConfigFiles.zip"
+            }
+            ConfigFilesJar(MavenPublication) {
+                artifactId = "${project.name}-$flavour"
+                artifact "$buildDir/libs/ConfigFiles.jar"
+            }			
+        }
+    }
+    proj.configure(proj.tasks['artifactoryPublish']) {
+        publications 'ConfigFilesZip','ConfigFilesJar'
+    }
+}
+
+artifactory artifactoryConfig
+

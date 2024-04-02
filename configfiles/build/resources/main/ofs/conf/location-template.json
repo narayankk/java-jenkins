@@ -1,0 +1,131 @@
+[
+    {
+        "type": "Sales Floor",
+        "locationType": "READ_POINT",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "YES",
+            "posPriority": 2
+        }
+    },
+    {
+        "type": "Backroom",
+        "locationType": "READ_POINT",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "YES"
+        }
+    },
+    {
+        "type": "Receiving Area",
+        "locationType": "BUSINESS_LOCATION",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "YES"
+        }
+    },
+    {
+        "type": "Receiving Area",
+        "locationType": "READ_POINT",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "YES"
+        }
+    },
+    {
+        "type": "Assembly",
+        "locationType": "BUSINESS_LOCATION",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "Assembly",
+        "locationType": "READ_POINT",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "Shipping Area",
+        "locationType": "BUSINESS_LOCATION",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "Shipping Area",
+        "locationType": "READ_POINT",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "Out Of Site Location",
+        "locationType": "BUSINESS_LOCATION",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "Out Of Site Location",
+        "locationType": "READ_POINT",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "SF Transition Area",
+        "locationType": "BUSINESS_LOCATION",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "SF Transition Area",
+        "locationType": "READ_POINT",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "Production",
+        "locationType": "BUSINESS_LOCATION",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "Production",
+        "locationType": "READ_POINT",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "Customer Pick-Up Area",
+        "locationType": "BUSINESS_LOCATION",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    },
+    {
+        "type": "Customer Pick-Up Area",
+        "locationType": "READ_POINT",
+        "status": "ACTIVE",
+        "attributes": {
+            "isCycleCountLocation": "NO"
+        }
+    }
+]

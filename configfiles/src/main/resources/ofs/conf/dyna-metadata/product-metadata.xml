@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="PRODUCT_ATTRS">
+  <table name="product">
+    <entity type="Product" has-attributes="true">
+      <label>Product Attributes Definition</label>
+      <description>Product Attributes Definition</description>
+      </entity>
+  </table>
+</meta-data>
+

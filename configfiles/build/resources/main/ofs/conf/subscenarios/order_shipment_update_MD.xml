@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<scenario>
+	<property key="name">order and shipment update - subscenario</property>
+	<property key="description">Update order and shipment based on the process that comes in</property>
+	<property key="sub_scenario">true</property>
+	<property key="parent_access">R</property>
+	<property key="namespace">upd-order-shipment</property>
+	<property key="exits">DONE,ERROR</property>
+	<property key="inputs">processType,processSubType,tags,user,processStartTime,processEndTime,parentLocationEpc,readPointEpc,orderNumber,altOrderNumber1,altOrderNumber2,asnNumber,shipToLoc,boxDetails,handheldID,processID,scenarioID,actionReason,shipmentNumber,altShipmentNumber1,altShipmentNumber2,toLocDesc</property>
+	<property key="outputs">processID</property>
+
+	<process>
+
+		<start name="Start">
+			<target exit="Exit Condition" name="SetBatchVariablesToNullAtStart"></target>
+		</start>
+
+		<activity name="SetBatchVariablesToNullAtStart" resource="primitive:SetVariablesToNull">
+			<target name="CheckIfProcessExists" exit="done" />
+			<target name="CheckIfProcessExists" exit="skip" />
+			<target name="CheckIfProcessExists" exit="error" />
+			<output name="variable0" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+			<output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+			<output name="variable2" class="java.lang.Object">${process.inferredParentLocationEpc}</output>
+			<output name="variable3" class="java.lang.Object">${process.newEpcList}</output>
+			<output name="variable4" class="java.lang.Object">${process.invalidepcs}</output>
+			<output name="variable5" class="java.lang.String">${process.status}</output>
+		</activity>
+
+		<activity name="CheckIfProcessExists" resource="class:com.oatsystems.solutions.apparel.primitives.CheckProcessExists">
+			<target name="StartAssociationProcess" exit="notexists" />
+			<target name="GetSiteIdForLocation" exit="exists" />
+			<target name="ERROR" exit="error" />
+			<input name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+			<input name="processType" class="java.lang.String">${process.processType}</input>
+			<input name="user" class="java.lang.String">${process.user}</input>
+			<input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+			<input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+			<input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+			<input name="handheldID" class="java.lang.String">${process.handheldID}</input>
+			<output name="processID" class="java.lang.String">${process.processID}</output>
+		</activity>
+
+		<activity name="StartAssociationProcess" resource="primitive:StartProcess">
+			<target name="GetSiteIdForLocation" exit="done" />
+			<target name="ERROR" exit="error" />
+			<input name="processMasterCode" class="java.lang.String">${process.processType}</input>
+			<input name="processData0" class="java.lang.String">${process.processType}</input>
+			<input name="processData1" class="java.lang.String">${process.user}</input>
+			<input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+			<input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+			<input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+			<input name="processData5" class="java.lang.String">${process.parentLocationEpc}</input>
+			<input name="processData6" class="java.lang.String">${process.siteEpc}</input>
+			<input name="processData7" class="java.lang.String">${process.handheldID}</input>
+			<input name="processData8" class="java.lang.String">${process.scenarioID}</input>
+			<input name="processData9" class="java.lang.String">${process.processSubType}</input>
+			<output name="processID" class="java.lang.String">${process.processID}</output>
+		</activity>
+
+		<activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+			<target name="CheckIfOrderAssociated" exit="done" />
+			<target name="SetVariablesToNullOnError" exit="error" />
+			<input name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+			<input  name="rpLocationEpc" class="java.lang.String">${process.readPointEpc}</input>
+			<output name="siteId" class="java.lang.String">${process.siteId}</output>
+			<output name="siteEpc" class="java.lang.String">${process.siteEpc}</output>
+			<output name="siteName" class="java.lang.String">${process.siteName}</output>
+			<output name="locSubtype" class="java.lang.String">${process.locSubtype}</output>
+		</activity>
+
+		<activity name="CheckIfOrderAssociated" resource="class:com.oatsystems.solutions.apparel.primitives.CheckIfOrderAssociated">
+			<target name="DecideOnEPCStateValidation" exit="done" />
+			<target name="SetVariablesToNullOnError" exit="error" />
+			<input name="processType" class="java.lang.String">${process.processType}</input>
+			<input name="asnNumber" class="java.lang.String">${process.asnNumber}</input>
+			<input name="orderNumber" class="java.lang.String">${process.orderNumber}</input>
+			<input name="shipmentNumber" class="java.lang.String">${process.shipmentNumber}</input>
+			<input name="shipToLoc" class="java.lang.String">${process.shipToLoc}</input>
+			<input name="toLocDesc" class="java.lang.String">${process.toLocDesc}</input>
+			<input name="siteName" class="java.lang.String">${process.siteName}</input>
+			<output name="assocOrderNumber" class="java.lang.String">${process.assocOrderNumber}</output>
+			<output name="orderType" class="java.lang.String">${process.orderType}</output>
+			<output name="shipmentType" class="java.lang.String">${process.shipType}</output>
+		</activity>
+
+		<decision name="DecideOnEPCStateValidation">
+			<case target="FilterInvalidStateTags" condition="${process.orderType} ne null and ${process.orderType} eq 'DC_RETURN' and ${process.processType} eq 'ITEM_PACK'" />
+			<default label="Skip" target="DecideOnShipmentUpdate" />
+		</decision>
+
+		<activity name="FilterInvalidStateTags" resource="class:com.oatsystems.workflow.primitives.StateValidatorMDBatch">
+			<target name="DecideOnShipmentUpdate" exit="skip" />
+			<target name="RemoveInvalidTagsFromBoxDetails" exit="validated" />
+			<target name="SetVariablesToNullOnError" exit="error" />
+			<input name="containeeArray" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</input>
+			<input name="siteId" class="java.lang.String">${process.siteId}</input>
+			<input name="bizLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+			<input name="rpLocationEpc" class="java.lang.String">${process.readPointEpc}</input>
+			<input name="processType" class="java.lang.String">${process.processType}</input>
+			<input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+			<input name="orderType" class="java.lang.String">${process.orderType}</input>
+			<input name="shipmentType" class="java.lang.String">${process.shipType}</input>
+			<output name="validContaineeArray" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</output>
+		</activity>
+
+		<activity name="RemoveInvalidTagsFromBoxDetails" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateBoxDetailsWithTags">
+			<target name="DecideOnShipmentUpdate" exit="done" />
+			<target name="SetVariablesToNullOnError" exit="error" />
+			<target name="FAILURE" exit="failure" />
+			<input name="boxDetails" class="java.util.List">${process.boxDetails}</input>
+			<input name="validContaineeArray" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</input>
+			<output name="updatedBoxDetails" class="java.util.List">${process.boxDetails}</output>
+		</activity>
+
+		<decision name="DecideOnShipmentUpdate">
+			<case target="UpdateShipmentStatus" condition="${process.assocOrderNumber} ne null" />
+			<default label="CheckOrderUpdate" target="DecideOnOrderUpdate" />
+		</decision>
+
+		<activity name="UpdateShipmentStatus" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateShipmentStatus">
+			<target name="DecideOnOrderUpdate" exit="done" />
+			<target name="ERROR" exit="error" />
+			<input name="boxDetails" class="java.util.List">${process.boxDetails}</input>
+			<input name="orderNumber" class="java.lang.String">${process.assocOrderNumber}</input>
+			<input name="orderType" class="java.lang.String">${process.orderType}</input>
+			<input name="orderStatus" class="java.lang.String">${process.orderStatus}</input>
+			<input name="processType" class="java.lang.String">${process.processType}</input>
+			<input name="actionReason" class="java.util.List">${process.actionReason}</input>
+			<input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+			<output name="status" class="java.lang.String">${process.status}</output>
+			<output name="actionReason" class="java.util.List">${process.actionReason}</output>
+			<output name="actionReasonMap" class="java.util.HashMap">${process.actionReasonMap}</output>
+		</activity>
+
+		<decision name="DecideOnOrderUpdate">
+			<case target="UpdateOrderStatus" condition="${process.assocOrderNumber} ne null" />
+			<default label="Skip" target="DecideIfItemRetirement" />
+		</decision>
+
+		<activity name="UpdateOrderStatus" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateOrderStatus">
+			<target name="PurgeCachedOrderMetadata" exit="done"/>
+			<target name="ERROR" exit="error" />
+			<input name="status" class="java.lang.String">${process.status}</input>
+			<input name="actionReason" class="java.util.List">${process.actionReason}</input>
+			<input name="orderNumber" class="java.lang.String">${process.assocOrderNumber}</input>
+			<input name="altOrderNumber1" class="java.lang.String">${process.altOrderNumber1}</input>
+			<input name="altOrderNumber2" class="java.lang.String">${process.altOrderNumber2}</input>
+			<input name="shipmentNumber" class="java.lang.String">${process.shipmentNumber}</input>
+			<input name="altShipmentNumber1" class="java.lang.String">${process.altShipmentNumber1}</input>
+			<input name="altShipmentNumber2" class="java.lang.String">${process.altShipmentNumber2}</input>
+			<input name="processType" class="java.lang.String">${process.processType}</input>
+			<input name="actionReasonMap" class="java.util.HashMap">${process.actionReasonMap}</input>
+		</activity>
+		<activity name="PurgeCachedOrderMetadata" resource="class:com.oatsystems.solutions.apparel.primitives.PurgeCachedOrderMetadata">
+			<target name="DecideIfItemRetirement" exit="done" />
+			<target name="ERROR" exit="error" />
+			<input name="collectionName" class="java.lang.String">ordermetadata</input>
+			<input name="orderNumber" class="java.lang.String">${process.assocOrderNumber}</input>
+		</activity>
+
+		<decision name="DecideIfItemRetirement">
+			<case target="GetInferredRetirementBusinessLocation" condition="${process.actionReason} eq null and ${process.processType} eq 'ITEM_PACK' and ${process.shipType} eq 'CUSTOMER_PICKUP' and ${process.shipToLoc} eq null" />
+			<case target="IncrementEpcReadTimestamp" condition="${process.processType} eq 'ITEM_RECV' and ${process.shipType} eq 'CUSTOMER_PICKUP' and (${process.shipToLoc} eq ${process.siteName} or ${process.toLocDesc} eq ${process.siteName}) and ${process.status} ne 'MISS_DELIVERED'" />
+			<default label="Skip" target="CloseAssociationProcessBatch"/>
+		</decision>
+
+		<activity name="IncrementEpcReadTimestamp" resource="class:com.oatsystems.solutions.apparel.primitives.IncrementEpcReadTimestamp">
+			<target name="GetInferredRetirementBusinessLocation" exit="done"/>
+			<target name="SetVariablesToNullOnError" exit="error"/>
+			<input name="epcListArray" class="[Ljava.lang.Object;">${process.tags}</input>
+			<output name="epcListArray" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</output>
+		</activity>
+
+		<activity name="GetInferredRetirementBusinessLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetInferredLocation">
+			<target name="IterateOnTagArrayBatch" exit="done" />
+			<target name="CloseAssociationProcessBatch" exit="error" />
+			<input name="siteEpc" class="java.lang.String">${process.siteEpc}</input>
+			<input name="processType" class="java.lang.String">ITEM_SHIP</input>
+			<output name="inferredParentLocationEpc" class="java.lang.String">${process.inferredParentLocationEpc}</output>
+			<output name="readPointEpc" class="java.lang.String">${process.readPointEpc}</output>
+		</activity>
+
+		<activity name="IterateOnTagArrayBatch" resource="class:com.oatsystems.workflow.primitives.IterateOnObjectArrayInBatch">
+			<target name="ConvertArrayToArrayList" exit="continue" />
+			<target name="CloseAssociationProcessBatch" exit="break" />
+			<target name="SetVariablesToNullOnErrorBatch" exit="error" />
+			<input name="iterationRange" class="[Ljava.lang.Object;">${process.tags}</input>
+			<input name="currentStartIndex" class="java.lang.String">${process.currentIndex}</input>
+			<input name="batchSize" class="java.lang.String">1000</input>
+			<output name="currentEndIndex" class="java.lang.String">${process.currentIndex}</output>
+			<output name="currentValues" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+		</activity>
+
+		<activity name="ConvertArrayToArrayList" resource="class:com.oatsystems.workflow.primitives.ConvertArrayToArrayList">
+			<target name="AssociateTagWithNullParentLocation" exit="done"/>
+			<target name="CloseAssociationProcessBatch" exit="error"/>
+			<input name="epcListArray" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</input>
+			<output name="epcList" class="java.util.List">${process.newEpcList}</output>
+		</activity>
+
+		<activity name="AssociateTagWithNullParentLocation" resource="class:com.oatsystems.workflow.primitives.AssociateEpcToLocationMDBatch">
+			<target name="LogInvalidEpcAfterAssociationBatch" exit="associated" />
+			<target name="CloseAssociationProcessOnError" exit="error" />
+			<input name="epcList" class="java.util.List">${process.newEpcList}</input>
+			<input name="associatedEpcList" class="java.util.List">${process.associatedEpcList}</input>
+			<input name="parentLocationEpc" class="java.lang.String">${process.inferredParentLocationEpc}</input>
+			<input name="processId" class="java.lang.String">${process.processID}</input>
+			<input name="processType" class="java.lang.String">ITEM_SHIP</input>
+			<input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+			<input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+			<input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+			<input name="orderType" class="java.lang.String">${process.orderType}</input>
+			<input name="shipmentType" class="java.lang.String">${process.shipType}</input>
+			<output name="invalidepcs" class="java.util.List">${process.invalidepcs}</output>
+			<output name="associatedEpcList" class="java.util.List">${process.associatedEpcList}</output>
+		</activity>
+
+		<activity name="LogInvalidEpcAfterAssociationBatch" resource="class:com.oatsystems.workflow.primitives.LogProcessErrorBatch">
+			<target name="IterateOnTagArrayBatch" exit="done" />
+			<target name="SetVariablesToNullOnErrorBatch" exit="error" />
+			<input name="errorCode" class="java.lang.String">ERROR_BAD_ITEM</input>
+			<input name="errorDesc" class="java.lang.String">"An un-received EPC encountered"</input>
+			<input name="invalidepcs" class="java.util.List">${process.invalidepcs}</input>
+		</activity>
+
+		<activity name="CloseAssociationProcessBatch" resource="primitive:CloseProcess">
+			<target name="SetBatchVariablesToNull" exit="done" />
+			<target name="SetVariablesToNullOnErrorBatch" exit="error" />
+			<input name="processID" class="java.lang.String">${process.processID}</input>
+			<input name="processData0" class="java.lang.String">${process.processType}</input>
+			<input name="processData1" class="java.lang.String">${process.user}</input>
+			<input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+			<input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+			<input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+			<input name="processData5" class="java.lang.String">${process.parentLocationEpc}</input>
+			<input name="processData6" class="java.lang.String">${process.siteEpc}</input>
+			<input name="processData7" class="java.lang.String">${process.handheldID}</input>
+			<input name="processData8" class="java.lang.String">${process.scenarioID}</input>
+			<input name="processData9" class="java.lang.String">${process.processSubType}</input>
+			<output name="processID" class="java.lang.String">${process.processID}</output>
+		</activity>
+
+		<activity name="CloseAssociationProcessOnError" resource="primitive:CloseProcess">
+			<target name="RETRY_NEEDED" exit="done" />
+			<target name="RETRY_NEEDED" exit="error" />
+			<input name="processID" class="java.lang.String">${process.processID}</input>
+			<input name="processData0" class="java.lang.String">${process.processType}</input>
+			<input name="processData1" class="java.lang.String">${process.user}</input>
+			<input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+			<input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+			<input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+			<input name="processData5" class="java.lang.String">${process.parentLocationEpc}</input>
+			<input name="processData6" class="java.lang.String">${process.siteEpc}</input>
+			<input name="processData7" class="java.lang.String">${process.handheldID}</input>
+			<input name="processData8" class="java.lang.String">${process.scenarioID}</input>
+			<input name="processData9" class="java.lang.String">${process.processSubType}</input>
+			<output name="processID" class="java.lang.String">${process.processID}</output>
+		</activity>
+
+		<activity name="SetVariablesToNullOnErrorBatch" resource="primitive:SetVariablesToNull">
+			<target name="ERROR" exit="done" />
+			<target name="ERROR" exit="skip" />
+			<target name="ERROR" exit="error" />
+			<output name="variable0" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+			<output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+			<output name="variable2" class="java.lang.Object">${process.inferredParentLocationEpc}</output>
+			<output name="variable3" class="java.lang.Object">${process.newEpcList}</output>
+			<output name="variable4" class="java.lang.Object">${process.invalidepcs}</output>
+			<output name="variable5" class="java.lang.String">${process.status}</output>
+		</activity>
+
+		<activity name="SetVariablesToNullOnError" resource="primitive:SetVariablesToNull">
+			<target name="ERROR" exit="done" />
+			<target name="ERROR" exit="skip" />
+			<target name="ERROR" exit="error" />
+			<output name="variable0" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+			<output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+			<output name="variable2" class="java.lang.Object">${process.inferredParentLocationEpc}</output>
+			<output name="variable3" class="java.lang.Object">${process.newEpcList}</output>
+			<output name="variable4" class="java.lang.Object">${process.invalidepcs}</output>
+			<output name="variable5" class="java.lang.String">${process.status}</output>
+		</activity>
+
+		<activity name="SetBatchVariablesToNull" resource="primitive:SetVariablesToNull">
+			<target name="DONE" exit="done" />
+			<target name="DONE" exit="skip" />
+			<target name="ERROR" exit="error" />
+			<output name="variable0" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+			<output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+			<output name="variable2" class="java.lang.Object">${process.inferredParentLocationEpc}</output>
+			<output name="variable3" class="java.lang.Object">${process.newEpcList}</output>
+			<output name="variable4" class="java.lang.Object">${process.invalidepcs}</output>
+			<output name="variable5" class="java.lang.String">${process.status}</output>
+		</activity>
+
+		<end name="RETRY_NEEDED"></end>
+		<end name="ERROR"></end>
+		<end name="FAILURE"></end>
+		<end name="DONE"></end>
+
+	</process>
+
+	<config/>
+
+	<display/>
+
+</scenario>

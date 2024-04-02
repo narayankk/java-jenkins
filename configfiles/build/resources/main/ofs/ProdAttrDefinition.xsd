@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="urn:ProdAttrDefinition" elementFormDefault="qualified" xmlns:x="urn:ProdAttrDefinition" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="ProductAttributes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Entity" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Attribute" minOccurs="1" maxOccurs="100">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="EnumeratedAttributeValue" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                            <xs:attribute name="value" type="xs:string"/>
+                      </xs:complexType>
+                    </xs:element> 
+                  </xs:sequence>
+                  <xs:attribute name="name" type="xs:string" use="required"/>
+                  <xs:attribute name="display" type="xs:string" use="required"/>
+                  <xs:attribute name="type" type="x:AttrDataType" use="required"/>
+                  <xs:attribute name="is-reportable" type="xs:string" default="true"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <!-- is-reportable flag cannot be false for Product entity
+            <xs:attribute name="is-reportable" type="xs:string" default="true"/> 
+            -->
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="AttrDataType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="String"/>
+      <xs:enumeration value="Double"/>
+      <xs:enumeration value="Integer"/>
+      <xs:enumeration value="Date"/>
+      <xs:enumeration value="DateTime"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

@@ -1,0 +1,1152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://support.oatsystems.com/xsd/scenarios4_0.xsd">
+    <property key="name">Poolable MV Handheld Cycle Count Scenario</property>
+    <property key="description">This scenario associates an EPC with a given location and an appropriate status.</property>
+    <property key="version">9.0</property>
+    <property key="scenario.type">Apparel_CC</property>
+    <property key="poolable">true</property>
+
+    <process>
+        <start name="Start">
+            <target exit="Exit Condition" name="GetCCProcessingOptions"></target>
+        </start>
+
+        <activity name="GetCCProcessingOptions" resource="class:com.oatsystems.solutions.apparel.primitives.GetCCProcessingOptions">
+            <target exit="done" name="SetVariablesToNull"></target>
+            <output name="useStoredProc" class="java.lang.String">${process.useStoredProc}</output>
+            <output name="callAutoretirement" class="java.lang.String">${process.callAutoretirement}</output>
+        </activity>
+
+        <activity name="SetVariablesToNull" resource="primitive:SetVariablesToNull">
+            <target exit="done" name="SetVariablesToNull2"></target>
+            <target exit="error" name="SetVariablesToNull2"></target>
+            <target exit="skip" name="SetVariablesToNull2"></target>
+
+            <output class="java.lang.Object" constant="false" name="variable0">${process.parentLocationEpc}</output>
+            <output class="java.lang.String" constant="false" name="variable1">${process.user}</output>
+            <output class="java.lang.Object" constant="false" name="variable2">${process.processStartTime}</output>
+            <output class="java.lang.Object" constant="false" name="variable3">${process.processEndTime}</output>
+            <output class="java.lang.Object" constant="false" name="variable4">${process.elapsedTimeInSeconds}</output>
+            <output class="java.lang.String" constant="false" name="variable5">${process.scenarioType}</output>
+            <output class="java.lang.String" constant="false" name="variable6">${process.acceptedByUser}</output>
+            <output class="java.lang.String" constant="false" name="variable7">${process.acceptanceStatus}</output>
+            <output class="java.lang.Long" constant="false" name="variable8">${process.ccDetailID}</output>
+        </activity>
+
+        <activity name="SetVariablesToNull2" resource="primitive:SetVariablesToNull">
+            <target exit="done" name="ResetProcessId"></target>
+            <target exit="error" name="ResetProcessId"></target>
+            <target exit="skip" name="ResetProcessId"></target>
+            <output class="java.lang.String" constant="false" name="variable0">${process.processType}</output>
+            <output class="java.lang.String" constant="false" name="variable1">${process.isThresholdMet}</output>
+            <output class="java.lang.Object" constant="false" name="variable2" >${process.tags}</output>
+            <output class="java.lang.String" constant="false" name="variable3">${process.isCCAcceptanceFromUI}</output>
+            <output class="java.util.Set" constant="false" name="variable4">${process.failedEpcs}</output>
+            <output class="java.lang.String" constant="false" name="variable5">${process.filterExpression}</output>
+            <output class="java.lang.String" constant="false" name="variable6">${process.filterName}</output>
+        </activity>
+
+        <activity name="ResetProcessId" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="ProcessMessageIn" exit="done"/>
+            <target name="ProcessMessageIn" exit="error"/>
+            <input  name="value" class="java.lang.String">''</input>
+            <output name="variable" class="java.lang.String">${process.processID}</output>
+        </activity>
+
+
+        <activity name="ProcessMessageIn" resource="class:com.oatsystems.workflow.apparel.primitives.ProcessMessageIn">
+            <target exit="done" name="CheckIfmanualacceptance"></target>
+            <!--  ProcessMessageIn does not return an error exit value. Ok to continue? -->
+            <target exit="error" name="FAILURE"></target>
+            <input class="java.lang.Object" constant="false" name="payload" required="false">${process.payload}</input>
+            <output class="java.lang.String" constant="false" name="acceptedStatus">${process.acceptanceStatus}</output>
+            <output class="java.lang.Long" constant="false" name="ccDetailID">${process.ccDetailID}</output>
+            <output class="java.lang.String" constant="false" name="elapsedTimeInSeconds">${process.elapsedTimeInSeconds}</output>
+            <output class="java.lang.String" constant="false" name="location">${process.parentLocationEpc}</output>
+            <output class="java.lang.String" constant="false" name="readPointEpc">${process.readPointEpc}</output>
+            <output class="java.lang.String" constant="false" name="processEndTime">${process.processEndTime}</output>
+            <output class="java.lang.String" constant="false" name="processStartTime">${process.processStartTime}</output>
+            <output class="java.lang.String" constant="false" name="processType">${process.processType}</output>
+            <output class="java.lang.String" constant="false" name="processSubType">${process.processSubType}</output>
+            <output class="java.lang.String" constant="false" name="handheldID">${process.handheldID}</output>
+            <output class="java.lang.String" constant="false" name="scenarioID">${process.scenarioID}</output>
+            <output class="java.lang.String" constant="false" name="scenarioType">${process.scenarioType}</output>
+            <output class="java.lang.Long" constant="false" name="threshold">${process.discrepancyThreshold}</output>
+            <output class="java.lang.String" constant="false" name="isThresholdMet">${process.isThresholdMet}</output>
+            <output class="java.lang.String" constant="false" name="filterExpression">${process.filterExpression}</output>
+            <output class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;" constant="false" name="tags">${process.tags}</output>
+            <output class="java.lang.String" constant="false" name="user">${process.user}</output>
+            <output class="java.lang.String" constant="false" name="filterName">${process.filterName}</output>
+            <output class="com.oatsystems.solutions.apparel.objects.CombinedCC" constant="false" name="combinedCC">${process.combinedCC}</output>
+            <output class="java.lang.Boolean" constant="false" name="isCombined">${process.isCombined}</output>
+            <output class="java.lang.Long" constant="false" name="seqNumber">${process.msgSeqNum}</output>
+            <output class="java.util.List" constant="false" name="customProcessAttributes">${process.customProcessAttributes}</output>
+            <output class="java.lang.String" constant="false" name="hhSessionID">${process.hhSessionID}</output>
+            <output class="java.lang.String" constant="false" name="taskSource">${process.taskSource}</output>
+            <output class="java.lang.Long" constant="false" name="msgRecvTimeMillis">${process.msgRecvTimeMillis}</output>
+      <output class="java.lang.String" constant="false" name="epcListSize">${process.epcListSize}</output>
+        </activity>
+
+        <decision name="CheckIfmanualacceptance">
+            <case condition="${process.scenarioType} eq 'associationReconciliation' and ${process.isCombined} eq true" label="Combined CC" target="ResetMergeHHID"></case>
+            <case condition="${process.scenarioType} eq 'associationReconciliation'" label="Manual CC" target="SetHHIDForCCManual"></case>
+            <default label="Regular CC" target="StartMongoProcess"></default>
+        </decision>
+
+        <activity name="ResetMergeHHID" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="Iterate1" exit="done"/>
+            <target name="Iterate1" exit="error"/>
+            <input  name="value" class="java.lang.String">''</input>
+            <output name="variable" class="java.lang.String">${process.mergeHHID}</output>
+        </activity>
+
+        <activity name="Iterate1" resource="primitive:IterateOnObjectArray">
+            <target name="ComputeMergeHHID" exit="continue" />
+            <target name="SetMergeHHID" exit="break" />
+            <input name="iterationRange" class="[Ljava.lang.Object;">${process.combinedCC}.getCcIds()</input>
+            <input name="currentIndex" class="java.lang.String">${process.currentIndex1}</input>
+            <output name="currentIndex" class="java.lang.String">${process.currentIndex1}</output>
+            <output name="currentValue" class="java.lang.Long">${process.childCCDetailId}</output>
+        </activity>
+
+        <activity name="ComputeMergeHHID" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="Iterate1" exit="done"/>
+            <target name="Iterate1" exit="error"/>
+            <input  name="value" class="java.lang.String">${process.mergeHHID}+","+${process.childCCDetailId}</input>
+            <output name="variable" class="java.lang.String">${process.mergeHHID}</output>
+        </activity>
+
+
+        <activity name="SetHHIDForCCManual" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="StartMongoProcessForMerge" exit="done"/>
+            <target name="StartMongoProcessForMerge" exit="error"/>
+            <input  name="value" class="java.lang.String">${process.ccDetailID}</input>
+            <output name="variable" class="java.lang.String">${process.mergeHHID}</output>
+        </activity>
+
+        <activity name="SetMergeHHID" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="StartMongoProcessForMerge" exit="done"/>
+            <target name="StartMongoProcessForMerge" exit="error"/>
+            <input  name="value" class="java.lang.String">${process.mergeHHID}.substring(1)</input>
+            <output name="variable" class="java.lang.String">${process.mergeHHID}</output>
+        </activity>
+
+
+        <activity name="StartMongoProcessForMerge" resource="class:com.oatsystems.workflow.primitives.StartMongoProcess">
+            <target name="CheckIfCCProcessed" exit="done" />
+            <target name="SUCCESS" exit="alreadyProcessed" />
+            <target name="RETRY_NEEDED" exit="error" />
+            <input  name="user" class="java.lang.String">${process.user}</input>
+            <input name ="ccDetailID" class="java.lang.Long">${process.ccDetailID}</input>
+            <input  name="hhID" class="java.lang.String">${process.mergeHHID}</input>
+            <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+            <input  name="hhEndTime" class="java.lang.String">${process.processEndTime}</input>
+            <input  name="processType" class="java.lang.String">${process.processType}</input>
+            <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+            <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+        </activity>
+
+        <activity name="StartMongoProcess" resource="class:com.oatsystems.workflow.primitives.StartMongoProcess">
+            <target name="CheckIfFirstStreamingMessage" exit="done" />
+            <target name="SUCCESS" exit="alreadyProcessed" />
+            <target name="RETRY_NEEDED" exit="error" />
+            <input  name="user" class="java.lang.String">${process.user}</input>
+            <input name ="ccDetailID" class="java.lang.Long" required="false">${process.ccDetailID}</input>
+            <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+            <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+            <input  name="hhEndTime" class="java.lang.String">${process.msgSeqNum}</input>
+            <input  name="processType" class="java.lang.String">${process.processType}</input>
+            <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+            <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+        </activity>
+
+        <decision name="CheckIfFirstStreamingMessage">
+            <case condition="${process.msgSeqNum} eq 1 " label="First Streaming Message" target="UpdateCCType"></case>
+            <default label="First Streaming Message has already processed" target="CheckIfCCProcessed"></default>
+        </decision>
+
+        <activity name="UpdateCCType" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateCycleCountType">
+            <target name="CheckIfCCProcessed" exit="done" />
+            <target exit="error" name="checkIfUIacceptanceRetry" />
+            <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+       <input class="java.lang.String" constant="false" name="hhID">${process.handheldID}</input>
+            <input class="java.lang.Long" constant="false" name="ccDetailID">${process.ccDetailID}</input>
+        </activity>
+
+        <activity name="CheckIfCCProcessed" resource="class:com.oatsystems.solutions.apparel.primitives.CheckIfCCProcessed">
+            <target exit="processed" name="checkIfUIacceptance"></target>
+            <target exit="notProcessed" name="InitializeCCWholeStore"></target>
+            <target exit="partiallyProcessed" name="GetSiteIdForLocationAfterLastBatch"></target>
+            <target exit="ignored" name="checkIfUIacceptance"></target>
+            <target exit="tccStreamingPartiallyProcessed" name="SetAcceptedForTCCStreamRetry"></target>
+            <target exit="tccPartiallyProcessed" name="DecideOnLastMessageOfCC"></target>
+            <target exit="uiPartiallyProcessed" name="DecideOnCombinedCCOrNot"></target>
+            <target exit="notClosed" name="GetSiteIdForLocationForNotClosedProcess"></target>
+            <target exit="invalidCCDetailId" name="checkIfUIacceptance"></target>
+            <target exit="error" name="checkIfUIacceptanceRetry"></target>
+            <input class="java.lang.String" constant="false" name="processStartTime">${process.processStartTime}</input>
+            <input class="java.lang.Long" constant="false" name="ccDetailID">${process.ccDetailID}</input>
+            <input class="java.lang.String" constant="false" name="hhSessionID">${process.hhSessionID}</input>
+            <input class="java.lang.String" constant="false" name="hhID">${process.handheldID}</input>
+            <input class="java.lang.Long" constant="false" name="hhSeqNum">${process.msgSeqNum}</input>
+            <input class="java.util.Map" constant="false" name="processedMessages">${process.processedMap}</input>
+            <input class="com.oatsystems.solutions.apparel.objects.CombinedCC" constant="false" name="combinedCC">${process.combinedCC}</input>
+            <input class="java.lang.Boolean" constant="false" name="isCombined">${process.isCombined}</input>
+            <input class="java.lang.String" constant="false" name="scenarioType">${process.scenarioType}</input>
+            <input class="java.lang.String" constant="false" name="acceptanceStatus">${process.acceptanceStatus}</input>
+            <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+            <input class="java.lang.String" constant="false" name="parentLocationEpc">${process.parentLocationEpc}</input>
+            <input name="processType" class="java.lang.String">${process.processType}</input>
+            <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <input name="isManualAcceptance" class="java.lang.String">${process.isManualAcceptance}</input>
+            <input class="java.lang.String" constant="false" name="filterExpression">${process.filterExpression}</input>
+            <output class="com.oatsystems.solutions.apparel.objects.CombinedCC" constant="false" name="validCombinedCC">${process.combinedCC}</output>
+            <output class="java.lang.Long" constant="false" name="ccDetailID">${process.ccDetailID}</output>
+            <output class="java.lang.String" constant="false" name="hasWholeStoreCC">${process.hasWholeStoreCC}</output>
+            <output class="java.lang.String" name="acceptedProcessID">${process.processID}</output>
+            <output class="java.lang.String" name="streamingProcessID">${process.streamingProcessID}</output>
+            <output class="java.lang.String" constant="false" name="processStartTime">${process.processStartTime}</output>
+            <!-- Setting variable to be used by aspect; not used within scenario itself -->
+            <output class="java.lang.String" name="ccAlreadySumitted">${process.ccAlreadySumitted}</output>
+            <output class="java.lang.String" constant="false" name="parentLocationEpc">${process.parentLocationEpc}</output>
+            <output class="java.lang.String" constant="false" name="filterExpression">${process.filterExpression}</output>
+        </activity>
+
+
+        <activity name="InitializeCCWholeStore" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="DecideOnScenarioCaller" exit="done"/>
+            <target name="DecideOnScenarioCaller" exit="error"/>
+            <input  name="value" class="java.lang.String">F</input>
+            <output name="variable" class="java.lang.String">${process.isWholeStoreCC}</output>
+        </activity>
+
+        <decision name="DecideOnScenarioCaller">
+            <case condition="${process.scenarioType} eq 'associationReconciliation'" label="Message from UI" target="DecideOnCombinedCCOrNot"></case>
+            <default label="Message from HH" target="DecideOnWholeStoreOrNot"></default>
+        </decision>
+
+
+
+
+
+
+
+
+
+
+        <!-- CC Acceptance Report processing -->
+
+        <decision name="DecideOnCombinedCCOrNot">
+            <case condition="${process.isCombined} eq true" label="Combined CC" target="SetFlagForCCMergeReportProcessing"></case>
+            <default label="Regular CC" target="DecideOnAcceptedOrNot"></default>
+        </decision>
+
+        <activity name="SetFlagForCCMergeReportProcessing" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="Subscenario_ProcessCombinedCC_FromUI" exit="done"/>
+            <target name="Subscenario_ProcessCombinedCC_FromUI" exit="error"/>
+            <input  name="value" class="java.lang.String">true</input>
+            <output name="variable" class="java.lang.String">${process.isCCAcceptanceFromUI}</output>
+        </activity>
+
+
+
+
+        <!-- Process Combined CCs -->
+        <call name="Subscenario_ProcessCombinedCC_FromUI" resource="item_all_cc_sub_combined_MD.xml">
+            <target name="checkIfUIacceptance" exit="DONE"/>
+            <target name="checkIfUIacceptanceRetry" exit="ERROR"/>
+
+            <!--  parameters from message -->
+            <input name="isCombined" class="java.lang.Boolean">${process.isCombined}</input>
+            <input name="combinedCC" class="com.oatsystems.solutions.apparel.objects.CombinedCC">${process.combinedCC}</input>
+            <input name="hasWholeStoreCC" class="java.lang.String">${process.hasWholeStoreCC}</input>
+
+            <input name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</input>
+            <input name="processType" class="java.lang.String">${process.processType}</input>
+            <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <input name="user" class="java.lang.String">${process.user}</input>
+            <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+            <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+            <!--  configuration parameters -->
+            <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+            <!--
+                  <input name="missingItemRP" class="java.lang.String">${process.missingItemRP}</input>
+                  <input name="missingItemBL" class="java.lang.String">${process.missingItemBL}</input>
+            -->
+            <input name="useStoredProc" class="java.lang.String">${process.useStoredProc}</input>
+            <input name="isManualAcceptance" class="java.lang.String">${process.isManualAcceptance}</input>
+            <input name="isCCAcceptanceFromUI" class="java.lang.String">${process.isCCAcceptanceFromUI}</input>
+            <input name="callAutoretirement" class="java.lang.String">${process.callAutoretirement}</input>
+            <input class="java.lang.String" constant="false" name="taskSource">${process.taskSource}</input>
+            <output name="failedEpcs" class="java.util.Set">${process.failedEpcs}</output>
+        </call>
+
+
+
+
+
+        <!-- Process Accepted/Rejected single CCs from UI -->
+        <decision name="DecideOnAcceptedOrNot">
+            <case condition="${process.acceptanceStatus} eq 'T'" label="CC Accepted" target="SetFlagForCCAcceptanceReportProcessing"></case>
+            <default label="CC Rejected" target="CloseCCDetailWithRejection"></default>
+        </decision>
+
+        <activity name="SetFlagForCCAcceptanceReportProcessing" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="SetAcceptedByUser" exit="done"/>
+            <target name="SetAcceptedByUser" exit="error"/>
+            <input  name="value" class="java.lang.String">true</input>
+            <output name="variable" class="java.lang.String">${process.isCCAcceptanceFromUI}</output>
+        </activity>
+
+        <activity name="SetAcceptedByUser" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="GetCCBLAndRP" exit="done"/>
+            <target name="GetCCBLAndRP" exit="error"/>
+            <input  name="value" class="java.lang.String">${process.user}</input>
+            <output name="variable" class="java.lang.String">${process.acceptedByUser}</output>
+        </activity>
+
+        <activity name="GetCCBLAndRP" resource="class:com.oatsystems.solutions.apparel.primitives.GetCCBLAndRP">
+            <target name="GetSiteIdForLocationFromUI" exit="done"/>
+            <target name="checkIfUIacceptanceRetry" exit="error"/>
+            <input class="java.lang.Long" constant="false" name="ccDetailId">${process.ccDetailID}</input>
+            <output name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</output>
+            <output name="readPointEpc" class="java.lang.String">${process.readPointEpc}</output>
+        </activity>
+
+        <activity name="GetSiteIdForLocationFromUI" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+            <target name="DecideOnStartingProcess" exit="done" />
+            <target name="DecideOnStartingProcess" exit="error" />
+            <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+            <output name="siteId" class="java.lang.String">${process.ccLocSiteId}</output>
+            <output name="siteEpc" class="java.lang.String">${process.siteEpc}</output>
+        </activity>
+
+        <decision name="DecideOnStartingProcess">
+            <case condition="${process.processID} eq ''" label="No process id present" target="StartAssociationProcessFromUI"></case>
+            <default label="Process id available - this is a retry of a partially processed CC" target="Subscenario_ProcessItems_FromUI"></default>
+        </decision>
+
+        <activity name="StartAssociationProcessFromUI" resource="primitive:StartProcess">
+            <!--Fix for MV-486-->
+            <target name="AddProcessToSiteUI" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input  name="processMasterCode" class="java.lang.String">${process.processType}</input>
+            <input  name="processData0" class="java.lang.String">${process.processType}</input>
+            <input  name="processData9" class="java.lang.String">${process.processSubType}</input>
+            <output name="processID" class="java.lang.String">${process.processID}</output>
+        </activity>
+
+        <activity name="AddProcessToSiteUI" resource="class:com.oatsystems.workflow.apparel.primitives.AddProcessToSite">
+            <target name="UpdateAcceptedProcess" exit="done" />
+            <target name="UpdateAcceptedProcess" exit="error" />
+            <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+            <input name="processId" class="java.lang.String">${process.processID}</input>
+        </activity>
+
+        <activity name="UpdateAcceptedProcess" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateAcceptedProcess">
+            <target name="Subscenario_ProcessItems_FromUI" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input  name="acceptedProcessId" class="java.lang.String">${process.processID}</input>
+            <input  name="isCombined" class="java.lang.Boolean">${process.isCombined}</input>
+            <input  name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+        </activity>
+
+        <!--
+             <activity name="ConstructAdjustInventoryForUI" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructAdjustInventory">
+                  <target name="Subscenario_ProcessItems_FromUI" exit="done" />
+                  <target name="checkIfUIacceptanceRetry" exit="error" />
+                  <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+
+                  <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+                  <input name="processType" class="java.lang.String">${process.processType}</input>
+                  <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+                  <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+                  <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+                  <input name="processID" class="java.lang.String">${process.processID}</input>
+                  <input name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</input>
+                    <output name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</output>
+              </activity>
+        -->
+
+
+        <call name="Subscenario_ProcessItems_FromUI" resource="item_all_cc_sub_process_MD.xml" namespace="proc_sub_2">
+            <target name="RemoveProcessFromSite" exit="DONE"/>
+            <target name="RemoveProcessFromSiteForFailure" exit="ERROR"/>
+
+            <!-- parameters from message -->
+            <input name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</input>
+            <input name="processType" class="java.lang.String">${process.processType}</input>
+            <input name="user" class="java.lang.String">${process.user}</input>
+
+            <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input name="readPointEpc" class="java.lang.String">${process.readPointEpc}</input>
+
+            <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+            <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+            <input name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+
+            <input name="ccDetailID" class="java.lang.Long">${process.ccDetailID}</input>
+            <input name="msgRecvTimeMillis" class="java.lang.Long">${process.msgRecvTimeMillis}</input>
+            <input name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</input>
+            <!--  flag to indicate acceptance source -->
+            <input name="isCombined" class="java.lang.Boolean" constant="false">${process.isCombined}</input>
+            <input name="isCCAcceptanceFromUI" class="java.lang.String">${process.isCCAcceptanceFromUI}</input>
+            <input name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</input>
+            <input name="acceptedByUser" class="java.lang.String">${process.acceptedByUser}</input>
+
+            <input name="isWholeStoreCC" class="java.lang.String">${process.isWholeStoreCC}</input>
+            <!-- The following 2 params will be present only if isWholeStoreCC is true -->
+            <input  name="defaultBLLocEpcForSite" class="java.lang.String">${process.defaultBLLocEpcForSite}</input>
+            <input  name="defaultRPLocEpcForSite" class="java.lang.String">${process.defaultRPLocEpcForSite}</input>
+
+            <!-- configuration parameters -->
+            <input name="useStoredProc" class="java.lang.String">${process.useStoredProc}</input>
+            <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+            <!--
+                  <input name="missingItemBL" class="java.lang.String">${process.missingItemBL}</input>
+                  <input name="missingItemRP" class="java.lang.String">${process.missingItemRP}</input>
+            -->
+            <input name="isManualAcceptance" class="java.lang.String">${process.isManualAcceptance}</input>
+
+            <!-- Streaming -->
+            <input name="processedMap" class="java.util.Map">${process.processedMap}</input>
+            <input name="processID" class="java.lang.String">${process.processID}</input>
+            <input name="callAutoretirement" class="java.lang.String">${process.callAutoretirement}</input>
+      <input name="epcListSize" class="java.lang.String">${process.epcListSize}</input>
+            <output name="failedEpcs" class="java.util.Set">${process.failedEpcs}</output>
+            <output name="processedMap" class="java.util.Map">${process.processedMap}</output>
+        </call>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- HH Cycle Count processing - store the items, check if this is the last batch, decide on processing or not -->
+
+        <decision name="DecideOnWholeStoreOrNot">
+            <case condition="${process.scenarioType} eq 'associationTCCWholeStore'" label="Whole store TCC" target="SetCCWholeStore"></case>
+            <case condition="${process.scenarioType} eq 'associationCCWholeStore'" label="Whole store CC" target="SetCCWholeStore"></case>
+            <default label="Not whole store CC" target="GetSiteIdForRegMsgFromHH"></default>
+        </decision>
+
+        <activity name="SetCCWholeStore" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="GetSiteIdForLocation" exit="done"/>
+            <target name="GetSiteIdForLocation" exit="error"/>
+            <input  name="value" class="java.lang.String">T</input>
+            <output name="variable" class="java.lang.String">${process.isWholeStoreCC}</output>
+        </activity>
+
+        <activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+            <target name="GetDefaultLocForSite" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+            <output name="siteId" class="java.lang.String">${process.ccLocSiteId}</output>
+        </activity>
+
+        <activity name="GetDefaultLocForSite" resource="class:com.oatsystems.solutions.apparel.primitives.GetDefaultLocForSite" >
+            <target name="SetWholeStoreCCReadPoint" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+            <output name="defaultBLLocEpcForSite" class="java.lang.String">${process.defaultBLLocEpcForSite}</output>
+            <output name="defaultRPLocEpcForSite" class="java.lang.String">${process.defaultRPLocEpcForSite}</output>
+            <output name="defaultBLLocSubTypeForSite" class="java.lang.String">${process.ccDefaultLocSubtype}</output><!--fix for MV-3447-->
+        </activity>
+        <!--fix for MV-3447-->
+        <activity name="SetWholeStoreCCReadPoint" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="DecideToSetDefaultBLForTCC" exit="done"/>
+            <target name="DecideToSetDefaultBLForTCC" exit="error"/>
+            <input  name="value" class="java.lang.String">${process.defaultRPLocEpcForSite}</input>
+            <output name="variable" class="java.lang.String">${process.readPointEpc}</output>
+        </activity>
+
+        <decision name="DecideToSetDefaultBLForTCC">
+            <case condition="${process.scenarioType} eq 'associationTCCWholeStore'" label="Whole store TCC" target="SetLocSubTypeForWholeStoreTCC"></case>
+            <default label="Not whole store TCC" target="CreateCCFilterEPCs2"></default>
+        </decision>
+
+        <activity name="SetLocSubTypeForWholeStoreTCC" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="CreateCCFilterEPCs2" exit="done"/>
+            <target name="CreateCCFilterEPCs2" exit="error"/>
+            <input  name="value" class="java.lang.String">${process.ccDefaultLocSubtype}</input>
+            <output name="variable" class="java.lang.String">${process.ccLocSubtype}</output>
+        </activity>
+        <!--end-->
+        <activity name="GetSiteIdForRegMsgFromHH" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+            <target name="CreateCCFilterEPCs2" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+            <output name="siteId" class="java.lang.String">${process.ccLocSiteId}</output>
+            <output name="siteEpc" class="java.lang.String">${process.siteEpc}</output>
+        </activity>
+
+        <activity name="CreateCCFilterEPCs2" resource="class:com.oatsystems.solutions.apparel.primitives.CreateCCFilterEPCs2">
+            <target name="Subscenario_StoreItems" exit="done"/>
+            <target name="checkIfUIacceptanceRetry" exit="error"/>
+            <input  class="java.lang.Long" constant="false" name="ccDetailId">${process.ccDetailID}</input>
+            <input  class="java.lang.String" constant="false" name="hhSessionId">${process.hhSessionID}</input>
+            <input  class="java.lang.Long" constant="false" name="threshold">${process.discrepancyThreshold}</input>
+            <input  class="java.lang.String" constant="false" name="isThresholdMet">${process.isThresholdMet}</input>
+            <input  class="java.lang.String" constant="false" name="location">${process.parentLocationEpc}</input>
+            <input  class="java.lang.String" constant="false" name="filterExpression">${process.filterExpression}</input>
+            <input  class="java.lang.String" constant="false" name="filterName">${process.filterName}</input>
+            <input  class="java.lang.String" constant="false" name="user">${process.user}</input>
+            <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <input  name="processType" class="java.lang.String">${process.processType}</input>
+            <input class="java.lang.String" constant="false" name="acceptedStatus">${process.acceptanceStatus}</input>
+            <input  class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;" constant="false" name="tags">${process.tags}</input>
+            <output class="java.lang.Long" constant="false" name="ccDetailId">${process.ccDetailID}</output>
+            <!--
+                  <output class="java.lang.String" constant="false" name="isThresholdMet">${process.isThresholdMet}</output>
+                  <output class="java.lang.Long" constant="false" name="accuracy">${process.accuracy}</output>
+            -->
+            <output class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;" constant="false" name="tags">${process.tags}</output>
+        </activity>
+
+        <decision name="DecideOnCCType">
+      <case condition="${process.processSubType} eq 'TCC' or ${process.processSubType} eq 'TFCC' or ${process.processSubType} eq 'TICC'" label="Log Device details for TCC/TFCC/TICC Message" target="LogDeviceDetailsForTCC"></case>
+            <case condition="${process.processSubType} eq 'CC' or ${process.processSubType} eq 'FCC'" label="Log Device details for CC/FCC Message" target="LogDeviceDetailsForCC"></case>
+            <default label="Not TCC or TFCC" target="DecideOnLastMessageOfCC"></default>
+        </decision>
+
+        <activity name="LogDeviceDetailsForTCC" resource="class:com.oatsystems.solutions.apparel.primitives.SetTCCDeviceDetails">
+            <target name="DecideOnTCCAcceptedStatus" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input  name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+            <input name="filterExpression" class="java.lang.String">${process.filterExpression}</input>
+            <input name="location" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <input name="readPointEpc" class="java.lang.String">${process.readPointEpc}</input>
+            <input name="filterName" class="java.lang.String">${process.filterName}</input>
+            <input name="hhSessionID" class="java.lang.String">${process.hhSessionID}</input>
+            <input name="user" class="java.lang.String">${process.user}</input>
+            <input name="handheldID" class="java.lang.String">${process.handheldID}</input>
+            <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+            <input name="processeEndTime" class="java.lang.String">${process.processEndTime}</input>
+            <input name="msgSeqNum" class="java.lang.Long">${process.msgSeqNum}</input>
+            <input name="counted" class="java.lang.Long">${process.tags}.size()</input>
+            <input name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</input>
+            <input name="customProcessAttributes" class="java.util.List">${process.customProcessAttributes}</input>
+        </activity>
+
+        <activity name="LogDeviceDetailsForCC" resource="class:com.oatsystems.solutions.apparel.primitives.SetCCDeviceDetails">
+            <target name="DecideOnLastMessageOfCC" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input  name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+            <input name="msgSeqNum" class="java.lang.Long">${process.msgSeqNum}</input>
+            <input name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</input>
+            <input name="handheldID" class="java.lang.String">${process.handheldID}</input>
+            <output name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</output>
+        </activity>
+
+        <decision name="DecideOnTCCAcceptedStatus">
+            <case condition="(${process.acceptanceStatus} eq 'C')" label="TCC Device cancelled" target="ProcessTCCDeviceCancel"></case>
+            <case condition="(${process.acceptanceStatus} eq 'F')" label="Rejected TCC session" target="ProcessTCCReject"></case>
+            <default label="TCC Device Submit/Stream" target="CheckIfTCCSessionCompleted"></default>
+        </decision>
+
+        <activity name="ProcessTCCDeviceCancel" resource="class:com.oatsystems.solutions.apparel.primitives.ProcessTCCDeviceCancel">
+            <target name="CheckIfTCCSessionCompleted" exit="done"/>
+            <target name="checkIfUIacceptanceRetry" exit="error"/>
+            <input  name="hhSessionID" class="java.lang.String">${process.hhSessionID}</input>
+            <input  name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+            <input name="handheldID" class="java.lang.String">${process.handheldID}</input>
+      <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+        </activity>
+
+        <activity name="CheckIfTCCSessionCompleted" resource="class:com.oatsystems.solutions.apparel.primitives.CheckIfTCCSessionCompleted">
+            <target name="DecideOnLastMessageOfCC" exit="done"/>
+            <target name="checkIfUIacceptanceRetry" exit="error"/>
+            <input  name="hhSessionID" class="java.lang.String">${process.hhSessionID}</input>
+            <output name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</output>
+        </activity>
+
+        <activity name="ProcessTCCReject" resource="class:com.oatsystems.solutions.apparel.primitives.ProcessTCCReject">
+            <target name="DecideOnLastMessageOfCC" exit="done"/>
+            <target name="DecideOnLastMessageOfCC" exit="error"/>
+            <input  name="hhSessionID" class="java.lang.String">${process.hhSessionID}</input>
+            <input name="handheldID" class="java.lang.String">${process.handheldID}</input>
+        </activity>
+
+        <activity name="SetAcceptedForTCCStreamRetry" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="DecideOnLastMessageOfCC" exit="done"/>
+            <target name="DecideOnLastMessageOfCC" exit="error"/>
+            <input  name="value" class="java.lang.String">T</input>
+            <output name="variable" class="java.lang.String">${process.acceptanceStatus}</output>
+        </activity>
+
+
+        <call name="Subscenario_StoreItems" resource="item_all_cc_sub_storebatch_MD.xml">
+            <target name="DecideOnCCType" exit="DONE"/>
+            <target name="checkIfUIacceptanceRetry" exit="ERROR"/>
+
+            <!--  parameters from message -->
+            <input name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</input>
+            <input name="readPointEpc" class="java.lang.String">${process.readPointEpc}</input>
+            <input name="ccDetailID" class="java.lang.Long" constant="false">${process.ccDetailID}</input>
+            <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+            <!-- Streaming -->
+            <input name="msgSeqNum" class="java.lang.Long">${process.msgSeqNum}</input>
+            <input name="processedMap" class="java.util.Map">${process.processedMap}</input>
+            <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input  name="filterExpression" constant="false" class="java.lang.String">${process.filterExpression}</input>
+            <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+            <input class="java.lang.String" name="streamingProcessID">${process.streamingProcessID}</input>
+            <input class="java.lang.String" name="handheldID">${process.handheldID}</input>
+            <input class="java.lang.String" name="processSubType">${process.processSubType}</input>
+            <output name="failedEpcs" class="java.util.Set">${process.failedEpcs}</output>
+            <output name="processedMap" class="java.util.Map">${process.processedMap}</output>
+        </call>
+
+        <decision name="DecideOnLastMessageOfCC">
+            <case condition="(${process.acceptanceStatus} eq 'T') and (${process.streamingProcessID} ne null)" label="Last message, user submitted, processId already created" target="SetAssociationProcess"></case>
+      <case condition="(${process.acceptanceStatus} eq 'T') and (${process.processSubType} eq 'SMART_CC' or  ${process.processSubType}.contains('ICC') )" label="Smart CC Last message, user submitted" target="ProcessSmartCCData"></case>
+            <case condition="(${process.acceptanceStatus} eq 'T')" label="Last message, user submitted" target="StartAssociationProcess"></case>
+            <case condition="(${process.acceptanceStatus} eq 'F')" label="Last message, user cancelled" target="CloseCCDetailWithRejection"></case>
+            <default label="Not last message, CC is continuing; send response for the batch" target="StopMongoProcess"></default>
+        </decision>
+
+        <activity name="ProcessSmartCCData" resource="class:com.oatsystems.solutions.apparel.primitives.ComputeSmartCCData">
+            <target name="StartAssociationProcess" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error"/>
+            <target name="StopMongoProcess" exit="emptyData"/>
+            <input  name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+            <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input class="java.lang.String" name="processSubType">${process.processSubType}</input>
+      <input class="java.lang.String" constant="false" name="hhSessionID">${process.hhSessionID}</input>
+      <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+        </activity>
+
+        <activity name="SetAssociationProcess" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="GetSiteIdForLocationAfterLastBatch" exit="done"/>
+            <target name="GetSiteIdForLocationAfterLastBatch" exit="error"/>
+            <input  name="value" class="java.lang.String">${process.streamingProcessID}</input>
+            <output name="variable" class="java.lang.String">${process.processID}</output>
+        </activity>
+
+        <!-- HH has submitted the CC. Process the CC, or wait for acceptance -->
+
+        <activity name="StartAssociationProcess" resource="primitive:StartProcess">
+            <target name="GetSiteIdForLocationAfterLastBatch" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input name="processMasterCode" class="java.lang.String">${process.processType}</input>
+            <input name="processData0" class="java.lang.String">${process.processType}</input>
+            <input name="processData1" class="java.lang.String">${process.user}</input>
+            <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+            <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+            <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+            <input name="processData5" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input name="processData6" class="java.lang.String">${process.siteEpc}</input>
+            <input name="processData7" class="java.lang.String">${process.handheldID}</input>
+            <input name="processData8" class="java.lang.String">${process.scenarioID}</input>
+            <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+            <output name="processID" class="java.lang.String">${process.processID}</output>
+        </activity>
+
+        <activity name="GetSiteIdForLocationAfterLastBatch" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+            <target name="AddProcessToSite" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+            <output name="siteId" class="java.lang.String">${process.ccLocSiteId}</output>
+        </activity>
+
+        <activity name="AddProcessToSite" resource="class:com.oatsystems.workflow.apparel.primitives.AddProcessToSite">
+            <!--<target name="StoreCCDetails" exit="done" />
+            <target name="StoreCCDetails" exit="error" />-->
+            <!-- Fix for MV-3447-->
+            <target name="DecideOnWholeStoreTCCOrNot" exit="done" />
+            <target name="DecideOnWholeStoreTCCOrNot" exit="error" />
+            <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+            <input name="processId" class="java.lang.String">${process.processID}</input>
+        </activity>
+
+        <!-- Fix for MV-3447-->
+        <decision name="DecideOnWholeStoreTCCOrNot">
+            <case condition="${process.scenarioType} eq 'associationTCCWholeStore'" label="Whole store TCC" target="SetTCCWholeStore"></case>
+            <default label="Not whole store TCC" target="StoreCCDetails"></default>
+        </decision>
+
+        <activity name="SetTCCWholeStore" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="GetSiteIdForLocationPartiallyProcessed" exit="done"/>
+            <target name="GetSiteIdForLocationPartiallyProcessed" exit="error"/>
+            <input  name="value" class="java.lang.String">T</input>
+            <output name="variable" class="java.lang.String">${process.isWholeStoreCC}</output>
+        </activity>
+
+        <activity name="GetSiteIdForLocationPartiallyProcessed" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+            <target name="GetDefaultLocForSitePartiallyProcessed" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+            <output name="siteId" class="java.lang.String">${process.ccLocSiteId}</output>
+            <output name="siteEpc" class="java.lang.String">${process.siteEpc}</output>
+        </activity>
+
+        <activity name="GetDefaultLocForSitePartiallyProcessed" resource="class:com.oatsystems.solutions.apparel.primitives.GetDefaultLocForSite" >
+            <target name="SetWholeStoreTCCReadPoint" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+            <output name="defaultBLLocEpcForSite" class="java.lang.String">${process.defaultBLLocEpcForSite}</output>
+            <output name="defaultRPLocEpcForSite" class="java.lang.String">${process.defaultRPLocEpcForSite}</output>
+            <output name="defaultBLLocSubTypeForSite" class="java.lang.String">${process.ccLocSubtype}</output>
+        </activity>
+
+        <activity name="SetWholeStoreTCCReadPoint" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="StoreCCDetails" exit="done"/>
+            <target name="StoreCCDetails" exit="error"/>
+            <input  name="value" class="java.lang.String">${process.defaultRPLocEpcForSite}</input>
+            <output name="variable" class="java.lang.String">${process.readPointEpc}</output>
+        </activity>
+        <!-- end -->
+
+        <activity name="StoreCCDetails" resource="class:com.oatsystems.solutions.apparel.primitives.StoreCCDetailsMD">
+            <target name="DecideAcceptanceMode" exit="done" />
+            <target name="RemoveProcessFromSite" exit="rejected" />
+            <target name="RemoveProcessFromSiteForFailure" exit="error" />
+
+            <input  name="processID" class="java.lang.String">${process.processID}</input>
+            <input  name="processEndTime" class="java.lang.String">${process.processStartTime}</input>
+            <!-- <input  name="countedItems" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</input> -->
+            <input  name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+            <input  name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input  name="readPointEpc" class="java.lang.String">${process.readPointEpc}</input>
+            <input  name="threshold" class="java.lang.Long">${process.discrepancyThreshold}</input>
+            <input class="java.lang.String" constant="false" name="acceptedStatus">${process.acceptanceStatus}</input>
+            <input  name="filterExpression" constant="false" class="java.lang.String">${process.filterExpression}</input>
+            <!--
+                  <input name="missingItemBL" class="java.lang.String" constant="false" required="false">${process.missingItemBL}</input>
+                  <input name="missingItemRP" class="java.lang.String" constant="false" required="false">${process.missingItemRP}</input>
+            -->
+            <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+            <input name="isManualAcceptance" class="java.lang.String">${process.isManualAcceptance}</input>
+            <input name="user" class="java.lang.String">${process.user}</input>
+            <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+            <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <output name="isManualAcceptance" class="java.lang.String">${process.isManualAcceptance}</output>
+            <output  name="isThresholdMet" class="java.lang.String">${process.isThresholdMet}</output>
+            <output name="accuracy" class="java.lang.Long">${process.accuracy}</output>
+        </activity>
+
+        <!--
+            <activity name="ConstructAdjustInventory" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructAdjustInventory">
+                  <target name="DecideAcceptanceMode" exit="done" />
+                  <target name="checkIfUIacceptanceRetry" exit="error" />
+                  <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+
+                  <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+                  <input name="processType" class="java.lang.String">${process.processType}</input>
+                  <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+                  <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+                  <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+                  <input name="processID" class="java.lang.String">${process.processID}</input>
+                  <input name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</input>
+                    <output name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</output>
+              </activity>
+        -->
+
+        <decision name="DecideAcceptanceMode">
+            <!--  start processing if the msgseq is not null and accepted status is null -->
+            <!--
+            <case condition="${process.msgSeqNum} ne null and ${process.acceptanceStatus} eq ''" label="Streaming" target="Subscenario_AssocItems"></case>
+            <case condition="${process.msgSeqNum} ne null and ${process.acceptanceStatus} eq null" label="Streaming" target="Subscenario_AssocItems"></case>
+            -->
+            <case condition="${process.isManualAcceptance} eq 'Never' or ${process.filterExpression}.equalsIgnoreCase('DisplayCount') or ${process.filterExpression}.equalsIgnoreCase('ShelfTargetResetCount')" label="Auto Acceptance" target="SetFlagForAutoAcceptance"></case>
+            <case condition="${process.isManualAcceptance} eq 'Always'" label="Full Manual Acceptance" target="DecideIfEmailToBeSent"></case>
+            <default label="Conditional Manual Acceptance" target="DecideIfThresholdMet"></default>
+        </decision>
+
+        <decision name="DecideIfThresholdMet">
+            <case condition="${process.isThresholdMet} eq 'T'" label="Threshold Met" target="SetFlagForAutoAcceptance"></case>
+            <case condition="${process.isThresholdMet} eq 'F'" label="Threshold Not Met" target="DecideIfEmailToBeSent"></case>
+            <default label="Threshold Probably Not Met" target="DecideIfEmailToBeSent"></default>
+        </decision>
+
+        <!-- Wait for acceptance -->
+        <decision name="DecideIfEmailToBeSent">
+            <case condition="${process.isEmailRequired} eq 'TRUE'" label="Send Email" target="SendEmailAlert"></case>
+            <default label="Do not send email" target="RemoveProcessFromSite"></default>
+        </decision>
+
+        <activity name="SendEmailAlert" resource="class:com.oatsystems.workflow.primitives.SendEmailAlert">
+            <target name="RemoveProcessFromSite" exit="done" />
+            <target name="RemoveProcessFromSite" exit="error" />
+            <input  name="alertType" class="java.lang.String">CC_Acceptance_Alert</input>
+            <input name="locationEPC" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input  name="ccTime" class="java.lang.String">${process.processEndTime}</input>
+            <input name="operator" class="java.lang.String">${process.user}</input>
+            <input name="accuracy" class="java.lang.Long">${process.accuracy}</input>
+            <input  name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+        </activity>
+
+        <!-- Prepare for processing -->
+        <activity name="SetFlagForAutoAcceptance" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="SetSourceForAutoAcceptance" exit="done"/>
+            <target name="SetSourceForAutoAcceptance" exit="error"/>
+            <input name="value" class="java.lang.String">T</input>
+            <output name="variable" class="java.lang.String">${process.acceptanceStatus}</output>
+        </activity>
+
+        <activity name="SetSourceForAutoAcceptance" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="SetUserForAutoAcceptance" exit="done"/>
+            <target name="SetUserForAutoAcceptance" exit="error"/>
+            <input  name="value" class="java.lang.String">false</input>
+            <output name="variable" class="java.lang.String">${process.isCCAcceptanceFromUI}</output>
+        </activity>
+
+        <activity name="SetUserForAutoAcceptance" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="UpdateAcceptedProcess" exit="done"/>
+            <target name="UpdateAcceptedProcess" exit="error"/>
+            <input name="value" class="java.lang.String">system</input>
+            <output name="variable" class="java.lang.String">${process.acceptedByUser}</output>
+        </activity>
+
+        <activity name="UpdateAcceptedProcess" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateAcceptedProcess">
+            <target name="Subscenario_ProcessItems" exit="done" />
+            <target name="RemoveProcessFromSiteForFailure" exit="error" />
+            <input  name="acceptedProcessId" class="java.lang.String">${process.processID}</input>
+            <input  name="isCombined" class="java.lang.Boolean">${process.isCombined}</input>
+            <input  name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+        </activity>
+
+        <!-- Process the stored items by SP or regular Java processing -->
+
+        <call name="Subscenario_ProcessItems" resource="item_all_cc_sub_process_MD.xml">
+            <target name="RemoveProcessFromSite" exit="DONE"/>
+            <target name="RemoveProcessFromSiteForFailure" exit="ERROR"/>
+
+            <!-- parameters from message -->
+            <input name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</input>
+            <input name="processType" class="java.lang.String">${process.processType}</input>
+            <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <input name="user" class="java.lang.String">${process.user}</input>
+
+            <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input name="readPointEpc" class="java.lang.String">${process.readPointEpc}</input>
+
+            <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+            <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+            <input name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+
+            <input name="ccDetailID" class="java.lang.Long">${process.ccDetailID}</input>
+            <input name="msgRecvTimeMillis" class="java.lang.Long">${process.msgRecvTimeMillis}</input>
+            <input name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</input>
+
+            <!--  flag to indicate acceptance source -->
+            <input name="isCombined" class="java.lang.Boolean" constant="false">${process.isCombined}</input>
+            <input name="isCCAcceptanceFromUI" class="java.lang.String">${process.isCCAcceptanceFromUI}</input>
+            <input name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</input>
+            <input name="acceptedByUser" class="java.lang.String">${process.acceptedByUser}</input>
+
+            <input name="isWholeStoreCC" class="java.lang.String">${process.isWholeStoreCC}</input>
+            <!-- The following 2 params will be present only if isWholeStoreCC is true -->
+            <input  name="defaultBLLocEpcForSite" class="java.lang.String">${process.defaultBLLocEpcForSite}</input>
+            <input  name="defaultRPLocEpcForSite" class="java.lang.String">${process.defaultRPLocEpcForSite}</input>
+
+            <!-- configuration parameters -->
+            <input name="useStoredProc" class="java.lang.String">${process.useStoredProc}</input>
+            <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+            <!--
+                  <input name="missingItemBL" class="java.lang.String">${process.missingItemBL}</input>
+                  <input name="missingItemRP" class="java.lang.String">${process.missingItemRP}</input>
+            -->
+
+            <!-- Streaming -->
+            <input name="processedMap" class="java.util.Map">${process.processedMap}</input>
+            <input  class="java.lang.String" constant="false" name="filterExpression">${process.filterExpression}</input>
+            <input  class="java.lang.String" constant="false" name="filterName">${process.filterName}</input>
+      <input  class="java.lang.String" constant="false" name="epcListSize">${process.epcListSize}</input>
+            <output name="failedEpcs" class="java.util.Set">${process.failedEpcs}</output>
+            <output name="processedMap" class="java.util.Map">${process.processedMap}</output>
+        </call>
+
+
+
+
+        <activity name="RemoveProcessFromSite" resource="class:com.oatsystems.workflow.apparel.primitives.RemoveProcessFromSite">
+            <target name="CloseAssociationProcess" exit="done" />
+            <target name="CloseAssociationProcess" exit="error" />
+            <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+            <input name="processId" class="java.lang.String">${process.processID}</input>
+        </activity>
+
+        <activity name="GetSiteIdForLocationForNotClosedProcess" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+            <target name="CloseAssociationProcess" exit="done" />
+            <target name="CloseAssociationProcess" exit="error" />
+            <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+            <output name="siteId" class="java.lang.String">${process.ccLocSiteId}</output>
+            <output name="siteEpc" class="java.lang.String">${process.siteEpc}</output>
+            <output name="siteName" class="java.lang.String">${process.ccLocSiteName}</output>
+            <output name="locSubtype" class="java.lang.String">${process.ccLocSubtype}</output>
+        </activity>
+
+        <!--
+            <activity name="ConstructAdjustInventoryForNotClosedProcess" resource="class:com.oatsystems.solutions.apparel.primitives.ConstructAdjustInventory">
+                  <target name="AdjustInventoryForNotClosedProcess" exit="done" />
+                  <target name="checkIfUIacceptanceRetry" exit="error" />
+                  <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+
+                  <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+                  <input name="processType" class="java.lang.String">${process.processType}</input>
+                  <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+                  <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+                  <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+                  <input name="processID" class="java.lang.String">${process.processID}</input>
+                  <input name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</input>
+                    <output name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</output>
+            </activity>
+
+            <activity name="AdjustInventoryForNotClosedProcess" resource="class:com.oatsystems.solutions.apparel.primitives.AdjustInventory">
+              <target exit="done" name="CloseAssociationProcess"></target>
+              <target exit="error" name="checkIfUIacceptanceRetry"></target>
+              <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+              <input name="siteName" class="java.lang.String">${process.ccLocSiteName}</input>
+              <input name="processId" class="java.lang.String" constant="false" required="true">${process.processID}</input>
+              <input name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</input>
+              <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+              <input name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+              <input name="locSubtype" class="java.lang.String">${process.ccLocSubtype}</input>
+              <output name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</output>
+            </activity>
+        -->
+
+        <activity name="CloseAssociationProcess" resource="primitive:CloseProcess">
+            <target name="checkIfUIacceptance" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input name="processID" class="java.lang.String">${process.processID}</input>
+            <input name="processData0" class="java.lang.String">${process.processType}</input>
+            <input name="processData1" class="java.lang.String">${process.user}</input>
+            <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+            <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+            <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+            <input name="processData5" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input name="processData6" class="java.lang.String">${process.siteEpc}</input>
+            <input name="processData7" class="java.lang.String">${process.handheldID}</input>
+            <input name="processData8" class="java.lang.String">${process.scenarioID}</input>
+            <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+            <output name="processID" class="java.lang.String">${process.processID}</output>
+        </activity>
+
+        <decision name="checkIfUIacceptance">
+            <case condition="${process.scenarioType} eq 'associationReconciliation'" label="Combined CC" target="StopMongoProcessForUI"></case>
+            <default label="Regular CC" target="StopMongoProcess"></default>
+        </decision>
+
+        <!--activity name="SetHHIDForUI" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+              <target name="StopMongoProcessForUI" exit="done"/>
+              <target name="StopMongoProcessForUI" exit="error"/>
+              <input  name="value" class="java.lang.String">${process.ccDetailID}</input>
+              <output name="variable" class="java.lang.String">${process.mergeHHID}</output>
+</activity-->
+
+        <decision name="checkIfUIacceptanceRetry">
+            <case condition="${process.scenarioType} eq 'associationReconciliation'" label="Combined CC" target="StopMongoProcessForUIRetry"></case>
+            <default label="Regular CC" target="RetryStopMongoProcess"></default>
+        </decision>
+
+        <!--activity name="SetHHIDForUIRetry" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+              <target name="StopMongoProcessForUIRetry" exit="done"/>
+              <target name="StopMongoProcessForUIRetry" exit="error"/>
+              <input  name="value" class="java.lang.String">${process.ccDetailID}</input>
+              <output name="variable" class="java.lang.String">${process.mergeHHID}</output>
+</activity-->
+
+        <activity name="StopMongoProcessForUI" resource="class:com.oatsystems.workflow.primitives.StopMongoProcess">
+            <target name="SUCCESS" exit="done" />
+            <target name="SUCCESS" exit="error" />
+            <input  name="user" class="java.lang.String">${process.user}</input>
+            <input  name="hhID" class="java.lang.String">${process.mergeHHID}</input>
+            <!--     <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+                 <input  name="hhEndTime" class="java.lang.String">${process.processEndTime}</input> -->
+            <input  name="processType" class="java.lang.String">${process.processType}</input>
+            <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <!--   <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+               <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input> -->
+            <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+        </activity>
+
+        <activity name="StopMongoProcess" resource="class:com.oatsystems.workflow.primitives.StopMongoProcess">
+            <target name="SUCCESS" exit="done" />
+            <target name="SUCCESS" exit="error" />
+            <input  name="user" class="java.lang.String">${process.user}</input>
+            <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+            <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+            <input  name="hhEndTime" class="java.lang.String">${process.msgSeqNum}</input>
+            <input  name="processType" class="java.lang.String">${process.processType}</input>
+            <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+            <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+        </activity>
+
+        <activity name="RemoveProcessFromSiteForFailure" resource="class:com.oatsystems.workflow.apparel.primitives.RemoveProcessFromSite">
+            <target name="checkIfUIacceptanceRetry" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+            <input name="processId" class="java.lang.String">${process.processID}</input>
+        </activity>
+
+        <activity name="CloseAssociationProcessForFailure" resource="primitive:CloseProcess">
+            <target name="checkIfUIacceptanceRetry" exit="done" />
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input name="processID" class="java.lang.String">${process.processID}</input>
+            <input name="processData0" class="java.lang.String">${process.processType}</input>
+            <input name="processData1" class="java.lang.String">${process.user}</input>
+            <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+            <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+            <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+            <input name="processData5" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input name="processData6" class="java.lang.String">${process.siteEpc}</input>
+            <input name="processData7" class="java.lang.String">${process.handheldID}</input>
+            <input name="processData8" class="java.lang.String">${process.scenarioID}</input>
+            <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+            <output name="processID" class="java.lang.String">${process.processID}</output>
+        </activity>
+
+        <activity name="StopMongoProcessForUIRetry" resource="class:com.oatsystems.workflow.primitives.StopMongoProcess">
+            <target name="RETRY_NEEDED" exit="done" />
+            <target name="RETRY_NEEDED" exit="error" />
+            <input  name="user" class="java.lang.String">${process.user}</input>
+            <input  name="hhID" class="java.lang.String">${process.mergeHHID}</input>
+            <!--    <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+                <input  name="hhEndTime" class="java.lang.String">${process.processEndTime}</input> -->
+            <input  name="processType" class="java.lang.String">${process.processType}</input>
+            <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <!--     <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+                 <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input> -->
+            <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+            <input  name="status" class="java.lang.String">N</input>
+        </activity>
+
+        <activity name="RetryStopMongoProcess" resource="class:com.oatsystems.workflow.primitives.StopMongoProcess">
+            <target name="RETRY_NEEDED" exit="done" />
+            <target name="RETRY_NEEDED" exit="error" />
+            <input  name="user" class="java.lang.String">${process.user}</input>
+            <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+            <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+            <input  name="hhEndTime" class="java.lang.String">${process.msgSeqNum}</input>
+            <input  name="processType" class="java.lang.String">${process.processType}</input>
+            <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+            <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+            <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+            <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+            <input  name="status" class="java.lang.String">N</input>
+        </activity>
+
+        <activity name="CloseCCDetailWithRejection" resource="class:com.oatsystems.solutions.apparel.primitives.RejectCCDetail">
+            <target name="checkIfUIacceptance" exit="done" />
+            <!-- Even if there's an error, nothing else can be done, so SendResponse -->
+            <target name="checkIfUIacceptanceRetry" exit="error" />
+            <input name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+            <input name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</input>
+            <input name="acceptedUser" class="java.lang.String">${process.user}</input>
+            <input name="acceptedProcessId" class="java.lang.String"></input>
+            <input  name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+        </activity>
+
+        <end name="SUCCESS"></end>
+        <end name="RETRY_NEEDED"></end>
+        <end name="FAILURE"></end>
+    </process>
+
+
+
+
+    <config>
+        <var name="${process.isAuthoritative}" class="java.lang.String">
+            <property key="ui.group">Cycle Count Options</property>
+            <property key="ui.label">Is this an authoritative cycle count (i.e., counted items become inventory)?</property>
+            <property key="ui.required">true</property>
+            <property key="ui.list"><![CDATA[
+            <option SELECTED value="TRUE">Yes</option>
+            <option value="FALSE">No</option>
+        ]]></property>
+            <property key="ui.enabler">isAuthoritative</property>
+        </var>
+        <var name="${process.isManualAcceptance}" class="java.lang.String">
+            <property key="ui.group">Cycle Count Options</property>
+            <property key="ui.label">Should this count be accepted by a supervisor before it is processed?</property>
+            <property key="ui.required">true</property>
+            <property key="ui.list"><![CDATA[
+            <option SELECTED value="Always">Always</option>
+            <option value="Never">Never</option>
+            <option value="Condl">When threshold is not met</option>
+        ]]></property>
+            <property key="ui.enabler">isManualAcceptance</property>
+        </var>
+
+
+        <!--
+            <var name="${process.missingItemBL}" class="java.lang.String">
+                <property key="ui.label">Specify business location to assign items found missing during a cycle count</property>
+                <property key="ui.group">Handling Missing Items</property>
+                <property key="ui.required">true</property>
+                <property key="ui.list"><![CDATA[
+                <source="class:com.oatsystems.workflow.config.LeafLocationBusinessLocationListSource"/>
+                ]]></property>
+                <property key="ui.enable.on">isAuthoritative:TRUE</property>
+            </var>
+            <var name="${process.missingItemRP}" class="java.lang.String">
+                <property key="ui.label">Specify read point to assign items found missing during a cycle count</property>
+                <property key="ui.group">Handling Missing Items</property>
+                <property key="ui.required">true</property>
+                <property key="ui.list"><![CDATA[
+                <source="class:com.oatsystems.workflow.config.SimpleReadPointListSource"/>
+                ]]></property>
+                <property key="ui.enable.on">isAuthoritative:TRUE</property>
+            </var>
+
+            <var name="${process.transitLocation}" class="java.lang.String">
+                <property key="ui.label">Specify initial business location to assign new items</property>
+                <property key="ui.group">Handling New Items</property>
+                <property key="ui.required">true</property>
+                <property key="ui.list"><![CDATA[
+                <source="class:com.oatsystems.workflow.config.LeafLocationBusinessLocationListSource"/>
+                ]]></property>
+            </var>
+        -->
+
+        <!--
+            <var name="${process.useStoredProc}" class="java.lang.String">
+                <property key="ui.label">Should stored procedure be used to process items?</property>
+                <property key="ui.group">Processing Options</property>
+                <property key="ui.required">true</property>
+                <property key="ui.list"><![CDATA[
+                    <option SELECTED value="TRUE">Yes</option>
+                    <option value="FALSE">No</option>
+                ]]></property>
+            </var>
+        -->
+
+        <var name="${process.isEmailRequired}" class="java.lang.String">
+            <property key="ui.label">Is it required to send an e-mail for a CC waiting for acceptance?</property>
+            <property key="ui.group">E-mail Alert</property>
+            <property key="ui.required">true</property>
+            <property key="ui.list"><![CDATA[
+            <option SELECTED value="TRUE">Yes</option>
+            <option value="FALSE">No</option>
+        ]]></property>
+            <property key="ui.enable.on">isManualAcceptance:Always || isManualAcceptance:Condl</property>
+        </var>
+
+        <var class="java.lang.String" name="${process.callAutoretirement}">
+            <property key="doc">callAutoretirement</property>
+            <property key="ui.required">false</property>
+        </var>
+        <var name="${process.payload}" class="java.lang.Object">
+            <property key="ui.required">false</property>
+        </var>
+    </config>
+    <display/>
+</scenario>

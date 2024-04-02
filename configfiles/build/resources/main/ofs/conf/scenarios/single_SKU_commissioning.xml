@@ -1,0 +1,819 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<scenario>
+  <!-- This scenario performs a Single SKU Association/Commissioning. The setup includes an RFID reader, a barcode scanner and a digital
+       IO device.
+
+       The scenario can be run in two modes:
+		- Assocation only (populate entries in object/object_assn/object_assn_verification)
+		- Commissioning and Association (commission an epc, encode on the tag, and populate DB similar to Association only mode)
+       The different states of the scenario can be displayed to the user thru the DIO, and each of these states DIO display
+       is a configuration option in the scenario.
+       
+  -->
+  <property key="name">MV Single SKU Commissioning</property>
+  <property key="description">Use fixed barcode scanner to scan SKU; use fixed reader to associate/commission one tag at a time</property>
+  <process>
+    <start name="Start">
+      <target name="CheckForProcessType" />
+    </start>
+    <end name="End"></end>
+    <decision name="CheckForProcessType">
+      <case condition="${process.scenarioMode} eq 2" label="encoding" target="SetProcessTypeEncode"></case>
+      <default label="assn" target="SetProcessTypeAssn"></default>
+    </decision>
+    <activity name="SetProcessTypeEncode" resource="primitive:SetVariableValue">
+      <target exit="done" name="SetProcessSubType"></target>
+      <target exit="error" name="SetProcessSubType"></target>
+      <input class="java.lang.String" constant="false" name="value" required="false">ITEM_ENCODE</input>
+      <output class="java.lang.String" constant="false" name="variable">${process.processType}</output>
+    </activity>
+    <activity name="SetProcessTypeAssn" resource="primitive:SetVariableValue">
+      <target exit="done" name="SetProcessSubType"></target>
+      <target exit="error" name="SetProcessSubType"></target>
+      <input class="java.lang.String" constant="false" name="value" required="false">ITEM_PROD_ASSN</input>
+      <output class="java.lang.String" constant="false" name="variable">${process.processType}</output>
+    </activity>
+    <activity name="SetProcessSubType" resource="primitive:SetVariableValue">
+      <target exit="done" name="CreateIntObj"></target>
+      <target exit="error" name="CreateIntObj"></target>
+      <input class="java.lang.String" constant="false" name="value" required="false">FR</input>
+      <output class="java.lang.String" constant="false" name="variable">${process.processSubType}</output>
+    </activity>
+    <activity name="CreateIntObj" resource="primitive:EvaluateExpression">
+      <target exit="done" name="StartCommissioningProcess"></target>
+      <target exit="error" name="StartCommissioningProcess"></target>
+      <input class="java.lang.Integer" constant="true" name="expression0" required="false">0</input>
+      <output class="java.lang.Integer" constant="false" name="evaluatedExpression0">${process.intObj}</output>
+    </activity>
+    <!-- Commissioning process creation -->
+    <activity name="StartCommissioningProcess" resource="primitive:StartProcess">
+      <target name="CreateTagCounter" exit="done" />
+      <target name="End" exit="error" />
+      <input name="processMasterCode" class="java.lang.String">${process.processType}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData5" class="java.lang.String">${process.assnLocationEpc}</input>      
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+    <activity name="CreateTagCounter" resource="primitive:EvaluateExpression">
+      <target exit="done" name="GetDeviceEPCForAntenna"></target>
+      <target exit="error" name="GetDeviceEPCForAntenna"></target>
+      <input class="java.lang.Integer" constant="true" name="expression0" required="false">0</input>
+      <output class="java.lang.Integer" constant="false" name="evaluatedExpression0">${process.TagCounter}</output>
+    </activity>
+    <activity name="GetDeviceEPCForAntenna" resource="class:com.oatsystems.workflow.apparel.primitives.GetDeviceEPCForAntenna">
+      <target exit="done" name="InitializeAssnMethod"></target>
+      <target exit="error" name="InitializeAssnMethod"></target>
+      <input class="java.lang.String" constant="false" name="antennaEpc" required="false">${process.antennaEpc}</input>
+      <output class="java.lang.String" constant="false" name="deviceEpc">${process.rfDeviceEpc}</output>
+    </activity>
+    <activity name="InitializeAssnMethod" resource="class:com.oatsystems.workflow.apparel.primitives.GetAssnMethodForScenario">
+      <target exit="done" name="GetSiteIdForLocation"></target>
+      <target exit="error" name="GetSiteIdForLocation"></target>
+      <input class="java.lang.String" constant="false" name="scenarioMode">${process.scenarioMode}</input>
+      <output class="java.lang.String" constant="false" name="assnMethod">${process.assnMethod}</output>
+    </activity>
+    <activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+      <target name="CheckIfTagCommissioning" exit="done" />
+      <target name="CheckIfTagCommissioning" exit="error" />
+      <input  name="locationEpc" class="java.lang.String">${process.assnReadPointLocationEpc}</input>
+      <output name="siteId" class="java.lang.String">${process.assnSiteId}</output>
+    </activity>
+    <decision name="CheckIfTagCommissioning">
+      <case condition="${process.scenarioMode} eq 2" label="yes" target="LoadTagWriter"></case>
+      <default label="no" target="Wait"></default>
+    </decision>
+    <activity name="LoadTagWriter" resource="primitive:LoadTagWriter">
+      <target exit="done" name="CheckIfConfiguredCommProd"></target>
+      <target exit="error" name="End"></target>
+      <input class="java.lang.String" constant="true" name="blindWrite" required="false">TRUE</input>
+      <input class="java.lang.String" constant="true" name="maximumWriteTime" required="false">1000</input>
+      <input class="java.lang.String" constant="false" name="retryCount" required="false">${process.retryCount}</input>
+      <input class="java.lang.String" constant="false" name="tagWriterEpc" required="false">${process.antennaEpc}</input>
+      <input class="java.lang.String" constant="true" name="writeValidation" required="false">FALSE</input>
+      <output class="com.oatsystems.workflow.objects.TagWriter" constant="false" name="tagWriter">${process.tagWriter}</output>
+    </activity>
+    <decision name="CheckIfConfiguredCommProd">
+      <case condition="${process.configuredCommProd} eq 'YES'" label="yes" target="LoadCommProductFromSku"></case>
+      <default label="no" target="Wait"></default>
+    </decision>
+    <activity name="LoadCommProductFromSku" resource="primitive:LoadProductFromSku">
+      <target exit="error" name="End"></target>
+      <target exit="noProductForSku" name="End"></target>
+      <target exit="productLoaded" name="Wait"></target>
+      <input class="java.lang.String" constant="false" name="sku" required="false">${process.commProdSKU}</input>
+      <input class="java.lang.String" constant="false" name="uom" required="false">'Item'</input>
+      <input class="java.lang.String" constant="false" name="styleCode">${process.commProdStyleCode}</input>
+      <input class="java.lang.String" constant="true" name="fetchProdRef" required="false">FALSE</input>
+      <output class="com.oatsystems.workflow.objects.ProductReference" constant="false" name="product">${process.commProduct}</output>
+      <output class="java.lang.String" constant="false" name="productID">${process.commProductID}</output>
+      <output class="java.lang.String" constant="false" name="productName">${process.commProductName}</output>
+    </activity>
+
+    <wait name="Wait">
+      <event name="barcode_read" target="ValidateSKU">
+        <param class="java.lang.String" constant="false" name="gtin">${process.sku}</param>
+        <filter resource="filter:BarcodeEventFilter">
+          <argument class="java.lang.String" constant="false" name="deviceEpc">${process.barcodeScannerEpc}</argument>
+        </filter>
+      </event>
+      
+      <event name="__timeout_event" target="IsDeviceOnline">
+        <property key="timeout">${process.intObj}.parseInt(${process.deviceCheckInterval})</property>
+      </event>
+    </wait>
+
+   <!-- Check for device status -->
+   <activity name="IsDeviceOnline" resource="primitive:IsDeviceOnline">
+      <target exit="done" name="CheckDevice"></target>
+      <target exit="error" name="PublishDeviceErrorOutput"></target>
+      <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.barcodeScannerEpc}</input>
+      <output class="java.lang.Boolean" constant="false" name="isOnline">${process.barcodeIsOnline}</output>
+    </activity>
+    <decision name="CheckDevice">
+      <case condition="${process.barcodeIsOnline}" label="online" target="IsReaderOnline"></case>
+      <default label="offline" target="PublishDeviceErrorOutput"></default>
+    </decision>
+    <activity name="IsReaderOnline" resource="primitive:IsDeviceOnline">
+      <target exit="done" name="CheckReader"></target>
+      <target exit="error" name="PublishDeviceErrorOutput"></target>
+      <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.rfDeviceEpc}</input>
+      <output class="java.lang.Boolean" constant="false" name="isOnline">${process.tagWriterIsOnline}</output>
+    </activity>
+    <decision name="CheckReader">
+      <case condition="${process.tagWriterIsOnline}" label="online" target="PublishOkOutput"></case>
+      <default label="offline" target="PublishDeviceErrorOutput"></default>
+    </decision>
+
+    <activity name="ValidateSKU" resource="primitive:LoadProductFromSku">
+      <target exit="error" name="PublishInvalidSKUOutput"></target>
+      <target exit="noProductForSku" name="PublishInvalidSKUOutput"></target>
+      <target exit="productLoaded" name="PublishValidSKUOutput"></target>
+      <input class="java.lang.String" constant="false" name="sku" required="true">${process.sku}</input>
+      <input class="java.lang.String" constant="false" name="styleCode">${process.styleCode}</input>
+      <input class="java.lang.String" constant="false" name="uom">'Item'</input>
+      <output class="java.lang.String" name="productID">${process.productID}</output>
+      <output class="com.oatsystems.workflow.objects.ProductReference" name="product">${process.product}</output>
+    </activity>    
+    <activity name="PublishValidSKUOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="SetVariableToNull"></target>
+      <target exit="error" name="SetVariableToNull"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.validSKUoutput}</input>
+    </activity>
+    <activity name="SetVariableToNull" resource="primitive:SetVariableToNull">
+      <target exit="done" name="shouldScanEPCBarcode"></target>
+      <target exit="error" name="shouldScanEPCBarcode"></target>
+      <target exit="skip" name="shouldScanEPCBarcode"></target>
+      <output class="java.lang.Object" constant="false" name="variable">${process.startTagSingulationTime}</output>
+    </activity>
+	
+	<decision name="shouldScanEPCBarcode">
+      <case condition="${process.operationMode} eq '2'" label="yes" target="WaitForEPCBarcode"></case>
+      <default label="no" target="SetStartTagSingulationTime"></default>
+    </decision>
+	
+	<wait name="WaitForEPCBarcode">
+      <event name="barcode_read" target="ValidateEPCBarcode">
+        <param class="java.lang.String" constant="false" name="gtin">${process.targetEPCBarcode}</param>
+        <filter resource="filter:BarcodeEventFilter">
+          <argument class="java.lang.String" constant="false" name="deviceEpc">${process.barcodeScannerEpc}</argument>
+        </filter>
+      </event>
+    </wait>
+	
+	<activity name="ValidateEPCBarcode" resource="class:com.oatsystems.solutions.apparel.primitives.ValidateEPCBarcode">
+      <target exit="error" name="PublishInvalidEPCBarcodeOutput"></target>
+	  <target exit="invalid" name="PublishInvalidEPCBarcodeOutput"></target>
+      <target exit="valid" name="PublishValidEPCBarcodeOutput"></target>
+      <input class="java.lang.String" constant="false" name="prefix" required="true">${process.targetEPCPrefix}</input>
+      <input class="java.lang.String" constant="false" name="suffix">${process.targetEPCSuffix}</input>
+      <input class="java.lang.String" constant="false" name="barcode">${process.targetEPCBarcode}</input>
+      <output class="java.lang.String" name="targetEPC">${process.epcToWrite}</output>      
+    </activity>    
+		
+	<activity name="PublishValidEPCBarcodeOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="ShouldEncode"></target>
+      <target exit="error" name="ShouldEncode"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.validEPCBarcodeoutput}</input>
+    </activity>
+	
+		
+	<activity name="PublishInvalidEPCBarcodeOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="Wait"></target>
+      <target exit="error" name="Wait"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.invalidEPCBarcodeoutput}</input>
+    </activity>
+	
+    <activity name="SetStartTagSingulationTime" resource="class:com.oatsystems.workflow.apparel.primitives.GetCurrentTimestamp">
+      <target exit="done" name="TurnReaderOn"></target>
+      <target exit="error" name="TurnReaderOn"></target>
+      <output class="java.lang.Long" constant="false" name="currTimestamp">${process.startTagSingulationTime}</output>
+    </activity>
+    <activity name="TurnReaderOn" resource="primitive:SetReaderState">
+      <target exit="done" name="RawRead"></target>
+      <target exit="error" name="RawRead"></target>
+      <input class="java.lang.String" constant="false" name="readerLocationEpc" required="false">${process.antennaEpc}</input>
+      <input class="java.lang.String" constant="true" name="readerState" required="false">ENABLED</input>
+    </activity>
+    <activity name="RawRead" resource="primitive:RawRead">
+      <target exit="done" name="CheckNumberOfTagsInField"></target>
+      <target exit="error" name="PublishErrorOutput"></target>
+      <input class="java.lang.String" constant="false" name="antennaEpc" required="false">${process.antennaEpc}</input>
+      <output class="[Ljava.lang.String;" constant="false" name="tagList">${process.tagListOut}</output>
+    </activity>
+
+    <!-- Check the number of tags in the field and singulate a tag  --> 
+    <decision name="CheckNumberOfTagsInField">
+      <case condition="empty(${process.tagListOut})" label="no_tag_found" target="AddNoTagToErrorLog"></case>
+      <case condition="size(${process.tagListOut}) eq 1" label="one_tag_found" target="SetEpcToAssociate"></case>
+      <default label="more_tags_found" target="AddMoreTagsToErrorLog"></default>
+    </decision>
+	
+	<activity name="SetEpcToAssociate" resource="primitive:SetVariableValue">
+      <target exit="done" name="ShouldEncode"></target>
+      <target exit="error" name="ShouldEncode"></target>
+      <input class="java.lang.String" constant="false" name="value" required="false">${process.tagListOut}[0]</input>
+      <output class="java.lang.String" constant="false" name="variable">${process.epcToWrite}</output>
+    </activity>
+
+    <decision name="ShouldEncode">
+      <case condition="${process.scenarioMode} eq '2'" label="yes" target="ShouldSetMask"></case>
+      <default label="no" target="CreateContaineeObj"></default>
+    </decision>
+    
+
+    <!-- Create the containee object, bind the object and associate the location -->
+    <activity name="CreateContaineeObj" resource="class:com.oatsystems.workflow.apparel.primitives.CreateContaineeImpl">
+      <target exit="done" name="AssociateEpcToLocation"></target>
+      <target exit="error" name="AssociateEpcToLocation"></target>
+      <input class="java.lang.String" constant="false" name="sku" required="false">${process.sku}</input>
+      <input class="java.lang.String" constant="false" name="uom" required="false">'Item'</input>
+      <input class="java.lang.String" constant="false" name="styleCode" required="false">${process.styleCode}</input>
+      <output class="com.oatsystems.workflow.objects.impl.ContaineeImpl" constant="false" name="containeeObj">${process.containeeObj}</output>
+    </activity>
+    <activity name="AssociateEpcToLocation" resource="class:com.oatsystems.workflow.primitives.AssociateEpcToLocation">
+      <target name="PublishTagOperSuccessOutput" exit="associated" />
+      <target name="PublishTagOperErrorOutput" exit="notAssociated" />
+      <target name="PublishTagOperErrorOutput" exit="error" />
+      <input name="epc" class="java.lang.String">${process.epcToWrite}</input>
+      <input name="containeeObj" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.containeeObj}</input>
+      <input name="timestamp" class="java.lang.String">${process.processStartTime}</input>
+      <input name="checkEpcValidity" class="java.lang.String">FALSE</input>
+      <input name="associationLocationEpc" class="java.lang.String">${process.assnReadPointLocationEpc}</input>
+      <input name="associationSiteId" class="java.lang.String">${process.assnSiteId}</input>
+      <input name="parentLocationEpc" class="java.lang.String">${process.assnLocationEpc}</input>
+      <input  name="logVerification" class="java.lang.String">true</input>
+      <input  name="processId" class="java.lang.String">${process.processID}</input>
+      <input  name="status" class="java.lang.String">${process.processType}</input>
+      <input class="java.lang.String" constant="false" name="method" required="false">${process.assnMethod}</input>
+      <input class="java.lang.String" constant="false" name="processType" required="false">${process.processType}</input>
+      <input class="java.lang.String" constant="false" name="processSubType" required="false">${process.processSubType}</input>
+    </activity>
+
+    <!-- decision whether a mask is needed or not -->
+    <decision name="ShouldSetMask">
+      <case condition="${process.useMaskWriting} eq 'YES'" label="yes" target="SetEpcMask"></case>
+      <default label="no" target="UnsetEpcMask"></default>
+    </decision>
+    <activity name="SetEpcMask" resource="primitive:SetVariableValue">
+      <target exit="done" name="ShouldSetCommProductId"></target>
+      <target exit="error" name="ShouldSetCommProductId"></target>
+      <input class="java.lang.String" constant="false" name="value" required="false">${process.epcToWrite}</input>
+      <output class="java.lang.String" constant="false" name="variable">${process.oldEpc}</output>
+    </activity>
+    <activity name="UnsetEpcMask" resource="primitive:SetVariableValue">
+      <target exit="done" name="ShouldSetCommProductId"></target>
+      <target exit="error" name="ShouldSetCommProductId"></target>
+      <input class="java.lang.String" constant="false" name="value" required="false"></input>
+      <output class="java.lang.String" constant="false" name="variable">${process.oldEpc}</output>
+    </activity>
+
+    <!-- If the encoding schemes of the commissioned product is setup, use it, else use the barcode scanned product -->
+    <decision name="ShouldSetCommProductId">
+      <case condition="${process.configuredCommProd} eq 'NO'" label="no" target="SetCommProductIDToBarcodeValue"></case>
+      <default label="yes" target="SetCommProductIDToPreConfigProduct"></default>
+    </decision>
+    <activity name="SetCommProductIDToBarcodeValue" resource="primitive:SetVariableValue">
+      <target exit="done" name="WriteTag"></target>
+      <target exit="error" name="WriteTag"></target>
+      <input class="java.lang.String" constant="false" name="value" required="false">${process.productID}</input>
+      <output class="java.lang.String" constant="false" name="variable">${process.productIDForTagEpc}</output>
+    </activity>
+    <activity name="SetCommProductIDToPreConfigProduct" resource="primitive:SetVariableValue">
+      <target exit="done" name="WriteTag"></target>
+      <target exit="error" name="WriteTag"></target>
+      <input class="java.lang.String" constant="false" name="value" required="false">${process.commProductID}</input>
+      <output class="java.lang.String" constant="false" name="variable">${process.productIDForTagEpc}</output>
+    </activity>
+   
+    <activity name="WriteTag" resource="primitive:WriteTag">
+      <target exit="error" name="PublishTagOperErrorOutput"></target>
+      <target exit="noProductIDSet" name="PublishTagOperErrorOutput"></target>
+      <target exit="writeFailure" name="PublishTagOperErrorOutput"></target>
+      <target exit="writeSuccess" name="CreateStringArrayOfStrings"></target>
+      <input class="java.lang.String" constant="true" name="disableCommTagLogging" required="false">TRUE</input>
+      <input class="java.lang.String" constant="false" name="encodingScheme" required="false">${process.encodingScheme}</input>
+      <input class="com.oatsystems.workflow.objects.EpcCommissioningLog" constant="false" name="epcCommissioningLog" required="false">${process.epcCommissioningLog}</input>
+      <input class="java.lang.String" constant="false" name="productID" required="false">${process.productIDForTagEpc}</input>
+      <input class="java.lang.String" constant="false" name="tagToEncode" required="false">${process.oldEpc}</input>
+      <input class="com.oatsystems.workflow.objects.TagWriter" constant="false" name="tagWriter" required="false">${process.tagWriter}</input>
+      <output class="java.lang.String" constant="false" name="newEpc">${process.epcToWrite}</output>
+      <output class="com.oatsystems.workflow.objects.EpcCommissioningLog" constant="false" name="epcCommissioningLog">${process.epcCommissioningLog}</output>
+    </activity>
+
+    <!-- Log the commissioned epc to commisioned_tag table -->
+    <activity name="CreateStringArrayOfStrings" resource="class:com.oatsystems.workflow.apparel.primitives.CreateStringArrayOfStrings">
+      <target exit="done" name="LogCommissionedEPC"></target>
+      <target exit="error" name="PublishTagOperErrorOutput"></target>
+      <input class="java.lang.String" constant="false" name="attribute0" required="false">${process.sku}</input>
+      <input class="java.lang.Integer" constant="true" name="size" required="false">1</input>
+      <output class="[Ljava.lang.String;" constant="false" name="outputArray">${process.commissioningData}</output>
+    </activity>	    
+    <activity name="LogCommissionedEPC" resource="primitive:LogCommissionedEPC">
+      <target exit="done" name="CreateContaineeObj"></target>
+      <target exit="error" name="CreateContaineeObj"></target>
+      <input class="[Ljava.lang.String;" constant="false" name="commissioningData" required="false">${process.commissioningData}</input>
+      <input class="java.lang.String" constant="false" name="epc" required="false">${process.epcToWrite}</input>
+      <input class="java.lang.String" constant="false" name="locationEpc" required="false">${process.assnLocationEpc}</input>
+    </activity>
+
+    <!-- Error conditions during tag singulation -->
+    <activity name="AddNoTagToErrorLog" resource="primitive:AddToErrorLog">
+      <target exit="done" name="PublishNoTagOutput"></target>
+      <target exit="error" name="PublishNoTagOutput"></target>
+      <input class="java.lang.String" constant="true" name="errorCode" required="false">NO_TAG</input>
+      <input class="java.lang.String" constant="true" name="errorString" required="false">'No tag found'</input>
+    </activity>
+    <activity name="AddMoreTagsToErrorLog" resource="primitive:AddToErrorLog">
+      <target exit="done" name="PublishMultipleTagsOutput"></target>
+      <target exit="error" name="PublishMultipleTagsOutput"></target>
+      <input class="java.lang.String" constant="true" name="errorCode" required="false">MORE_TAGS</input>
+      <input class="java.lang.String" constant="true" name="errorString" required="false">'More than one tag in field'</input>
+    </activity>
+
+    <decision name="CheckForTagSingulationTimeout">
+      <case condition="${process.elapsedTime} gt 0" label="yes" target="SetVariablesToNull"></case>
+      <default label="no" target="RawRead"></default>
+    </decision>
+    <activity name="SetEndSingulationTs" resource="class:com.oatsystems.workflow.apparel.primitives.GetCurrentTimestamp">
+      <target exit="done" name="SetElapsedTagSingulationTime"></target>
+      <target exit="error" name="SetElapsedTagSingulationTime"></target>
+      <output class="java.lang.Long" constant="false" name="currTimestamp">${process.endTagSingulationTime}</output>
+    </activity>
+    <activity name="SetElapsedTagSingulationTime" resource="primitive:EvaluateExpression">
+      <target exit="done" name="CheckForTagSingulationTimeout"></target>
+      <target exit="error" name="CheckForTagSingulationTimeout"></target>
+      <input class="java.lang.Integer" constant="true" name="expression0" required="false"> (${process.endTagSingulationTime}.intValue() - ${process.startTagSingulationTime}.intValue() - ${process.tagSingulationTimeout}) </input>
+      <output class="java.lang.Integer" constant="false" name="evaluatedExpression0">${process.elapsedTime}</output>
+    </activity>
+
+    <!-- Turn reader off / Turn reader on -->
+    <activity name="TurnReaderOff" resource="primitive:SetReaderState">
+      <target exit="done" name="SetVariablesToNull"></target>
+      <target exit="error" name="SetVariablesToNull"></target>
+      <input class="java.lang.String" constant="false" name="readerLocationEpc" required="false">${process.antennaEpc}</input>
+      <input class="java.lang.String" constant="true" name="readerState" required="false">DISABLED</input>
+    </activity>
+    <activity name="SetVariablesToNull" resource="primitive:SetVariablesToNull">
+      <target exit="done" name="Wait"></target>
+      <target exit="error" name="Wait"></target>
+      <target exit="skip" name="Wait"></target>
+      <output class="java.lang.Object" constant="false" name="variable0">${process.epcToWrite}</output>
+      <output class="java.lang.Object" constant="false" name="variable1">${process.containeeObj}</output>
+      <output class="java.lang.Object" constant="false" name="variable2">${process.startTagSingulationTime}</output>
+      <output class="java.lang.Object" constant="false" name="variable3">${process.endTagSingulationTime}</output>
+      <output class="java.lang.Object" constant="false" name="variable4">${process.sku}</output>
+      <output class="java.lang.Object" constant="false" name="variable5">${process.productID}</output>
+      <output class="java.lang.Object" constant="false" name="variable6">${process.product}</output>
+      <output class="java.lang.Object" constant="false" name="variable7">${process.productIDForTagEpc}</output>
+    </activity>
+
+    <activity name="PublishErrorOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="SetVariablesToNull"></target>
+      <target exit="error" name="SetVariablesToNull"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.systemErrorOutput}</input>
+    </activity>
+    <activity name="PublishTagOperErrorOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="SetVariablesToNull"></target>
+      <target exit="error" name="SetVariablesToNull"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.tagOperErrorOutput}</input>
+    </activity>
+
+    <activity name="PublishTagOperSuccessOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="IsMaxNumOfTagsReached"></target>
+      <target exit="error" name="IsMaxNumOfTagsReached"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.tagOperSuccessOutput}</input>
+    </activity>
+    
+<!--
+    <activity name="AdjustInventoryOnSuccess" resource="class:com.oatsystems.solutions.apparel.primitives.AdjustInventory">
+        <target exit="done" name="IsMaxNumOfTagsReached"></target>
+        <target exit="error" name="IsMaxNumOfTagsReached"></target>
+        <input name="siteId" class="java.lang.String">${process.assnSiteId}</input>
+        <input name="processId" class="java.lang.String" constant="false" required="true">${process.processID}</input>
+        <input name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</input>
+        <output name="intInvAdjList" class="com.oatsystems.util.IntInventoryAdjustmentList">${process.intInvAdjList}</output>
+    </activity>
+-->
+    
+    <activity name="PublishInvalidSKUOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="Wait"></target>
+      <target exit="error" name="Wait"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.invalidSKUoutput}</input>
+    </activity>
+    <activity name="PublishOkOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="Wait"></target>
+      <target exit="error" name="Wait"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.systemOkOutput}</input>
+    </activity>
+    <activity name="PublishMultipleTagsOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="SetEndSingulationTs"></target>
+      <target exit="error" name="SetEndSingulationTs"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.multipleTagsOutput}</input>
+    </activity>
+    <activity name="PublishNoTagOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="SetEndSingulationTs"></target>
+      <target exit="error" name="SetEndSingulationTs"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.noTagOutput}</input>
+    </activity>
+    <activity name="PublishDeviceErrorOutput" resource="primitive:PublishDigitalOutput">
+      <target exit="done" name="Wait"></target>
+      <target exit="error" name="Wait"></target>
+      <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.deviceErrorOutput}</input>
+    </activity>
+
+    <!-- Create a new process if max number of tags were associated/commissioned -->
+    <decision name="IsMaxNumOfTagsReached">
+      <case condition="${process.TagCounter} eq 100" label="yes" target="ResetTagCounterValue"></case>
+      <default label="no" target="IncrementTagCounterValue"></default>
+    </decision>
+    <activity name="IncrementTagCounterValue" resource="primitive:EvaluateExpression">
+      <target exit="done" name="TurnReaderOff"></target>
+      <target exit="error" name="TurnReaderOff"></target>
+      <input class="java.lang.Integer" constant="true" name="expression0" required="false"> (${process.TagCounter}+1) </input>
+      <output class="java.lang.Integer" constant="false" name="evaluatedExpression0">${process.TagCounter}</output>
+    </activity>
+    <activity name="ResetTagCounterValue" resource="primitive:EvaluateExpression">
+      <target exit="done" name="CloseCurrentProcess"></target>
+      <target exit="error" name="CloseCurrentProcess"></target>
+      <input class="java.lang.Integer" constant="true" name="expression0" required="false"> 0 </input>
+      <output class="java.lang.Integer" constant="false" name="evaluatedExpression0">${process.TagCounter}</output>
+    </activity>
+    <activity name="CloseCurrentProcess" resource="primitive:CloseProcess">
+      <target name="StartNewProcess" exit="done" />
+      <target name="StartNewProcess" exit="error" />
+      <input name="processID" class="java.lang.String">${process.processID}</input>
+      <input name="processData0" class="java.lang.String">ITEM_PROD_ASSN</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+      <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="processData5" class="java.lang.String">${process.assnLocationEpc}</input>      
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+    <activity name="StartNewProcess" resource="primitive:StartProcess">
+      <target name="TurnReaderOff" exit="done" />
+      <target name="TurnReaderOff" exit="error" />
+      <input name="processMasterCode" class="java.lang.String">${process.processType}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+
+
+  </process>
+  
+  <!-- Config section -->
+  <config>
+    <!-- General configuration -->
+    <var class="java.lang.String" name="${process.scenarioMode}">
+      <property key="name">scenarioMode</property>
+      <property key="ui.group">General</property>
+      <property key="ui.label">Scenario Mode</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.list"><![CDATA[
+            <option SELECTED value="1">Tag Association</option>
+            <option value="2">Tag Association And Commissioning</option>
+            ]]></property>
+      <property key="ui.required">true</property>
+      <property key="ui.enabler">scenarioMode</property>
+    </var>
+	<var class="java.lang.String" name="${process.operationMode}">
+      <property key="name">operationMode</property>
+      <property key="ui.group">General</property>
+      <property key="ui.label">Operation Mode</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.list"><![CDATA[
+            <option SELECTED value="1">Scan Encode</option>
+            <option value="2">Scan Scan Encode</option>
+            ]]></property>
+      <property key="ui.required">true</property>
+      <property key="ui.enabler">operationMode</property>
+    </var>
+	<var name="${process.targetEPCPrefix}" class="java.lang.String">
+	<property key="ui.label">Prefix for EPC barcode scan</property>
+	<property key="ui.group">General</property>
+	<property key="ui.required">false</property>
+	<property key="ui.input"><![CDATA[               
+        <textinput default="" type="BigString"/>
+                     ]]></property>
+     <property key="ui.enable.on">operationMode:2</property>
+     </var>
+	 <var name="${process.targetEPCSuffix}" class="java.lang.String">
+	<property key="ui.label">Suffix for EPC barcode scan</property>
+	<property key="ui.group">General</property>
+	<property key="ui.required">false</property>
+	<property key="ui.input"><![CDATA[               
+        <textinput default="" type="BigString"/>
+                     ]]></property>
+     <property key="ui.enable.on">operationMode:2</property>
+     </var>
+    <var class="java.lang.String" name="${process.assnLocationEpc}">
+      <property key="doc">ASSOCIATIONLOCATIONEPC</property>
+      <property key="name">assnLocationEpc</property>
+      <property key="ui.group">General</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Item Association Business Location</property>
+      <property key="ui.list"><![CDATA[      
+        <source="listsource:LeafLocationBusinessLocationListSource"/>
+            ]]></property>
+      <property key="ui.required">true</property>
+    </var>
+    <var class="java.lang.String" name="${process.assnReadPointLocationEpc}">
+      <property key="doc">ASSOCIATIONRPLOCATIONEPC</property>
+      <property key="name">assnReadPointLocationEpc</property>
+      <property key="ui.group">General</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Item Association Read Point Location</property>
+      <property key="ui.list"><![CDATA[      
+        <source="listsource:SimpleReadPointListSource"/>
+            ]]></property>
+      <property key="ui.required">true</property>
+    </var>
+	<!-- Scanned SKU configuration -->
+	<var class="java.lang.String" name="${process.styleCode}">
+      <property key="doc">STYLECODE</property>
+      <property key="ui.group">Product Identification</property>
+      <property key="ui.input"><![CDATA[               
+        <textinput default="" type="BigString"/>
+                     ]]></property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Style Code of Scanned Product</property>      
+    </var>
+    <!-- Tag Commissioning configuration -->
+    <var class="java.lang.String" name="${process.encodingScheme}">
+      <property key="doc">ENCODINGSCHEME</property>
+      <property key="name">encodingScheme</property>
+      <property key="ui.group">Tag Commissioning</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Encoding Scheme for EPCs</property>
+      <property key="ui.list"><![CDATA[          
+        <source="listsource:EncodingSchemeListSource"/>
+                ]]></property>
+      <property key="ui.required">true</property>
+      <property key="ui.enable.on">scenarioMode:2</property>
+    </var>
+    <var class="java.lang.String" name="${process.configuredCommProd}">
+      <property key="doc">MESSAGINGNAME</property>
+      <property key="name">configuredCommProd</property>
+      <property key="ui.group">Tag Commissioning</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Configure Product for Commissioning</property>
+      <property key="ui.list"><![CDATA[
+            <option  value="YES">Yes</option>
+            <option SELECTED value="NO">No</option>
+            ]]></property>
+      <property key="ui.required">true</property>
+      <property key="ui.enabler">configuredCommProd</property>
+      <property key="ui.enable.on">scenarioMode:2</property>
+    </var>
+    <var class="java.lang.String" name="${process.commProdSKU}">
+      <property key="doc">MESSAGINGNAME</property>
+      <property key="name">commProdSKU</property>
+      <property key="ui.group">Tag Commissioning</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Product SKU</property>
+      <property key="ui.input"><![CDATA[               
+        <textinput default="" type="BigString"/>
+                     ]]></property>
+      <property key="ui.required">true</property>
+      <property key="ui.enable.on">scenarioMode:2 &amp;&amp; configuredCommProd:YES</property>
+    </var>
+    <var class="java.lang.String" name="${process.commProdStyleCode}">
+      <property key="doc">STYLECODE</property>
+      <property key="ui.group">Tag Commissioning</property>
+      <property key="ui.input"><![CDATA[               
+        <textinput default="" type="BigString"/>
+                     ]]></property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Style Code</property>      
+      <property key="ui.enable.on">scenarioMode:2 &amp;&amp; configuredCommProd:YES</property>
+    </var>
+
+    <var class="java.lang.String" name="${process.barcodeScannerEpc}">
+      <property key="class">java.lang.String</property>
+      <property key="doc">BARCODESCANNEREPC</property>
+      <property key="name">barcodeScannerEpc</property>
+      <property key="ui.group">Device</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Barcode Scanner</property>
+      <property key="ui.list"><![CDATA[    
+        <source="listsource:BarcodeScannerListSource"/>
+          ]]></property>
+      <property key="ui.required">true</property>
+    </var>
+    <var class="java.lang.String" name="${process.antennaEpc}">
+      <property key="class">java.lang.String</property>
+      <property key="doc">TAGWRITEREPC</property>
+      <property key="name">antennaEpc</property>
+      <property key="ui.group">Device</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Reader/Antenna</property>
+      <property key="ui.list"><![CDATA[          
+        <source="listsource:AntennaListSource"/>
+                ]]></property>
+      <property key="ui.required">true</property>
+    </var>
+    <var class="java.lang.String" name="${process.deviceCheckInterval}">
+      <property key="doc">DEVICECHECKINTERVAL</property>
+      <property key="ui.group">Device</property>
+      <property key="ui.input"><![CDATA[               
+        <textinput default="30000" type="LongID"/>
+                     ]]></property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Device Online Check Interval (ms)</property>
+      <property key="ui.required">true</property>
+    </var>
+
+    <!-- Tag Operation Configuration  -->
+    <var class="java.lang.String" name="${process.tagSingulationTimeout}">
+      <property key="doc">TAGSINGULATIONTIMEOUT</property>
+      <property key="ui.group">Tag Operation</property>
+      <property key="ui.input"><![CDATA[               
+        <textinput default="350" type="LongID"/>
+                     ]]></property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Tag Singulation Timeout (ms)</property>
+      <property key="ui.required">true</property>
+    </var>
+    <var class="java.lang.String" name="${process.retryCount}">
+      <property key="doc">TAGWRITERRETRYCOUNT</property>
+      <property key="ui.group">Tag Operation</property>
+      <property key="ui.input"><![CDATA[               
+        <textinput default="2" type="TagWriterTimeValue"/>
+                     ]]></property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Number of commissioning retry attempts</property>
+      <property key="ui.required">false</property>
+      <property key="ui.enable.on">scenarioMode:2</property>
+    </var>
+    <var name="${process.useMaskWriting}" class="java.lang.String">
+	<property key="ui.label">Use mask when encoding tag</property>
+	<property key="ui.group">Tag Operation</property>
+	<property key="ui.required">false</property>
+	<property key="ui.list"><![CDATA[
+	<option value="NO">NO</option>
+	<option SELECTED value="YES">YES</option>
+	]]></property>
+       <property key="ui.enable.on">scenarioMode:2</property>
+     </var>
+
+     <!-- DIO Configuration --> 
+     <var class="java.lang.String" name="${process.systemOkOutput}">
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">systemOkOutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">On Device OK</property>
+      <property key="ui.popup"><![CDATA[    
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+          ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.deviceErrorOutput}">
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">deviceErrorOutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.isconfigvarprofiletype">CaseReadOutput</property>
+      <property key="ui.label">On Device Error</property>
+      <property key="ui.popup"><![CDATA[  
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.validSKUoutput}">
+      <property key="class">java.lang.String</property>
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">validSKUoutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">On Valid SKU</property>
+      <property key="ui.popup"><![CDATA[    
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+          ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.invalidSKUoutput}">
+      <property key="class">java.lang.String</property>
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">invalidSKUoutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">On Invalid SKU</property>
+      <property key="ui.popup"><![CDATA[    
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+          ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+	<var class="java.lang.String" name="${process.validEPCBarcodeoutput}">
+      <property key="class">java.lang.String</property>
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">validEPCBarcodeOutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">On Valid EPC Barcode</property>
+      <property key="ui.popup"><![CDATA[    
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+          ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.invalidEPCBarcodeoutput}">
+      <property key="class">java.lang.String</property>
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">invalidEPCBarcodeOutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">On Invalid EPC Barcode</property>
+      <property key="ui.popup"><![CDATA[    
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+          ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.noTagOutput}">
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">noTagOutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.isconfigvarprofiletype">CaseReadOutput</property>
+      <property key="ui.label">On No Tag Read Error</property>
+      <property key="ui.popup"><![CDATA[  
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.multipleTagsOutput}">
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">multipleTagsOutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.isconfigvarprofiletype">CaseReadOutput</property>
+      <property key="ui.label">On Multiple Tags Read Error</property>
+      <property key="ui.popup"><![CDATA[  
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.tagOperErrorOutput}">
+      <property key="class">java.lang.String</property>
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">tagOperErrorOutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">On Tag Association/Commissioning Error</property>
+      <property key="ui.popup"><![CDATA[    
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+          ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.tagOperSuccessOutput}">
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">tagOperSuccessOutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.isconfigvarprofiletype">CaseReadOutput</property>
+      <property key="ui.label">On Tag Association/Commissioning Success</property>
+      <property key="ui.popup"><![CDATA[  
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.systemErrorOutput}">
+      <property key="class">java.lang.String</property>
+      <property key="doc">CASEREADOUTPUT</property>
+      <property key="name">systemErrorOutput</property>
+      <property key="ui.group">Digital Outputs</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">On System Error</property>
+      <property key="ui.popup"><![CDATA[    
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+          ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+
+  </config>
+  <display>
+  </display>
+</scenario>

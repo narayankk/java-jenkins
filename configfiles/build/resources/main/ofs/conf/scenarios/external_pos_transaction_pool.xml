@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://support.oatsystems.com/xsd/scenarios4_0.xsd">
+  <property key="version">8.2</property>
+  <property key="scenario.type">EXTERNAL_POS_FEED</property>
+  <property key="name">Capturing POS feed from customers interface</property>
+  <property key="description">This scenario records the POS transaction(SALE/RETURN) using the POS feed from customers</property>
+  <property key="poolable">true</property>
+  <process>
+    <start name="Start">
+      <target name="SetVariablesToNull" />
+    </start>
+    
+	<activity name="SetVariablesToNull" resource="primitive:SetVariablesToNull">
+      <target name="ProcessMessageIn" exit="done" />
+      <target name="ProcessMessageIn" exit="skip" />
+      <target name="RETRY_NEEDED" exit="error" />
+	  <output name="variable0" class="java.lang.Object">${process.siteEpc}</output>
+      <output name="variable1" class="java.lang.String">${process.user}</output>
+      <output name="variable2" class="java.lang.Object">${process.processStartTime}</output>
+      <output name="variable3" class="java.lang.Object">${process.processEndTime}</output>      
+      <output name="variable4" class="java.lang.Object">${process.elapsedTimeInSeconds}</output>  
+    </activity>
+	
+    <activity name="ProcessMessageIn" resource="class:com.oatsystems.workflow.apparel.primitives.ProcessMessageIn">
+		  <target name="StartPosTransaction" exit="done" />
+		  <target name="FAILURE" exit="error" />
+		  <input name="payload" class="java.lang.Object">${process.payload}</input>
+		  <output name="processType" class="java.lang.String">${process.processType}</output>
+		  <output name="processSubType" class="java.lang.String">${process.processSubType}</output>
+		  <output name="handheldID" class="java.lang.String">${process.handheldID}</output>
+		  <output name="scenarioID" class="java.lang.String">${process.scenarioID}</output>
+		  <output name="user" class="java.lang.String">${process.user}</output>
+		  <output name="processStartTime" class="java.lang.String">${process.processStartTime}</output>
+		  <output name="processEndTime" class="java.lang.String">${process.processEndTime}</output>
+		  <output name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</output>
+		  <output name="readPointEpc" class="java.lang.String">${process.readPointEpc}</output>
+		  <output name="storeId" class="java.lang.String">${process.storeId}</output>
+		  <output name="epcData" class="java.util.Map">${process.epcData}</output>
+		  <output name="skuQty" class="java.util.Map">${process.skuQty}</output>
+		</activity>
+		
+	<activity name="StartPosTransaction" resource="class:com.oatsystems.solutions.apparel.primitives.ExternalPOSTransaction">
+	  <target name="SUCCESS" exit="done" />
+	  <target name="FAILURE" exit="error" />  
+      <input name="processType" class="java.lang.String">${process.processType}</input>
+      <input name="user" class="java.lang.String">${process.user}</input>
+      <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="siteEpc" class="java.lang.String">${process.siteEpc}</input>      
+      <input name="handheldID" class="java.lang.String">${process.handheldID}</input>      
+      <input name="scenarioID" class="java.lang.String">${process.scenarioID}</input>      
+      <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+	  <input name="epcData" class="java.util.HashMap">${process.epcData}</input>
+	  <input name="skuQty" class="java.util.HashMap">${process.skuQty}</input>
+	  <input  name="retireReasonId" class="java.lang.String">${process.retireReasonId}</input>
+	  <input name="storeId" class="java.lang.String">${process.storeId}</input>
+	</activity>
+		
+	<end name="SUCCESS"></end>
+    <end name="RETRY_NEEDED"></end>
+    <end name="FAILURE"></end>
+  </process>
+  
+  <config>
+  	<var name="${process.payload}" class="java.lang.Object">
+      <property key="ui.required">false</property>
+    </var>
+	
+	<var class="java.lang.String" name="${process.retireReasonId}">
+	  <property key="ui.label">Retirement Reason for Sold Epcs</property>
+	  <property key="ui.group">Handling Sold Items</property>
+	  <property key="ui.required">true</property>
+      <property key="ui.list"><![CDATA[   
+                <source="class:com.oatsystems.raf.config.RetirementReasonIdListSource"/>
+               ]]></property>     
+      <property key="ui.enable.on">retirementAction:RETIRE</property>
+    </var>
+	
+  </config>
+  <display />
+</scenario>

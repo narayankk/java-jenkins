@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="">
+    <table name="object_state">
+        <entity type="EPCObject" is-analytic="false">
+            <label>EPC Object</label>
+            <description>EPC Object</description>
+        </entity>
+    </table>
+    <table name="process">
+        <entity type="Process">
+            <label>Process</label>
+            <description>Process</description>
+        </entity>
+    </table>
+</meta-data>

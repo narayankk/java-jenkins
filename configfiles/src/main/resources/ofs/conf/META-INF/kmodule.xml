@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+    
+    <kbase name="nonRfidPosDefault" packages="drools.nonRfidPosDefault">
+        <ksession name="nonRfidPosDefaultSession"/>
+    </kbase>
+    
+    <kbase name="nonRfidPosPrioritised" packages="drools.nonRfidPosPrioritised">
+        <ksession name="nonRfidPosPrioritisedSession"/>
+    </kbase>
+    
+     <kbase name="StockInoutKB" packages="drools.stockInOutEvent">
+        <ksession name="StockInoutSession"/>
+    </kbase>
+
+    <kbase name="ccEvent" packages="drools.ccEvent">
+        <ksession name="CCEventSession"/>
+    </kbase>
+    
+    <kbase name="OrderShipmentKB" packages="drools.OrderShipment">
+        <ksession name="OrderShipmentSession"/>
+    </kbase>
+
+    <kbase name="smartMergeCC" packages="drools.smartMergeCC">
+        <ksession name="SmartMergeCCSession"/>
+    </kbase>
+
+    <kbase name="stockOnHand" packages="drools.stockOnHand">
+        <ksession name="StockOnHandTriggerSession"/>
+    </kbase>
+
+
+</kmodule>

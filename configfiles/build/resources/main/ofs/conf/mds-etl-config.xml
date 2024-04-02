@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataWarehouseETL>
+  <SchemaAlias alias="EA">enterprise</SchemaAlias>
+  <SQLExecTaskForDatabase desc="Pre MDSETL SQL">
+    <SQLForOracle />
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Insert into product_attrs">
+    <!--Updated from file:/usr/local/OATxpress/ofs/local/conf/mds-etl-config.xml.m
+<SQLForOracle><![CDATA[INSERT INTO product_attrs (insert_date, update_date, lk_hashcode, deleted, last_update_state, state, guid, custom_property_group_md_id) 
+  SELECT SYSDATE,null,null,temp.deleted,null,${state},temp.pa_guid,
+         (select custom_property_group_md_id from custom_property_group_md where guid= temp.guid)
+  from
+  ( select /*+NO_MERGE*/ pa.deleted,cpgm.guid,pa.guid as pa_guid
+    from ${EA}.product_attrs pa join ${EA}.product p
+        on pa.attrs_id = p.attrs_id
+       join ${EA}.product_site_map psm 
+        on psm.product_id = p.product_id
+       join ${EA}.edge_server es
+        on psm.edge_server_id = es.edge_server_id
+       join ${EA}.custom_property_group_md cpgm
+        on cpgm.custom_property_group_md_id = pa.custom_property_group_md_id
+    where edge_name = ${edge_name} and ( ( pa.state >= ${mds_start_state} and pa.state <= ${mds_end_state}) or (psm.state >= ${mds_start_state} and psm.state <= ${mds_end_state}) ) and psm.deleted != 'T') temp 
+  left outer join product_attrs pa on temp.pa_guid = pa.guid where pa.guid is null]]></SQLForOracle>-->
+    <!--Updated from file:/usr/local/OATxpress/ofs/local/conf/mds-etl-config.xml.m
+<SQLForOracle>INSERT INTO product_attrs (insert_date, update_date, lk_hashcode, deleted, last_update_state, state, guid, custom_property_group_md_id, gtin, style_color, style, color, color_description, size_, size_code, sales_floor_target, trade_item, gender, brand, department, merchandise_category, sub_category, season, collection, price, model_sku, image_url)
+  SELECT SYSDATE,null,null,temp.deleted,null,${state},temp.pa_guid,
+         (select custom_property_group_md_id from custom_property_group_md where guid= temp.guid),
+temp.gtin,temp.style_color,temp.style,temp.color,temp.color_description,temp.size_,temp.size_code,temp.sales_floor_target,temp.trade_item,temp.gender,temp.brand,temp.department,temp.merchandise_category,temp.sub_category,temp.season,temp.collection,temp.price,temp.model_sku,temp.image_url
+  from
+  ( select /*+NO_MERGE*/ pa.deleted,cpgm.guid,pa.guid as pa_guid, pa.gtin, pa.style_color, pa.style, pa.color, pa.color_description, pa.size_, pa.size_code, pa.sales_floor_target, pa.trade_item, pa.gender, pa.brand, pa.department, pa.merchandise_category, pa.sub_category, pa.season, pa.collection, pa.price, pa.model_sku, pa.image_url
+    from ${EA}.product_attrs pa join ${EA}.product p
+     on pa.attrs_id = p.attrs_id
+      join ${EA}.product_site_map psm
+      on psm.product_id = p.product_id
+      join ${EA}.edge_server es
+      on psm.edge_server_id = es.edge_server_id
+      join ${EA}.custom_property_group_md cpgm
+     on cpgm.custom_property_group_md_id = pa.custom_property_group_md_id
+    where edge_name = ${edge_name} and ( ( pa.state &gt;= ${mds_start_state} and pa.state &lt;= ${mds_end_state}) or (psm.state &gt;= ${mds_start_state} and psm.state &lt;= ${mds_end_state}) ) and psm.deleted != 'T') temp 
+  left outer join product_attrs pa on temp.pa_guid = pa.guid where pa.guid is null</SQLForOracle>-->
+    <SQLForOracle>INSERT INTO product_attrs (insert_date, update_date, lk_hashcode, deleted, last_update_state, state, guid, custom_property_group_md_id, gtin, style_color, style, color, color_description, size_, size_code, sales_floor_target, trade_item, gender, brand, department, merchandise_category, sub_category, season, collection, price, model_sku, image_url)
+  SELECT SYSDATE,null,null,temp.deleted,null,${state},temp.pa_guid,
+         (select custom_property_group_md_id from custom_property_group_md where guid= temp.guid),
+temp.gtin,temp.style_color,temp.style,temp.color,temp.color_description,temp.size_,temp.size_code,temp.sales_floor_target,temp.trade_item,temp.gender,temp.brand,temp.department,temp.merchandise_category,temp.sub_category,temp.season,temp.collection,temp.price,temp.model_sku,temp.image_url
+  from
+  ( select /*+NO_MERGE*/ pa.deleted,cpgm.guid,pa.guid as pa_guid, pa.gtin, pa.style_color, pa.style, pa.color, pa.color_description, pa.size_, pa.size_code, pa.sales_floor_target, pa.trade_item, pa.gender, pa.brand, pa.department, pa.merchandise_category, pa.sub_category, pa.season, pa.collection, pa.price, pa.model_sku, pa.image_url
+    from ${EA}.product_attrs pa join ${EA}.product p
+     on pa.attrs_id = p.attrs_id
+      join ${EA}.product_site_map psm
+      on psm.product_id = p.product_id
+      join ${EA}.edge_server es
+      on psm.edge_server_id = es.edge_server_id
+      join ${EA}.custom_property_group_md cpgm
+     on cpgm.custom_property_group_md_id = pa.custom_property_group_md_id
+    where edge_name = ${edge_name} and ( ( pa.state &gt;= ${mds_start_state} and pa.state &lt;= ${mds_end_state}) or (psm.state &gt;= ${mds_start_state} and psm.state &lt;= ${mds_end_state}) ) and psm.deleted != 'T') temp 
+  left outer join product_attrs pa on temp.pa_guid = pa.guid where pa.guid is null</SQLForOracle>
+    <!--Updated from file:/usr/local/OATxpress/ofs/local/conf/mds-etl-config.xml.m
+<SQLForSQLServer><![CDATA[INSERT INTO product_attrs (insert_date, update_date, lk_hashcode, deleted, last_update_state, state, guid, custom_property_group_md_id) 
+  SELECT GETDATE(),null,null,temp.deleted,null,${state},temp.pa_guid,
+         (select custom_property_group_md_id from custom_property_group_md where guid= temp.guid)
+  from
+  ( select /*+NO_MERGE*/ pa.deleted,cpgm.guid,pa.guid as pa_guid
+    from ${EA}.product_attrs pa join ${EA}.product p
+        on pa.attrs_id = p.attrs_id
+       join ${EA}.product_site_map psm 
+        on psm.product_id = p.product_id
+       join ${EA}.edge_server es
+        on psm.edge_server_id = es.edge_server_id
+       join ${EA}.custom_property_group_md cpgm
+        on cpgm.custom_property_group_md_id = pa.custom_property_group_md_id
+    where edge_name = ${edge_name} and ( ( pa.state >= ${mds_start_state} and pa.state <= ${mds_end_state}) or (psm.state >= ${mds_start_state} and psm.state <= ${mds_end_state}) ) and psm.deleted != 'T') temp 
+  left outer join product_attrs pa on temp.pa_guid = pa.guid where pa.guid is null]]></SQLForSQLServer>-->
+    <!--Updated from file:/usr/local/OATxpress/ofs/local/conf/mds-etl-config.xml.m
+<SQLForSQLServer>INSERT INTO product_attrs (insert_date, update_date, lk_hashcode, deleted, last_update_state, state, guid, custom_property_group_md_id, gtin, style_color, style, color, color_description, size_, size_code, sales_floor_target, trade_item, gender, brand, department, merchandise_category, sub_category, season, collection, price, model_sku, image_url)
+  SELECT GETDATE(),null,null,temp.deleted,null,${state},temp.pa_guid,
+         (select custom_property_group_md_id from custom_property_group_md where guid= temp.guid),
+temp.gtin,temp.style_color,temp.style,temp.color,temp.color_description,temp.size_,temp.size_code,temp.sales_floor_target,temp.trade_item,temp.gender,temp.brand,temp.department,temp.merchandise_category,temp.sub_category,temp.season,temp.collection,temp.price,temp.model_sku,temp.image_url
+  from
+  ( select /*+NO_MERGE*/ pa.deleted,cpgm.guid,pa.guid as pa_guid, pa.gtin, pa.style_color, pa.style, pa.color, pa.color_description, pa.size_, pa.size_code, pa.sales_floor_target, pa.trade_item, pa.gender, pa.brand, pa.department, pa.merchandise_category, pa.sub_category, pa.season, pa.collection, pa.price, pa.model_sku, pa.image_url
+    from ${EA}.product_attrs pa join ${EA}.product p
+        on pa.attrs_id = p.attrs_id
+       join ${EA}.product_site_map psm 
+        on psm.product_id = p.product_id
+       join ${EA}.edge_server es
+        on psm.edge_server_id = es.edge_server_id
+       join ${EA}.custom_property_group_md cpgm
+        on cpgm.custom_property_group_md_id = pa.custom_property_group_md_id
+    where edge_name = ${edge_name} and ( ( pa.state &gt;= ${mds_start_state} and pa.state &lt;= ${mds_end_state}) or (psm.state &gt;= ${mds_start_state} and psm.state &lt;= ${mds_end_state}) ) and psm.deleted != 'T') temp 
+  left outer join product_attrs pa on temp.pa_guid = pa.guid where pa.guid is null</SQLForSQLServer>-->
+    <SQLForSQLServer>INSERT INTO product_attrs (insert_date, update_date, lk_hashcode, deleted, last_update_state, state, guid, custom_property_group_md_id, gtin, style_color, style, color, color_description, size_, size_code, sales_floor_target, trade_item, gender, brand, department, merchandise_category, sub_category, season, collection, price, model_sku, image_url)
+  SELECT GETDATE(),null,null,temp.deleted,null,${state},temp.pa_guid,
+         (select custom_property_group_md_id from custom_property_group_md where guid= temp.guid),
+temp.gtin,temp.style_color,temp.style,temp.color,temp.color_description,temp.size_,temp.size_code,temp.sales_floor_target,temp.trade_item,temp.gender,temp.brand,temp.department,temp.merchandise_category,temp.sub_category,temp.season,temp.collection,temp.price,temp.model_sku,temp.image_url
+  from
+  ( select /*+NO_MERGE*/ pa.deleted,cpgm.guid,pa.guid as pa_guid, pa.gtin, pa.style_color, pa.style, pa.color, pa.color_description, pa.size_, pa.size_code, pa.sales_floor_target, pa.trade_item, pa.gender, pa.brand, pa.department, pa.merchandise_category, pa.sub_category, pa.season, pa.collection, pa.price, pa.model_sku, pa.image_url
+    from ${EA}.product_attrs pa join ${EA}.product p
+        on pa.attrs_id = p.attrs_id
+       join ${EA}.product_site_map psm 
+        on psm.product_id = p.product_id
+       join ${EA}.edge_server es
+        on psm.edge_server_id = es.edge_server_id
+       join ${EA}.custom_property_group_md cpgm
+        on cpgm.custom_property_group_md_id = pa.custom_property_group_md_id
+    where edge_name = ${edge_name} and ( ( pa.state &gt;= ${mds_start_state} and pa.state &lt;= ${mds_end_state}) or (psm.state &gt;= ${mds_start_state} and psm.state &lt;= ${mds_end_state}) ) and psm.deleted != 'T') temp 
+  left outer join product_attrs pa on temp.pa_guid = pa.guid where pa.guid is null</SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Gather statistics for product_attrs">
+    <SQLForOracle><![CDATA[{CALL DBMS_STATS.GATHER_TABLE_STATS (${dbuser_name}, 'product_attrs')}]]></SQLForOracle>
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Update product_attrs">
+    <!--Updated from file:/usr/local/OATxpress/ofs/local/conf/mds-etl-config.xml.m
+<SQLForOracle><![CDATA[UPDATE product_attrs pa1 SET (update_date, deleted, last_update_state, custom_property_group_md_id) = 
+       (select SYSDATE, temp.deleted, ${state}, cpgm2.custom_property_group_md_id
+        from (select /*+NO_MERGE*/ pa2.deleted, pa2.guid, cpgm1.guid as cpg_md_guid from ${EA}.product_attrs pa2
+              join ${EA}.custom_property_group_md cpgm1 on (cpgm1.custom_property_group_md_id=pa2.custom_property_group_md_id)
+              where  pa2.last_update_state >= ${mds_start_state} and pa2.last_update_state <= ${mds_end_state}
+              ) temp 
+              join custom_property_group_md cpgm2 on (cpgm2.guid = temp.cpg_md_guid)
+             where temp.guid = pa1.guid
+       ) WHERE pa1.guid in 
+        (select guid from ${EA}.product_attrs pa3 
+         where  pa3.last_update_state >= ${mds_start_state} and pa3.last_update_state <= ${mds_end_state})]]></SQLForOracle>-->
+    <!--Updated from file:/usr/local/OATxpress/ofs/local/conf/mds-etl-config.xml.m
+<SQLForOracle>UPDATE product_attrs pa1
+SET (update_date, deleted, last_update_state, custom_property_group_md_id, gtin, style_color, style, color, color_description, size_, size_code, sales_floor_target, trade_item, gender, brand, department, merchandise_category, sub_category, season, collection, price, model_sku, image_url) = 
+       (select SYSDATE, temp.deleted, ${state}, cpgm2.custom_property_group_md_id, temp.gtin,temp.style_color,temp.style,temp.color,temp.color_description,temp.size_,temp.size_code,temp.sales_floor_target,temp.trade_item,temp.gender,temp.brand,temp.department,temp.merchandise_category,temp.sub_category,temp.season,temp.collection,temp.price,temp.model_sku,temp.image_url
+        from (select /*+NO_MERGE*/ pa2.deleted, pa2.guid, cpgm1.guid as cpg_md_guid, pa2.gtin,pa2.style_color,pa2.style,pa2.color,pa2.color_description,pa2.size_,pa2.size_code,pa2.sales_floor_target,pa2.trade_item,pa2.gender,pa2.brand,pa2.department,pa2.merchandise_category,pa2.sub_category,pa2.season,pa2.collection,pa2.price,pa2.model_sku,pa2.image_url
+    from ${EA}.product_attrs pa2                join ${EA}.custom_property_group_md cpgm1 on
+                   (cpgm1.custom_property_group_md_id=pa2.custom_property_group_md_id)
+                where  pa2.last_update_state &gt;= ${mds_start_state} and pa2.last_update_state &lt;= ${mds_end_state} 
+                ) temp 
+               join custom_property_group_md cpgm2 on 
+                   (cpgm2.guid = temp.cpg_md_guid) 
+        where temp.guid = pa1.guid)
+    WHERE pa1.guid in 
+        (select guid 
+         from ${EA}.product_attrs pa3 
+         where  pa3.last_update_state &gt;= ${mds_start_state} and pa3.last_update_state &lt;= ${mds_end_state})</SQLForOracle>-->
+    <SQLForOracle>UPDATE product_attrs pa1
+SET (update_date, deleted, last_update_state, custom_property_group_md_id, gtin, style_color, style, color, color_description, size_, size_code, sales_floor_target, trade_item, gender, brand, department, merchandise_category, sub_category, season, collection, price, model_sku, image_url) = 
+       (select SYSDATE, temp.deleted, ${state}, cpgm2.custom_property_group_md_id, temp.gtin,temp.style_color,temp.style,temp.color,temp.color_description,temp.size_,temp.size_code,temp.sales_floor_target,temp.trade_item,temp.gender,temp.brand,temp.department,temp.merchandise_category,temp.sub_category,temp.season,temp.collection,temp.price,temp.model_sku,temp.image_url
+        from (select /*+NO_MERGE*/ pa2.deleted, pa2.guid, cpgm1.guid as cpg_md_guid, pa2.gtin,pa2.style_color,pa2.style,pa2.color,pa2.color_description,pa2.size_,pa2.size_code,pa2.sales_floor_target,pa2.trade_item,pa2.gender,pa2.brand,pa2.department,pa2.merchandise_category,pa2.sub_category,pa2.season,pa2.collection,pa2.price,pa2.model_sku,pa2.image_url
+    from ${EA}.product_attrs pa2                join ${EA}.custom_property_group_md cpgm1 on
+                   (cpgm1.custom_property_group_md_id=pa2.custom_property_group_md_id)
+                where  pa2.last_update_state &gt;= ${mds_start_state} and pa2.last_update_state &lt;= ${mds_end_state} 
+                ) temp 
+               join custom_property_group_md cpgm2 on 
+                   (cpgm2.guid = temp.cpg_md_guid) 
+        where temp.guid = pa1.guid)
+    WHERE pa1.guid in 
+        (select guid 
+         from ${EA}.product_attrs pa3 
+         where  pa3.last_update_state &gt;= ${mds_start_state} and pa3.last_update_state &lt;= ${mds_end_state})</SQLForOracle>
+    <!--Updated from file:/usr/local/OATxpress/ofs/local/conf/mds-etl-config.xml.m
+<SQLForSQLServer><![CDATA[update product_attrs set update_date=GETDATE(), deleted=temp.deleted, last_update_state=  ${state}, custom_property_group_md_id=lcpgm.custom_property_group_md_id 
+  from product_attrs lpa join 
+  ( select /*+NO_MERGE*/ rpa.deleted, rpa.guid as rpa_guid, rcpgm.guid as rcpgm_guid from ${EA}.product_attrs rpa join
+  ${EA}.custom_property_group_md rcpgm on (rpa.custom_property_group_md_id=rcpgm.custom_property_group_md_id)
+  where rpa.last_update_state >= ${mds_start_state} and rpa.last_update_state <= ${mds_end_state}
+  ) temp
+  on (lpa.guid= temp.rpa_guid)
+  join custom_property_group_md lcpgm on (lcpgm.GUID = temp.rcpgm_guid)]]></SQLForSQLServer>-->
+    <!--Updated from file:/usr/local/OATxpress/ofs/local/conf/mds-etl-config.xml.m
+<SQLForSQLServer>update product_attrs set update_date=GETDATE(),deleted=temp.deleted, last_update_state=  ${state}, custom_property_group_md_id=lcpgm.custom_property_group_md_id,
+gtin=temp.gtin,style_color=temp.style_color,style=temp.style,color=temp.color,color_description=temp.color_description,size_=temp.size_,size_code=temp.size_code,sales_floor_target=temp.sales_floor_target,trade_item=temp.trade_item,gender=temp.gender,brand=temp.brand,department=temp.department,merchandise_category=temp.merchandise_category,sub_category=temp.sub_category,season=temp.season,collection=temp.collection,price=temp.price,model_sku=temp.model_sku,image_url=temp.image_url
+  from product_attrs lpa join 
+  ( select /*+NO_MERGE*/ rpa.deleted, rpa.guid as rpa_guid, rcpgm.guid as rcpgm_guid, rpa.gtin,rpa.style_color,rpa.style,rpa.color,rpa.color_description,rpa.size_,rpa.size_code,rpa.sales_floor_target,rpa.trade_item,rpa.gender,rpa.brand,rpa.department,rpa.merchandise_category,rpa.sub_category,rpa.season,rpa.collection,rpa.price,rpa.model_sku,rpa.image_url
+ from ${EA}.product_attrs rpa join
+  ${EA}.custom_property_group_md rcpgm on (rpa.custom_property_group_md_id=rcpgm.custom_property_group_md_id)
+  where rpa.last_update_state &gt;= ${mds_start_state} and rpa.last_update_state &lt;= ${mds_end_state}
+  ) temp
+  on (lpa.guid= temp.rpa_guid) 
+  join custom_property_group_md lcpgm on (lcpgm.GUID = temp.rcpgm_guid)</SQLForSQLServer>-->
+    <SQLForSQLServer>update product_attrs set update_date=GETDATE(),deleted=temp.deleted, last_update_state=  ${state}, custom_property_group_md_id=lcpgm.custom_property_group_md_id,
+gtin=temp.gtin,style_color=temp.style_color,style=temp.style,color=temp.color,color_description=temp.color_description,size_=temp.size_,size_code=temp.size_code,sales_floor_target=temp.sales_floor_target,trade_item=temp.trade_item,gender=temp.gender,brand=temp.brand,department=temp.department,merchandise_category=temp.merchandise_category,sub_category=temp.sub_category,season=temp.season,collection=temp.collection,price=temp.price,model_sku=temp.model_sku,image_url=temp.image_url
+  from product_attrs lpa join 
+  ( select /*+NO_MERGE*/ rpa.deleted, rpa.guid as rpa_guid, rcpgm.guid as rcpgm_guid, rpa.gtin,rpa.style_color,rpa.style,rpa.color,rpa.color_description,rpa.size_,rpa.size_code,rpa.sales_floor_target,rpa.trade_item,rpa.gender,rpa.brand,rpa.department,rpa.merchandise_category,rpa.sub_category,rpa.season,rpa.collection,rpa.price,rpa.model_sku,rpa.image_url
+ from ${EA}.product_attrs rpa join
+  ${EA}.custom_property_group_md rcpgm on (rpa.custom_property_group_md_id=rcpgm.custom_property_group_md_id)
+  where rpa.last_update_state &gt;= ${mds_start_state} and rpa.last_update_state &lt;= ${mds_end_state}
+  ) temp
+  on (lpa.guid= temp.rpa_guid) 
+  join custom_property_group_md lcpgm on (lcpgm.GUID = temp.rcpgm_guid)</SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Insert into pml_property_group">
+    <SQLForOracle><![CDATA[INSERT INTO pml_property_group (deleted, last_update_state, state, guid, custom_property_group_md_id) 
+SELECT temp.deleted,null,${state},temp.ppg_guid,
+       (select custom_property_group_md_id from custom_property_group_md where guid= temp.guid)
+from
+( select /*+NO_MERGE*/ ppg.deleted,cpgm.guid,ppg.guid as ppg_guid
+  from ${EA}.pml_property_group ppg
+     join ${EA}.custom_property_group_md cpgm
+      on cpgm.custom_property_group_md_id = ppg.custom_property_group_md_id
+  where ppg.state >= ${mds_start_state} and ppg.state <= ${mds_end_state} ) temp 
+left outer join pml_property_group ppg on temp.ppg_guid = ppg.guid where ppg.guid is null]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[INSERT INTO pml_property_group (deleted, last_update_state, state, guid, custom_property_group_md_id) 
+SELECT temp.deleted,null,${state},temp.ppg_guid,
+       (select custom_property_group_md_id from custom_property_group_md where guid= temp.guid)
+from
+( select /*+NO_MERGE*/ ppg.deleted,cpgm.guid,ppg.guid as ppg_guid
+  from ${EA}.pml_property_group ppg
+     join ${EA}.custom_property_group_md cpgm
+      on cpgm.custom_property_group_md_id = ppg.custom_property_group_md_id
+  where ppg.state >= ${mds_start_state} and ppg.state <= ${mds_end_state} ) temp 
+left outer join pml_property_group ppg on temp.ppg_guid = ppg.guid where ppg.guid is null]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Gather statistics for pml_property_group">
+    <SQLForOracle><![CDATA[{CALL DBMS_STATS.GATHER_TABLE_STATS (${dbuser_name}, 'pml_property_group')}]]></SQLForOracle>
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Update pml_property_group">
+    <SQLForOracle><![CDATA[UPDATE pml_property_group ppg1
+SET (deleted, last_update_state, custom_property_group_md_id) = 
+       (select temp.deleted, ${state}, cpgm2.custom_property_group_md_id
+        from ( select /*+NO_MERGE*/ ppg2.deleted, ppg2.guid, cpgm1.guid as cpg_md_guid from ${EA}.pml_property_group ppg2
+        join ${EA}.custom_property_group_md cpgm1 on (cpgm1.custom_property_group_md_id=ppg2.custom_property_group_md_id)
+        where ppg2.last_update_state >= ${mds_start_state} and ppg2.last_update_state <= ${mds_end_state}
+        ) temp               
+        join custom_property_group_md cpgm2 on (cpgm2.guid = temp.cpg_md_guid)
+        where temp.guid = ppg1.guid
+        ) WHERE ppg1.guid in 
+        (select guid from ${EA}.pml_property_group ppg3 
+         where  ppg3.last_update_state >= ${mds_start_state} and ppg3.last_update_state <= ${mds_end_state})]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[update pml_property_group set deleted=temp.deleted, last_update_state=  ${state}, custom_property_group_md_id=lcpgm.custom_property_group_md_id 
+  from pml_property_group lppg join 
+  ( select /*+NO_MERGE*/ rppg.deleted, rppg.guid as rppg_guid, rcpgm.guid as rcpgm_guid from ${EA}.pml_property_group rppg join
+  ${EA}.custom_property_group_md rcpgm on (rppg.custom_property_group_md_id=rcpgm.custom_property_group_md_id)
+  where rppg.last_update_state >= ${mds_start_state} and rppg.last_update_state <= ${mds_end_state}
+  ) temp
+  on (lppg.guid= temp.rppg_guid)
+  join custom_property_group_md lcpgm on (lcpgm.GUID = temp.rcpgm_guid)]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Insert into manufacturer">
+    <SQLForOracle><![CDATA[INSERT INTO manufacturer (deleted, last_update_state, state, guid, external_identifier,internal_identifier,manufacturer_name,
+	property_group_id) SELECT temp.deleted,null,${state},temp.guid,temp.external_identifier,temp.internal_identifier,
+	temp.manufacturer_name,(select property_group_id from pml_property_group where guid = temp.ppg_guid) from 
+  (select /*+NO_MERGE*/ distinct(m.manufacturer_id),m.deleted,m.guid,m.external_identifier,m.internal_identifier,m.manufacturer_name,ppg.guid as ppg_guid
+  from
+  ${EA}.manufacturer m left join ${EA}.pml_property_group ppg
+      on m.property_group_id = ppg.property_group_id
+  where m.state >= ${mds_start_state} and m.state <= ${mds_end_state}) temp left outer join manufacturer m on temp.guid=m.guid where m.guid is null]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[INSERT INTO manufacturer (deleted, last_update_state, state, guid, external_identifier,internal_identifier,manufacturer_name,
+  	property_group_id) SELECT temp.deleted,null,${state},temp.guid,temp.external_identifier,temp.internal_identifier,
+  	temp.manufacturer_name,(select property_group_id from pml_property_group where guid = temp.ppg_guid) from 
+    (select /*+NO_MERGE*/ distinct(m.manufacturer_id),m.deleted,m.guid,m.external_identifier,m.internal_identifier,m.manufacturer_name,ppg.guid as ppg_guid
+    from
+    ${EA}.manufacturer m left join ${EA}.pml_property_group ppg
+        on m.property_group_id = ppg.property_group_id
+  where m.state >= ${mds_start_state} and m.state <= ${mds_end_state}) temp left outer join manufacturer m on temp.guid=m.guid where m.guid is null]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Gather statistics for manufacturer">
+    <SQLForOracle><![CDATA[{CALL DBMS_STATS.GATHER_TABLE_STATS (${dbuser_name}, 'manufacturer')}]]></SQLForOracle>
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Update manufacturer">
+    <SQLForOracle><![CDATA[UPDATE manufacturer m1 SET (deleted,last_update_state,external_identifier,internal_identifier,manufacturer_name, property_group_id) = 
+        (select temp.deleted, ${state}, temp.external_identifier, temp.internal_identifier, temp.manufacturer_name, ppg2.property_group_id
+         from ( select /*+NO_MERGE*/ m2.deleted, m2.external_identifier, m2.internal_identifier, m2.manufacturer_name, m2.guid, ppg1.guid as ppg_guid from ${EA}.manufacturer m2
+         left outer join ${EA}.pml_property_group ppg1 on (m2.property_group_id = ppg1.property_group_id)
+         where  m2.last_update_state >= ${mds_start_state} and m2.last_update_state <= ${mds_end_state}
+         ) temp 
+         left outer join pml_property_group ppg2 on (ppg2.guid=temp.ppg_guid)
+         where temp.guid = m1.guid
+         ) WHERE m1.guid in 
+        (select guid from ${EA}.manufacturer m3 
+         where m3.last_update_state >= ${mds_start_state} and m3.last_update_state <= ${mds_end_state})]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[UPDATE manufacturer
+ SET deleted=temp.deleted,last_update_state=${state},external_identifier=temp.external_identifier,internal_identifier=temp.internal_identifier,
+ manufacturer_name= temp.manufacturer_name, property_group_id = lppg.property_group_id
+          from manufacturer lm join
+          (select /*+NO_MERGE*/ rm.deleted,rm.external_identifier,rm.internal_identifier,rm.manufacturer_name,rm.guid as rm_guid, rppg.guid as rppg_guid from ${EA}.manufacturer rm 
+          left join ${EA}.pml_property_group rppg on (rppg.property_group_id = rm.property_group_id) 
+          where rm.last_update_state >= ${mds_start_state} and rm.last_update_state <= ${mds_end_state}) temp
+          on (lm.guid = temp.rm_guid)
+          left join pml_property_group lppg on (temp.rppg_guid=lppg.guid)]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Insert into product">
+    <SQLForOracle><![CDATA[INSERT INTO product (insert_date,update_date,lk_hashcode,deleted,last_update_state,state,guid,product_name,internal_identifier,
+external_identifier,sku,upc_ean_number,uom,packing_type,style_code,manufacturer_id,property_group_id,attrs_id)
+SELECT SYSDATE,null,null,temp.deleted,null,${state},temp.guid,temp.product_name,temp.internal_identifier,
+temp.external_identifier,temp.sku,temp.upc_ean_number,temp.uom,temp.packing_type,temp.style_code,
+(select manufacturer_id from manufacturer where guid=temp.m_guid),
+ null,
+(select attrs_id from product_attrs where guid = temp.pa_guid)
+from
+( select /*+NO_MERGE*/ p.deleted,p.sku,p.uom,p.style_code,p.guid,p.product_name,p.internal_identifier,
+p.external_identifier,p.upc_ean_number,p.packing_type,m1.guid as m_guid,pa1.guid as pa_guid
+from ${EA}.product p join
+${EA}.product_site_map psm 
+      on psm.product_id = p.product_id
+      join ${EA}.manufacturer m1 on m1.manufacturer_id = p.manufacturer_id
+      left outer join ${EA}.product_attrs pa1 on pa1.attrs_id = p.attrs_id
+     join ${EA}.edge_server es
+      on psm.edge_server_id = es.edge_server_id
+       where edge_name = ${edge_name} and p.state is not null and ( (p.state >= ${mds_start_state} and p.state <= ${mds_end_state}) or ( psm.state >= ${mds_start_state} and psm.state <= ${mds_end_state}) ) and psm.deleted != 'T') temp left outer join product p on temp.guid = p.guid where p.guid is null]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[INSERT INTO product (insert_date,update_date,lk_hashcode,deleted,last_update_state,state,guid,product_name,internal_identifier,
+external_identifier,sku,upc_ean_number,uom,packing_type,style_code,manufacturer_id,property_group_id,attrs_id)
+SELECT GETDATE(),null,null,temp.deleted,null,${state},temp.guid,temp.product_name,temp.internal_identifier,
+temp.external_identifier,temp.sku,temp.upc_ean_number,temp.uom,temp.packing_type,temp.style_code,
+(select manufacturer_id from manufacturer where guid=temp.m_guid),
+null,
+(select attrs_id from product_attrs where guid = temp.pa_guid)
+from
+( select /*+NO_MERGE*/ p.deleted,p.sku,p.uom,p.style_code,p.guid,p.product_name,p.internal_identifier,
+p.external_identifier,p.upc_ean_number,p.packing_type,m1.guid as m_guid,pa1.guid as pa_guid
+from ${EA}.product p join
+${EA}.product_site_map psm 
+      on psm.product_id = p.product_id
+      join ${EA}.manufacturer m1 on m1.manufacturer_id = p.manufacturer_id
+      left outer join ${EA}.product_attrs pa1 on pa1.attrs_id = p.attrs_id
+     join ${EA}.edge_server es
+      on psm.edge_server_id = es.edge_server_id
+       where edge_name = ${edge_name} and p.state is not null and ( (p.state >= ${mds_start_state} and p.state <= ${mds_end_state}) or ( psm.state >= ${mds_start_state} and psm.state <= ${mds_end_state}) ) and psm.deleted != 'T') temp left outer join product p on temp.guid = p.guid where p.guid is null]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Gather statistics for product">
+    <SQLForOracle><![CDATA[{CALL DBMS_STATS.GATHER_TABLE_STATS (${dbuser_name}, 'product')}]]></SQLForOracle>
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Update product">
+    <SQLForOracle><![CDATA[UPDATE product p1 
+SET (update_date,deleted,last_update_state,product_name,internal_identifier,external_identifier,sku,upc_ean_number,uom,packing_type,style_code,manufacturer_id,property_group_id,attrs_id)=
+	(select SYSDATE,temp.deleted,${state},temp.product_name,temp.internal_identifier,temp.external_identifier,temp.sku,temp.upc_ean_number,temp.uom,temp.packing_type,temp.style_code,m2.manufacturer_id,null,pa2.attrs_id
+	from (select /*+NO_MERGE*/ p2.deleted,p2.product_name,p2.internal_identifier,p2.external_identifier,p2.sku,p2.upc_ean_number,p2.uom,p2.packing_type,p2.style_code,p2.guid,m1.guid as m_guid,pa1.guid as pa_guid from ${EA}.product p2 
+	join ${EA}.manufacturer m1 on m1.manufacturer_id=p2.manufacturer_id
+	left outer join ${EA}.product_attrs pa1 on pa1.attrs_id=p2.attrs_id
+	where  p2.last_update_state >= ${mds_start_state} and p2.last_update_state <= ${mds_end_state}
+	) temp 
+	join manufacturer m2 on m2.guid=temp.m_guid
+	left outer join product_attrs pa2 on pa2.guid=temp.pa_guid 
+	where temp.guid = p1.guid
+	) where p1.guid in 
+	(select guid from ${EA}.product p3 where p3.last_update_state >= ${mds_start_state} and p3.last_update_state <= ${mds_end_state})]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[UPDATE product SET update_date=GETDATE(),deleted=temp.deleted,last_update_state=${state},product_name=temp.product_name,internal_identifier=temp.internal_identifier,
+    external_identifier=temp.external_identifier,sku=temp.sku,upc_ean_number=temp.upc_ean_number,uom=temp.uom,packing_type=temp.packing_type,style_code=temp.style_code,
+    manufacturer_id=lm.manufacturer_id,property_group_id=null,attrs_id=lpa.attrs_id
+    	from product lp join 
+    	( select /*+NO_MERGE*/ rp.deleted,rp.product_name,rp.internal_identifier,rp.external_identifier,rp.sku,rp.upc_ean_number,rp.uom,rp.packing_type,rp.style_code,rm.guid as rm_guid,
+    	  rpa.guid as rpa_guid, rp.guid as rp_guid from ${EA}.product rp join
+    	  ${EA}.manufacturer rm on (rm.manufacturer_id=rp.manufacturer_id) 
+    	  left outer join ${EA}.product_attrs rpa on (rpa.attrs_id=rp.attrs_id)
+    	  where rp.last_update_state >= ${mds_start_state} and rp.last_update_state <= ${mds_end_state}
+    	) temp
+     on (lp.guid=temp.rp_guid)
+    	join manufacturer lm on (lm.guid=temp.rm_guid)
+    	left outer join product_attrs lpa on (temp.rpa_guid=lpa.guid)]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Insert into pml_property">
+    <SQLForOracle><![CDATA[INSERT into pml_property(property_key,property_value,insert_date,update_date,lk_hashcode,deleted,last_update_state,state,guid,
+property_group_id,custom_property_md_id)
+select temp.property_key,temp.property_value,SYSDATE,null,null,temp.deleted,null,${state},temp.guid,
+(select property_group_id from pml_property_group where guid = temp.ppg_guid),
+(select custom_property_md_id from custom_property_md where guid=temp.cpm_guid)
+from
+(select /*+NO_MERGE*/ pp.property_key,pp.property_value,pp.deleted,pp.guid,ppg.guid as ppg_guid,cpm.guid as cpm_guid
+from ${EA}.pml_property pp 
+join ${EA}.pml_property_group ppg on pp.property_group_id = ppg.property_group_id
+join ${EA}.custom_property_md cpm on pp.custom_property_md_id = cpm.custom_property_md_id
+  where pp.state >= ${mds_start_state} and pp.state <= ${mds_end_state}) temp left outer join pml_property pml on temp.guid=pml.guid where pml.guid is null]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[INSERT into pml_property(property_key,property_value,insert_date,update_date,lk_hashcode,deleted,last_update_state,state,guid,
+property_group_id,custom_property_md_id)
+select temp.property_key,temp.property_value,GETDATE(),null,null,temp.deleted,null,${state},temp.guid,
+(select property_group_id from pml_property_group where guid = temp.ppg_guid),
+(select custom_property_md_id from custom_property_md where guid=temp.cpm_guid)
+from
+(select /*+NO_MERGE*/ pp.property_key,pp.property_value,pp.deleted,pp.guid,ppg.guid as ppg_guid,cpm.guid as cpm_guid
+from ${EA}.pml_property pp 
+join ${EA}.pml_property_group ppg on pp.property_group_id = ppg.property_group_id
+join ${EA}.custom_property_md cpm on pp.custom_property_md_id = cpm.custom_property_md_id
+  where pp.state >= ${mds_start_state} and pp.state <= ${mds_end_state}) temp left outer join pml_property pml on temp.guid=pml.guid where pml.guid is null]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Gather statistics for pml_property">
+    <SQLForOracle><![CDATA[{CALL DBMS_STATS.GATHER_TABLE_STATS (${dbuser_name}, 'pml_property')}]]></SQLForOracle>
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Update pml_property">
+    <SQLForOracle><![CDATA[UPDATE pml_property pp1
+SET (property_key,property_value,deleted,update_date,last_update_state,property_group_id,custom_property_md_id) =
+	(select temp.property_key,temp.property_value,temp.deleted,SYSDATE,${state},ppg2.property_group_id,cpm2.custom_property_md_id
+	from (select /*+NO_MERGE*/ pp2.property_key,pp2.property_value,pp2.deleted,${state},ppg1.guid as ppg_guid,cpm1.guid as cpm_guid, pp2.guid from ${EA}.pml_property pp2 
+	      join ${EA}.custom_property_md cpm1 on (cpm1.custom_property_md_id=pp2.custom_property_md_id)
+	      join ${EA}.pml_property_group ppg1 on (ppg1.property_group_id=pp2.property_group_id)
+	      where  pp2.last_update_state >= ${mds_start_state} and pp2.last_update_state <= ${mds_end_state}
+	     ) temp 
+	join custom_property_md cpm2 on (cpm2.guid = temp.cpm_guid)
+	join pml_property_group ppg2 on (ppg2.guid=temp.ppg_guid)
+        where temp.guid = pp1.guid
+        ) where pp1.guid in 
+	(select guid from ${EA}.pml_property pp3 where pp3.last_update_state >= ${mds_start_state} and pp3.last_update_state <= ${mds_end_state})]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[UPDATE pml_property 
+   SET property_key=temp.property_key,property_value=temp.property_value,deleted=temp.deleted,update_date=GETDATE(),last_update_state=${state},  
+       property_group_id=lppg.property_group_id,custom_property_md_id=lcpm.custom_property_md_id   
+   from pml_property lpp join
+        (select /*+NO_MERGE*/ rpp.guid as rpp_guid, rcpm.guid as rcpm_guid, rppg.guid as rppg_guid,
+                rpp.property_key, rpp.property_value, rpp.deleted
+         from ${EA}.pml_property rpp 
+              join ${EA}.custom_property_md rcpm on (rpp.custom_property_md_id = rcpm.custom_property_md_id)
+              join ${EA}.pml_property_group rppg on (rpp.property_group_id = rppg.property_group_id)
+         where rpp.last_update_state >= ${mds_start_state} and rpp.last_update_state <= ${mds_end_state}) temp
+       on (lpp.guid = temp.rpp_guid)
+       join custom_property_md lcpm on (temp.rcpm_guid = lcpm.guid)
+    join pml_property_group lppg on (temp.rppg_guid = lppg.guid)]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Insert into content">
+    <SQLForOracle><![CDATA[INSERT INTO content (deleted,last_update_state,state,guid,product_set_id,epc,external_identifier,creation_ts,is_hidden,product_id,
+  content_creation_method_id,senseware_install_id,property_group_id)
+  SELECT temp.deleted,null,${state},temp.guid,null,temp.epc,temp.external_identifier,temp.creation_ts,temp.is_hidden,
+  (select product_id from product where guid=temp.p_guid),temp.content_creation_method_id,
+  (select senseware_install_id from senseware_install where senseware_epc=temp.senseware_epc),
+  (select property_group_id from pml_property_group where guid=temp.ppg_guid)
+  from
+  (select /*+NO_MERGE*/ c.deleted,c.guid,c.epc,c.external_identifier,c.creation_ts,c.is_hidden,p.guid as p_guid,c.content_creation_method_id,si.senseware_epc,
+  ppg.guid as ppg_guid from ${EA}.content c 
+      left outer join ${EA}.pml_property_group ppg on c.property_group_id = ppg.property_group_id
+      join ${EA}.product p on c.product_id = p.product_id
+      join ${EA}.senseware_install si on c.senseware_install_id = si.senseware_install_id
+   where c.state >= ${mds_start_state} and c.state <= ${mds_end_state}) temp left outer join content c on temp.guid=c.guid where c.guid is null]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[INSERT INTO content (deleted,last_update_state,state,guid,product_set_id,epc,external_identifier,creation_ts,is_hidden,product_id,
+  content_creation_method_id,senseware_install_id,property_group_id)
+  SELECT temp.deleted,null,${state},temp.guid,null,temp.epc,temp.external_identifier,temp.creation_ts,temp.is_hidden,
+  (select product_id from product where guid=temp.p_guid),temp.content_creation_method_id,
+  (select senseware_install_id from senseware_install where senseware_epc=temp.senseware_epc),
+  (select property_group_id from pml_property_group where guid=temp.ppg_guid)
+  from
+  (select /*+NO_MERGE*/ c.deleted,c.guid,c.epc,c.external_identifier,c.creation_ts,c.is_hidden,p.guid as p_guid,c.content_creation_method_id,si.senseware_epc,
+  ppg.guid as ppg_guid from ${EA}.content c 
+      left outer join ${EA}.pml_property_group ppg on c.property_group_id = ppg.property_group_id
+      join ${EA}.product p on c.product_id = p.product_id
+      join ${EA}.senseware_install si on c.senseware_install_id = si.senseware_install_id
+   where c.state >= ${mds_start_state} and c.state <= ${mds_end_state}) temp left outer join content c on temp.guid=c.guid where c.guid is null]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Gather statistics for content">
+    <SQLForOracle><![CDATA[{CALL DBMS_STATS.GATHER_TABLE_STATS (${dbuser_name}, 'content')}]]></SQLForOracle>
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Update content">
+    <SQLForOracle><![CDATA[UPDATE content c1 SET (deleted,last_update_state,epc,external_identifier,creation_ts,is_hidden,product_id,content_creation_method_id,senseware_install_id,property_group_id) =
+	 (select temp.deleted,${state},temp.epc,temp.external_identifier,temp.creation_ts,temp.is_hidden,p2.product_id,temp.content_creation_method_id,si2.senseware_install_id,ppg2.property_group_id
+	 from ( select /*+NO_MERGE*/ c2.deleted,c2.epc,c2.external_identifier,c2.creation_ts,c2.is_hidden,p1.guid as p_guid,c2.content_creation_method_id,si1.guid as si_guid,si1.senseware_epc as si_sepc,ppg1.guid as ppg_guid,c2.guid from ${EA}.content c2 
+	 	left outer join ${EA}.pml_property_group ppg1 on (ppg1.property_group_id=c2.property_group_id)
+	 	join ${EA}.product p1 on (p1.product_id=c2.product_id)
+	 	join ${EA}.senseware_install si1 on (si1.senseware_install_id=c2.senseware_install_id)
+	 	where  c2.last_update_state >= ${mds_start_state} and c2.last_update_state <= ${mds_end_state}
+	      ) temp
+	 left outer join pml_property_group ppg2 on (ppg2.guid=temp.ppg_guid)
+	 join product p2 on (p2.guid=temp.p_guid)
+	 join senseware_install si2 on (si2.senseware_epc=temp.si_sepc)
+	 where temp.guid = c1.guid
+	 )where c1.guid in (select guid from ${EA}.content c3 where c3.last_update_state >= ${mds_start_state} and c3.last_update_state <= ${mds_end_state})]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[UPDATE content SET deleted=temp.deleted,last_update_state=${state},epc=temp.epc,external_identifier=temp.external_identifier,creation_ts=temp.creation_ts,is_hidden=temp.is_hidden,
+    product_id=lp.product_id,content_creation_method_id=temp.content_creation_method_id,senseware_install_id=lsi.senseware_install_id,property_group_id=lppg.property_group_id
+      	 from content lc join 
+      	 ( select /*+NO_MERGE*/ rc.deleted,rc.epc,rc.external_identifier,rc.creation_ts,rc.is_hidden,rc.content_creation_method_id, rp.guid as rp_guid, rc.guid as rc_guid, rppg.guid as rppg_guid, 
+            rsi.senseware_epc as rsi_senseware_epc from ${EA}.content rc
+      	 left outer join ${EA}.pml_property_group rppg on (rc.property_group_id = rppg.property_group_id)
+      	 join ${EA}.product rp on (rc.product_id = rp.product_id)
+      	 join ${EA}.senseware_install rsi on (rc.senseware_install_id = rsi.senseware_install_id)
+      	 where rc.last_update_state >= ${mds_start_state} and rc.last_update_state <= ${mds_end_state}
+      	 ) temp 
+      	 on (lc.guid=temp.rc_guid)
+      	 left outer join pml_property_group lppg on (temp.rppg_guid=lppg.guid)
+      	 join product lp on (temp.rp_guid=lp.guid)
+      	 join senseware_install lsi on (temp.rsi_senseware_epc=lsi.senseware_epc)]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Insert into content_li">
+    <SQLForOracle><![CDATA[INSERT INTO content_li (deleted,last_update_state,state,guid,expected_qty,content_id,product_set_id,property_group_id,product_id)
+SELECT temp.deleted,null,${state},temp.guid,temp.expected_qty,
+(select content_id from content where guid=temp.c_guid),null,
+(select property_group_id from pml_property_group where guid=temp.ppg_guid),
+(select product_id from product where guid=temp.p_guid)
+from
+(select /*+NO_MERGE*/ cl.deleted,cl.guid,cl.expected_qty,c.guid as c_guid,ppg.guid as ppg_guid,p.guid as p_guid 
+from ${EA}.content_li cl 
+      join ${EA}.content c on c.content_id = cl.content_id
+      left outer join ${EA}.pml_property_group ppg on ppg.property_group_id = cl.property_group_id
+      join ${EA}.product p on p.product_id = cl.product_id
+        where cl.state >= ${mds_start_state} and cl.state <= ${mds_end_state}) temp left outer join content_li cl on temp.guid=cl.guid where cl.guid is null]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[INSERT INTO content_li (deleted,last_update_state,state,guid,expected_qty,content_id,product_set_id,property_group_id,product_id)
+SELECT temp.deleted,null,${state},temp.guid,temp.expected_qty,
+(select content_id from content where guid=temp.c_guid),null,
+(select property_group_id from pml_property_group where guid=temp.ppg_guid),
+(select product_id from product where guid=temp.p_guid)
+from
+(select /*+NO_MERGE*/ cl.deleted,cl.guid,cl.expected_qty,c.guid as c_guid,ppg.guid as ppg_guid,p.guid as p_guid 
+from ${EA}.content_li cl 
+      join ${EA}.content c on c.content_id = cl.content_id
+      left outer join ${EA}.pml_property_group ppg on ppg.property_group_id = cl.property_group_id
+      join ${EA}.product p on p.product_id = cl.product_id
+        where cl.state >= ${mds_start_state} and cl.state <= ${mds_end_state}) temp left outer join content_li cl on temp.guid=cl.guid where cl.guid is null]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Gather statistics for content_li">
+    <SQLForOracle><![CDATA[{CALL DBMS_STATS.GATHER_TABLE_STATS (${dbuser_name}, 'content_li')}]]></SQLForOracle>
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Update content_li">
+    <SQLForOracle><![CDATA[UPDATE content_li cl1 SET (deleted,last_update_state,expected_qty,content_id,property_group_id,product_id) =
+	(select temp.deleted,${state},temp.expected_qty,c2.content_id,ppg2.property_group_id,p2.product_id
+	from ( select /*+NO_MERGE*/ cl2.deleted,${state},cl2.expected_qty,cl2.guid,c1.guid as c_guid,ppg1.guid as ppg_guid,p1.guid as p_guid from ${EA}.content_li cl2 
+	       join ${EA}.content c1 on c1.content_id = cl2.content_id
+	       left outer join ${EA}.pml_property_group ppg1 on ppg1.property_group_id = cl2.property_group_id
+	       join ${EA}.product p1 on p1.product_id = cl2.product_id
+	       where cl2.last_update_state >= ${mds_start_state} and cl2.last_update_state <= ${mds_end_state}
+	     ) temp 
+	join content c2 on c2.guid = temp.c_guid
+	left outer join pml_property_group ppg2 on ppg2.guid = temp.ppg_guid
+	join product p2 on p2.guid = temp.p_guid
+	where temp.guid=cl1.guid
+	) where cl1.guid in 
+	(select guid from ${EA}.content_li cl3 where cl3.last_update_state >= ${mds_start_state} and cl3.last_update_state <= ${mds_end_state})]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[UPDATE content_li SET deleted=temp.deleted,last_update_state=${state},expected_qty=temp.expected_qty,content_id=lc.content_id,property_group_id=lppg.property_group_id,
+product_id=lp.product_id
+	from content_li lcl join 
+	( select /*+NO_MERGE*/ rcl.deleted,rcl.expected_qty,rc.guid as rc_guid, rcl.guid as rcl_guid, rppg.guid as rppg_guid, rp.guid as rp_guid from ${EA}.content_li rcl
+	join ${EA}.content rc on (rcl.content_id = rc.content_id)
+	left outer join ${EA}.pml_property_group rppg on (rcl.property_group_id = rppg.property_group_id)
+	join ${EA}.product rp on (rcl.product_id = rp.product_id)
+	where rcl.last_update_state >= ${mds_start_state} and rcl.last_update_state <= ${mds_end_state}
+	) temp
+	on (lcl.guid=temp.rcl_guid)
+	join content lc on (temp.rc_guid = lc.guid)
+	left outer join pml_property_group lppg on (temp.rppg_guid=lppg.guid)
+	join product lp on (temp.rp_guid=lp.guid)]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Insert into product_pure_identity">
+    <SQLForOracle><![CDATA[INSERT INTO product_pure_identity(company_prefix,object_class,sscc_extension_digit,identity_code,filter_value,state,last_update_state,
+guid,deleted,product_id,epc_identity_type_id) 
+SELECT temp.company_prefix,temp.object_class,temp.sscc_extension_digit,temp.identity_code,temp.filter_value,${state},null,
+temp.guid,temp.deleted,
+(select product_id from product where guid=temp.p_guid),
+(select epc_identity_type_id from epc_identity_type where type=temp.type) 
+from
+(select /*+NO_MERGE*/ ppi.company_prefix,ppi.object_class,ppi.sscc_extension_digit,ppi.identity_code,ppi.filter_value,p.guid as p_guid,ppi.epc_identity_type_id,ppi.guid,eit.type,
+ppi.deleted from ${EA}.product_pure_identity ppi 
+join ${EA}.product p on ppi.product_id = p.product_id 
+join ${EA}.product_site_map psm on psm.product_id = p.product_id 
+join ${EA}.edge_server es on psm.edge_server_id = es.edge_server_id 
+join ${EA}.epc_identity_type eit on eit.epc_identity_type_id = ppi.epc_identity_type_id
+  where edge_name = ${edge_name} and ppi.state is not null and ( (ppi.state >= ${mds_start_state} and ppi.state <= ${mds_end_state}) or (psm.state >= ${mds_start_state} and psm.state <= ${mds_end_state}) ) and psm.deleted != 'T') temp left outer join product_pure_identity ppi on temp.guid=ppi.guid where ppi.guid is null]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[INSERT INTO product_pure_identity(company_prefix,object_class,sscc_extension_digit,identity_code,filter_value,state,last_update_state,
+guid,deleted,product_id,epc_identity_type_id) 
+SELECT temp.company_prefix,temp.object_class,temp.sscc_extension_digit,temp.identity_code,temp.filter_value,${state},null,
+temp.guid,temp.deleted,
+(select product_id from product where guid=temp.p_guid),
+(select epc_identity_type_id from epc_identity_type where type=temp.type) 
+from
+(select /*+NO_MERGE*/ ppi.company_prefix,ppi.object_class,ppi.sscc_extension_digit,ppi.identity_code,ppi.filter_value,p.guid as p_guid,ppi.epc_identity_type_id,ppi.guid,eit.type,
+ppi.deleted from ${EA}.product_pure_identity ppi 
+join ${EA}.product p on ppi.product_id = p.product_id 
+join ${EA}.product_site_map psm on psm.product_id = p.product_id 
+join ${EA}.edge_server es on psm.edge_server_id = es.edge_server_id 
+join ${EA}.epc_identity_type eit on eit.epc_identity_type_id = ppi.epc_identity_type_id
+  where edge_name = ${edge_name} and ppi.state is not null and ( (ppi.state >= ${mds_start_state} and ppi.state <= ${mds_end_state}) or (psm.state >= ${mds_start_state} and psm.state <= ${mds_end_state}) ) and psm.deleted != 'T') temp left outer join product_pure_identity ppi on temp.guid=ppi.guid where ppi.guid is null]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Gather statistics for product_pure_identity">
+    <SQLForOracle><![CDATA[{CALL DBMS_STATS.GATHER_TABLE_STATS (${dbuser_name}, 'product_pure_identity')}]]></SQLForOracle>
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Update product_pure_identity">
+    <SQLForOracle><![CDATA[UPDATE product_pure_identity ppi1 SET (company_prefix,object_class,sscc_extension_digit,identity_code,filter_value,last_update_state,deleted,product_id,epc_identity_type_id) =
+	(select temp.company_prefix, temp.object_class, temp.sscc_extension_digit,temp.identity_code,temp.filter_value,${state},temp.deleted,p2.product_id,eit2.epc_identity_type_id
+	from (select /*+NO_MERGE*/ ppi2.company_prefix, ppi2.object_class, ppi2.sscc_extension_digit,ppi2.identity_code,ppi2.filter_value,ppi2.deleted,ppi2.guid,p1.guid as p_guid,eit1.type as eit_type from ${EA}.product_pure_identity ppi2 
+	      join ${EA}.product p1 on p1.product_id = ppi2.product_id
+	      join ${EA}.epc_identity_type eit1 on eit1.epc_identity_type_id = ppi2.epc_identity_type_id
+	      where  ppi2.last_update_state >= ${mds_start_state} and ppi2.last_update_state <= ${mds_end_state}
+	     ) temp 
+ 	join product p2 on p2.guid = temp.p_guid
+	join epc_identity_type eit2 on eit2.type = temp.eit_type
+	where temp.guid = ppi1.guid
+	) where ppi1.guid in 
+	(select guid from ${EA}.product_pure_identity ppi3 where ppi3.last_update_state >= ${mds_start_state} and ppi3.last_update_state <= ${mds_end_state})]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[UPDATE product_pure_identity SET company_prefix=temp.company_prefix,object_class=temp.object_class,sscc_extension_digit=temp.sscc_extension_digit,
+identity_code=temp.identity_code,filter_value=temp.filter_value,last_update_state=${state},deleted=temp.deleted,product_id=lp.product_id,epc_identity_type_id=leit.epc_identity_type_id
+	from product_pure_identity lppi join
+	(select /*+NO_MERGE*/ rppi.company_prefix,rppi.object_class,rppi.sscc_extension_digit,rppi.identity_code,rppi.filter_value,rppi.deleted,rp.guid as rp_guid, reit.type as type, rppi.guid as rppi_guid from ${EA}.product_pure_identity rppi
+	join ${EA}.product rp on (rppi.product_id = rp.product_id)
+	join ${EA}.epc_identity_type reit on (rppi.epc_identity_type_id=reit.epc_identity_type_id)
+	where rppi.last_update_state >= ${mds_start_state} and rppi.last_update_state <= ${mds_end_state}
+	) temp
+	on (lppi.guid = temp.rppi_guid)
+	join product lp on (temp.rp_guid=lp.guid)
+	join epc_identity_type leit on (temp.type = leit.type)]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Insert into product_epc_prefix">
+    <SQLForOracle><![CDATA[INSERT INTO product_epc_prefix (deleted,last_update_state,state,guid,epc_prefix,property_group_id,product_id)
+SELECT temp.deleted,null,${state},temp.guid,temp.epc_prefix,
+null,
+(select product_id from product where guid=temp.p_guid)
+from
+(select /*+NO_MERGE*/ pep.deleted,pep.guid,pep.epc_prefix,p.guid as p_guid
+from ${EA}.product_epc_prefix pep join 
+${EA}.product_site_map psm 
+      on psm.product_id = pep.product_id
+     join ${EA}.edge_server es
+      on psm.edge_server_id = es.edge_server_id
+      join ${EA}.product p on p.product_id = pep.product_id 
+      where edge_name = ${edge_name} and pep.state is not null and ( (pep.state >= ${mds_start_state} and pep.state <= ${mds_end_state}) or  (psm.state >= ${mds_start_state} and psm.state <= ${mds_end_state}) ) and psm.deleted != 'T') temp left outer join product_epc_prefix pep on temp.guid=pep.guid where pep.guid is null]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[INSERT INTO product_epc_prefix (deleted,last_update_state,state,guid,epc_prefix,property_group_id,product_id)
+SELECT temp.deleted,null,${state},temp.guid,temp.epc_prefix,
+null,
+(select product_id from product where guid=temp.p_guid)
+from
+(select /*+NO_MERGE*/ pep.deleted,pep.guid,pep.epc_prefix,p.guid as p_guid
+from ${EA}.product_epc_prefix pep join 
+${EA}.product_site_map psm 
+      on psm.product_id = pep.product_id
+     join ${EA}.edge_server es
+      on psm.edge_server_id = es.edge_server_id
+      join ${EA}.product p on p.product_id = pep.product_id 
+      where edge_name = ${edge_name} and pep.state is not null and ( (pep.state >= ${mds_start_state} and pep.state <= ${mds_end_state}) or  (psm.state >= ${mds_start_state} and psm.state <= ${mds_end_state}) ) and psm.deleted != 'T') temp left outer join product_epc_prefix pep on temp.guid=pep.guid where pep.guid is null]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Gather statistics for product_epc_prefix">
+    <SQLForOracle><![CDATA[{CALL DBMS_STATS.GATHER_TABLE_STATS (${dbuser_name}, 'product_epc_prefix')}]]></SQLForOracle>
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Update product_epc_prefix">
+    <SQLForOracle><![CDATA[UPDATE product_epc_prefix pep1 SET (deleted,last_update_state,epc_prefix,property_group_id,product_id)=
+	(select temp.deleted,${state},temp.epc_prefix,null,p2.product_id
+	from (select /*+NO_MERGE*/ pep2.deleted,pep2.epc_prefix,p1.guid as p_guid, pep2.guid from ${EA}.product_epc_prefix pep2
+	      join ${EA}.product p1 on p1.product_id = pep2.product_id
+	      where  pep2.last_update_state >= ${mds_start_state} and pep2.last_update_state <= ${mds_end_state}
+	     ) temp
+	join product p2 on p2.guid = temp.p_guid
+	where temp.guid = pep1.guid
+	) where pep1.guid in 
+	(select guid from ${EA}.product_epc_prefix pep3 where pep3.last_update_state >= ${mds_start_state} and pep3.last_update_state <= ${mds_end_state})]]></SQLForOracle>
+    <SQLForSQLServer><![CDATA[UPDATE product_epc_prefix SET deleted=temp.deleted,last_update_state=${state},epc_prefix=temp.epc_prefix,property_group_id=null,product_id=lp.product_id
+	from product_epc_prefix lpep join 
+	(select /*+NO_MERGE*/ rpep.deleted,rpep.epc_prefix,rp.guid as rp_guid, rpep.guid as rpep_guid from ${EA}.product_epc_prefix rpep 
+	join ${EA}.product rp on (rpep.product_id = rp.product_id)
+	where rpep.last_update_state >= ${mds_start_state} and rpep.last_update_state <= ${mds_end_state}
+	) temp 
+	on (lpep.guid=temp.rpep_guid)
+	join product lp on (temp.rp_guid = lp.guid)]]></SQLForSQLServer>
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+  <SQLExecTaskForDatabase desc="Post MDSETL SQL">
+    <SQLForOracle />
+    <SQLForSQLServer />
+    <SQLForDB2 />
+  </SQLExecTaskForDatabase>
+</DataWarehouseETL>
+

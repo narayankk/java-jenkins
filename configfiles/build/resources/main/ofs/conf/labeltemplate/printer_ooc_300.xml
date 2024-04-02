@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+ $Revision: 1.1.2.1 $
+ $State: Exp $
+-->
+<template name="printer-error-template">
+    <variables>
+       	<variable name="date" defaultValue=""/>
+		<variable name="ERROR_MSG" defaultValue=""/>
+    </variables>
+    <printcode>                                      
+    <![CDATA[
+^XA
+^FO100,10^GB350,10,140^FS
+^FT130,70^A0N,55,55^FR^FDPrinter out of^FS
+^FT130,130^A0N,55,55^FR^FDCallibration.^FS
+^FT15,170^A0N,30,30^FD{date}^FS
+^FT15,215^A0N,30,30^FD{ERROR_MSG}^FS
+^PQ1,0,0,N^MCY^XZ
+^XZ
+]]>
+    </printcode>
+</template>

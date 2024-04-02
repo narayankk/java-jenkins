@@ -1,0 +1,7 @@
+oat.task.inventory.rule.inventory_rule_task.POOL_SIZE=5
+use_external_inventory_for_cc=false
+replenishment.sell1replen1.enable=true
+DC.scenario.error.action.map.file=dc-error-actions
+assn.upper_bound.minutes=10
+assn.lower_bound.minutes=14400
+

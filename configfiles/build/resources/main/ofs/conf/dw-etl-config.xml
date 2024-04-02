@@ -1,0 +1,3665 @@
+<DataWarehouseETL>
+  <SchemaAlias alias="ODS">senseware</SchemaAlias> 
+  <SchemaAlias alias="Staging">senseware</SchemaAlias> 
+<CleanupTask table="sslta_dim" primaryKey="sslta_skey" insertDate="insert_date">
+  <ForeignKeyReference table="ral_sslta_business_loc" foreignKey="sslta_skey" action="delete"/> 
+  <ForeignKeyReference table="ral_sslta_read_point" foreignKey="sslta_skey" action="delete"/> 
+  </CleanupTask>
+<CleanupTask table="read_point_dim" primaryKey="read_point_skey" insertDate="insert_date">
+  <ForeignKeyReference table="tag_read_fact" foreignKey="read_point_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="from_read_point_skey" action="update"/> 
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="to_read_point_skey" action="update"/>
+  <ForeignKeyReference table="tag_loc_fact" foreignKey="enter_read_point_skey" action="update"/> 
+  <ForeignKeyReference table="ral_sslta_read_point" foreignKey="read_point_skey" action="delete"/> 
+  <ForeignKeyReference table="cycle_dim" foreignKey="assn_read_point_skey" action="update"/>
+  <ForeignKeyReference table="cycle_dim" foreignKey="disassn_read_point_skey" action="update"/>
+  </CleanupTask>
+ <CleanupTask table="business_loc_dim" primaryKey="business_loc_skey" insertDate="insert_date">
+  <ForeignKeyReference table="tag_loc_fact" foreignKey="business_loc_skey" action="delete"/> 
+  <ForeignKeyReference table="inventory_fact" foreignKey="business_loc_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="from_business_loc_skey" action="update"/> 
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="to_business_loc_skey" action="update"/> 
+  <ForeignKeyReference table="ral_sslta_business_loc" foreignKey="business_loc_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_inv_fact" foreignKey="business_loc_skey" action="delete"/>
+  </CleanupTask>
+ <CleanupTask table="sslt_dim" primaryKey="sslt_skey" insertDate="insert_date">
+  <ForeignKeyReference table="business_loc_dim" foreignKey="sslt_skey" action="update"/> 
+  <ForeignKeyReference table="read_point_dim" foreignKey="sslt_skey" action="update"/> 
+ </CleanupTask>
+<!-- COMMENTED FOR KETTLE ETL    
+ <CleanupTask table="site_dim" primaryKey="site_skey" insertDate="insert_date">
+  <ForeignKeyReference table="tag_read_fact" foreignKey="site_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_loc_fact" foreignKey="site_skey" action="delete"/> 
+  <ForeignKeyReference table="inventory_fact" foreignKey="site_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="from_site_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="to_site_skey" action="delete"/> 
+  <ForeignKeyReference table="shipment_qty_fact" foreignKey="from_site_skey" action="delete"/> 
+  <ForeignKeyReference table="shipment_qty_fact" foreignKey="to_site_skey" action="update"/> 
+  <ForeignKeyReference table="forecast_fact" foreignKey="site_skey" action="delete"/> 
+  <ForeignKeyReference table="pos_fact" foreignKey="site_skey" action="delete"/> 
+  <ForeignKeyReference table="ral_site_group_site" foreignKey="site_skey" action="delete"/>
+  <ForeignKeyReference table="oos_onhand_inventory_fact" foreignKey="site_skey" action="delete"/>
+  <ForeignKeyReference table="oos_sales_forecast_fact" foreignKey="site_skey" action="delete"/>
+  <ForeignKeyReference table="oos_event_fact" foreignKey="site_skey" action="delete"/>
+  </CleanupTask>
+-->
+  <CleanupTask table="site_group_dim" primaryKey="site_group_skey" insertDate="insert_date">
+  <ForeignKeyReference table="ral_site_group_site" foreignKey="site_group_skey" action="delete"/> 
+  </CleanupTask>
+ <CleanupTask table="tag_dim" primaryKey="tag_skey" insertDate="insert_date">
+  <ForeignKeyReference table="tag_read_fact" foreignKey="tag_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_read_fact" foreignKey="in_pallet_tag_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_loc_fact" foreignKey="tag_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_loc_fact" foreignKey="in_pallet_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="tag_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="in_pallet_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_state_fact" foreignKey="tag_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_site_read_fact" foreignKey="tag_skey" action="delete"/>
+  <ForeignKeyReference table="tag_attr_fact" foreignKey="tag_skey" action="delete"/>
+  <ForeignKeyReference table="cycle_dim" foreignKey="tag_skey" action="update"/>
+  <ForeignKeyReference table="tag_inv_fact" foreignKey="tag_skey" action="delete"/>
+  <ForeignKeyReference table="tag_with_cycle_change" foreignKey="tag_skey" action="delete"/>
+  <ForeignKeyReference table="tag_with_attr_change" foreignKey="tag_skey" action="delete"/>
+  </CleanupTask>  
+ <CleanupTask table="product_dim" primaryKey="prod_skey" insertDate="insert_date">
+  <ForeignKeyReference table="tag_read_fact" foreignKey="prod_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_loc_fact" foreignKey="prod_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="prod_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_dim" foreignKey="prod_skey" action="update"/>
+  <ForeignKeyReference table="inventory_fact" foreignKey="prod_skey" action="delete"/> 
+  <ForeignKeyReference table="shipment_qty_fact" foreignKey="prod_skey" action="update"/> 
+  <ForeignKeyReference table="product_upc_item_fact" foreignKey="prod_skey" action="delete"/> 
+  <ForeignKeyReference table="tag_site_read_fact" foreignKey="prod_skey" action="delete"/>
+  <ForeignKeyReference table="tag_inv_fact" foreignKey="prod_skey" action="delete"/>
+  <ForeignKeyReference table="prod_attr_fact" foreignKey="prod_skey" action="delete"/>
+  </CleanupTask>
+ <CleanupTask table="shipment_item_dim" primaryKey="shipment_item_skey" insertDate="insert_date">
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="shipment_item_skey" action="update"/> 
+  <ForeignKeyReference table="shipment_qty_fact" foreignKey="shipment_item_skey" action="delete"/> 
+  </CleanupTask>
+ <CleanupTask table="shipment_dim" primaryKey="ship_skey" insertDate="insert_date">
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="ship_skey" action="update"/> 
+  <ForeignKeyReference table="shipment_qty_fact" foreignKey="ship_skey" action="delete"/> 
+  </CleanupTask>
+ <CleanupTask table="sales_order_item_dim" primaryKey="sales_order_item_skey" insertDate="insert_date">
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="sales_order_item_skey" action="update"/> 
+  <ForeignKeyReference table="shipment_qty_fact" foreignKey="sales_order_item_skey" action="update"/> 
+  </CleanupTask>
+ <CleanupTask table="sales_order_dim" primaryKey="sales_order_skey" insertDate="insert_date">
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="sales_order_skey"  action="update"/> 
+  <ForeignKeyReference table="shipment_qty_fact" foreignKey="sales_order_skey"  action="update"/> 
+  </CleanupTask>
+ <CleanupTask table="promotion_product_dim" primaryKey="promotion_product_skey" insertDate="insert_date">
+  <ForeignKeyReference table="promotion_product_item_fact" foreignKey="promotion_product_skey" action="delete"/>
+  <ForeignKeyReference table="forecast_fact" foreignKey="promotion_product_skey" action="delete"/>
+  <ForeignKeyReference table="tag_read_fact" foreignKey="promotion_product_skey" action="update"/>
+  <ForeignKeyReference table="tag_loc_fact" foreignKey="promotion_product_skey" action="update"/>
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="promotion_product_skey" action="update"/>
+  <ForeignKeyReference table="tag_site_read_fact" foreignKey="promotion_product_skey" action="update"/>
+ </CleanupTask>
+ <CleanupTask table="promotion_dim" primaryKey="promotion_skey" insertDate="insert_date">
+  <ForeignKeyReference table="promotion_product_dim" foreignKey="promotion_skey" action="delete"/>
+  </CleanupTask>
+   <CleanupTask table="tag_attr_group_dim" primaryKey="tag_attr_group_skey" insertDate="insert_date">
+    <ForeignKeyReference table="tag_attr_dim" foreignKey="tag_attr_group_skey" action="update"/>
+    <ForeignKeyReference table="product_dim" foreignKey="tag_attr_group_skey" action="update"/>
+  </CleanupTask>
+  <CleanupTask table="tag_attr_dim" primaryKey="tag_attr_skey" insertDate="insert_date">
+      <ForeignKeyReference table="tag_attr_fact" foreignKey="tag_attr_skey" action="delete"/>
+  </CleanupTask>
+<!--   COMMENTED FOR KETTLE ETL
+ <CleanupTask table="pos_unit_dim" primaryKey="pos_unit_skey" insertDate="insert_date">
+  <ForeignKeyReference table="promotion_product_item_fact" foreignKey="pos_unit_skey" action="delete"/>
+  <ForeignKeyReference table="pos_fact" foreignKey="pos_unit_skey" action="delete"/>
+  <ForeignKeyReference table="product_upc_item_fact" foreignKey="pos_unit_skey" action="delete"/>
+  <ForeignKeyReference table="oos_onhand_inventory_fact" foreignKey="pos_unit_skey" action="delete"/>
+  <ForeignKeyReference table="oos_sales_forecast_fact" foreignKey="pos_unit_skey" action="delete"/>
+  <ForeignKeyReference table="oos_event_fact" foreignKey="pos_unit_skey" action="delete"/>
+ </CleanupTask>
+ <CleanupTask table="partner_dim" primaryKey="partner_skey" insertDate="insert_date">
+  <ForeignKeyReference table="tag_shipped_fact" foreignKey="partner_skey" action="update"/> 
+  <ForeignKeyReference table="shipment_qty_fact" foreignKey="partner_skey" action="update"/> 
+  <ForeignKeyReference table="product_upc_item_fact" foreignKey="partner_skey" action="delete"/> 
+  <ForeignKeyReference table="pos_fact" foreignKey="partner_skey" action="delete"/> 
+  <ForeignKeyReference table="oos_onhand_inventory_fact" foreignKey="partner_skey" action="delete"/> 
+  <ForeignKeyReference table="oos_sales_forecast_fact" foreignKey="partner_skey" action="delete"/> 
+  <ForeignKeyReference table="oos_event_fact" foreignKey="partner_skey" action="delete"/> 
+  <ForeignKeyReference table="promotion_dim" foreignKey="partner_skey" action="delete"/> 
+ </CleanupTask>
+-->
+
+ <!--   LOOKUP TABLES
+  --> 
+ <PopulateLookupTask table="brand_lkp" insertDate="insert_date">
+  <Table name="ods_product" alias="op" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="brand" sourceTableAlias="op" sourceColumn="brand" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="business_loc_type_lkp" insertDate="insert_date" expectedToAffectRecords="false">
+  <Table name="ods_business_loc" alias="obl" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="business_loc_type" sourceTableAlias="obl" sourceColumn="business_loc_type" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="carrier_lkp" insertDate="insert_date">
+  <Table name="ods_shipment" alias="os" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="carrier_name" sourceTableAlias="os" sourceColumn="carrier_name" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="country_lkp" insertDate="insert_date">
+  <Table name="ods_site" alias="os" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="country" sourceTableAlias="os" sourceColumn="country" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="state_province_lkp" insertDate="insert_date">
+ <JoinExpression>
+  <Table name="ods_site" alias="os" schema="ODS" /> 
+ <Join fromTableAlias="os" fromColumn="country" toColumn="country">
+  <Table name="country_lkp" alias="cl" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetColumn targetColumn="state_province" sourceTableAlias="os" sourceColumn="state_province" /> 
+  <SetColumn targetColumn="country_id" sourceTableAlias="cl" sourceColumn="country_id" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="city_lkp" insertDate="insert_date">
+ <JoinExpression>
+  <Table name="ods_site" alias="os" schema="ODS" /> 
+ <Join fromTableAlias="os" fromColumn="state_province" toColumn="state_province">
+  <Table name="state_province_lkp" alias="spl" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetColumn targetColumn="city" sourceTableAlias="os" sourceColumn="city" /> 
+  <SetColumn targetColumn="state_id" sourceTableAlias="spl" sourceColumn="state_id" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="manufacturer_lkp" insertDate="insert_date">
+  <Table name="ods_product" alias="op" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="manufacturer_name" sourceTableAlias="op" sourceColumn="manufacturer_name" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="product_group_lkp" insertDate="insert_date">
+  <Table name="ods_product" alias="op" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="product_group" sourceTableAlias="op" sourceColumn="product_group" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="read_point_type_lkp" insertDate="insert_date" expectedToAffectRecords="false">
+  <Table name="ods_read_point" alias="orp" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="read_point_type" sourceTableAlias="orp" sourceColumn="read_point_type" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="sales_order_number_lkp" insertDate="insert_date">
+  <Table name="ods_sales_order" alias="oso" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="sales_order_number" sourceTableAlias="oso" sourceColumn="order_number" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+  <PopulateLookupTask table="sales_order_number_lkp" insertDate="insert_date">
+    <JoinExpression>
+      <Table name="ods_tag" alias="ot" schema="ODS"/> 
+      <Join isLeftOuterJoin="true" onCondition="ot.ods_tag_id = os.object_id AND os.type = 'GENERIC_OBJECT_STATE'">
+       <Table name="v_object_state" alias="os" schema="ODS" /> 
+      </Join>
+    </JoinExpression>
+   <ColumnMapping>
+    <SetColumn targetColumn="sales_order_number" sourceTableAlias="os" sourceColumn="state_data_1" /> 
+    </ColumnMapping>
+  </PopulateLookupTask>
+ <!--  Shipment number is loaded from ods_shipment.shipment_number and ods_tag.shipment_number 
+  --> 
+ <PopulateLookupTask table="shipment_number_lkp" insertDate="insert_date">
+  <Table name="ods_shipment" alias="os" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="shipment_number" sourceTableAlias="os" sourceColumn="shipment_number" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="shipment_number_lkp" insertDate="insert_date">
+  <JoinExpression>
+    <Table name="ods_tag" alias="ot" schema="ODS"/> 
+    <Join isLeftOuterJoin="true" onCondition="ot.ods_tag_id = os.object_id AND os.type = 'GENERIC_OBJECT_STATE'">
+     <Table name="v_object_state" alias="os" schema="ODS" /> 
+    </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetColumn targetColumn="shipment_number" sourceTableAlias="os" sourceColumn="state_data_0" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="shipment_type_lkp" insertDate="insert_date">
+  <Table name="ods_shipment" alias="os" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="shipment_type" sourceTableAlias="os" sourceColumn="shipment_type" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="site_owner_lkp" insertDate="insert_date">
+  <Table name="ods_partner" alias="op" schema="ODS" /> 
+ <ColumnMapping>
+ <SetColumn targetColumn="site_owner_name" sourceTableAlias="op" sourceColumn="partner_ext_id" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="site_subtype_lkp" insertDate="insert_date" expectedToAffectRecords="false">
+  <Table name="ods_site" alias="os" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="site_subtype" sourceTableAlias="os" sourceColumn="site_subtype" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="site_type_lkp" insertDate="insert_date" expectedToAffectRecords="false">
+  <Table name="ods_site" alias="os" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="site_type" sourceTableAlias="os" sourceColumn="site_type" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <!--  status_lkp gets statuses from ods_sales_order, ods_sales_order_item, ods_shipment, ods_shipment_item 
+  --> 
+ <PopulateLookupTask table="status_lkp" insertDate="insert_date">
+  <Table name="ods_sales_order" alias="oso" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="status" sourceTableAlias="oso" sourceColumn="status" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="status_lkp" insertDate="insert_date">
+  <Table name="ods_sales_order_item" alias="osoi" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="status" sourceTableAlias="osoi" sourceColumn="status" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="status_lkp" insertDate="insert_date">
+  <Table name="ods_shipment" alias="os" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="status" sourceTableAlias="os" sourceColumn="status" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <PopulateLookupTask table="status_lkp" insertDate="insert_date">
+  <Table name="ods_shipment_item" alias="osi" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="status" sourceTableAlias="osi" sourceColumn="status" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+  <PopulateLookupTask table="asn_lkp" insertDate="insert_date">
+  <Table name="asn" alias="oa" schema="ODS" /> 
+ <ColumnMapping>
+  <SetColumn targetColumn="asn_number" sourceTableAlias="oa" sourceColumn="asn_number" /> 
+  </ColumnMapping>
+  </PopulateLookupTask>
+ <!--  DIMENSION TABLES 
+  --> 
+ <IncRefreshTask table="partner_dim" insertDate="insert_date" updateDate="update_date" expectedToAffectRecords="false" lookup_insert="true">
+  <Table name="ods_partner" alias="op" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <ColumnMapping>
+  <SetPKColumn targetColumn="partner_skey" sourceTableAlias="op" sourceColumn="ods_partner_id" /> 
+  <SetColumn targetColumn="partner_name" sourceTableAlias="op" sourceColumn="partner_name" /> 
+  <SetColumn targetColumn="partner_ext_id" sourceTableAlias="op" sourceColumn="partner_ext_id" /> 
+  <SetColumn targetColumn="inf_disable" sourceTableAlias="op" sourceColumn="inf_disable" />
+  <SetColumn targetColumn="deleted" sourceTableAlias="op" sourceColumn="deleted" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+ <IncRefreshTask table="sales_order_dim" insertDate="insert_date" updateDate="update_date">
+ <JoinExpression>
+  <Table name="ods_sales_order" alias="oso" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <Join isLeftOuterJoin="true" fromTableAlias="oso" fromColumn="partner_id" toColumn="ods_partner_id">
+  <Table name="ods_partner" alias="op" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="oso" fromColumn="status" toColumn="status">
+  <Table name="status_lkp" alias="sl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="oso" fromColumn="order_number" toColumn="sales_order_number">
+  <Table name="sales_order_number_lkp" alias="sonl" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="sales_order_skey" sourceTableAlias="oso" sourceColumn="ods_sales_order_id" /> 
+  <SetColumn targetColumn="sales_order_number" sourceTableAlias="oso" sourceColumn="order_number" /> 
+  <SetColumn targetColumn="sales_order_desc" sourceTableAlias="oso" sourceColumn="order_desc" /> 
+  <SetColumn targetColumn="partner_name" sourceTableAlias="op" sourceColumn="partner_name" /> 
+  <SetColumn targetColumn="sales_order_create_time" sourceTableAlias="oso" sourceColumn="order_create_time" /> 
+  <SetColumn targetColumn="transportation_term" sourceTableAlias="oso" sourceColumn="transportation_term" /> 
+  <SetColumn targetColumn="status" sourceTableAlias="oso" sourceColumn="status" /> 
+  <SetColumn targetColumn="sales_order_number_id" sourceTableAlias="sonl" sourceColumn="sales_order_number_id" /> 
+  <SetColumn targetColumn="status_id" sourceTableAlias="sl" sourceColumn="status_id" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="oso" sourceColumn="deleted" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+ <IncRefreshTask table="sales_order_item_dim" insertDate="insert_date" updateDate="update_date">
+ <JoinExpression>
+ <Table name="ods_sales_order_item" alias="osoi" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <Join isLeftOuterJoin="true" fromTableAlias="osoi" fromColumn="ods_sales_order_id" toColumn="ods_sales_order_id">
+  <Table name="ods_sales_order" alias="oso" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="osoi" fromColumn="ods_po_item_id" toColumn="ods_po_item_id">
+  <Table name="ods_po_item" alias="opoi" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="opoi" fromColumn="ods_po_id" toColumn="ods_po_id">
+  <Table name="ods_po" alias="opo" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="osoi" fromColumn="status" toColumn="status">
+  <Table name="status_lkp" alias="sl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="oso" fromColumn="order_number" toColumn="sales_order_number">
+  <Table name="sales_order_number_lkp" alias="sonl" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="sales_order_item_skey" sourceTableAlias="osoi" sourceColumn="ods_sales_order_item_id" /> 
+  <SetColumn targetColumn="sales_order_item_number" sourceTableAlias="osoi" sourceColumn="order_item_number" /> 
+  <SetColumn targetColumn="sales_order_item_desc" sourceTableAlias="osoi" sourceColumn="order_item_desc" /> 
+  <SetColumn targetColumn="sales_order_number" sourceTableAlias="oso" sourceColumn="order_number" /> 
+  <SetColumn targetColumn="status" sourceTableAlias="osoi" sourceColumn="status" /> 
+  <SetColumn targetColumn="quantity" sourceTableAlias="osoi" sourceColumn="quantity" /> 
+  <SetColumn targetColumn="requested_delivery_date" sourceTableAlias="opo" sourceColumn="requested_delivery_date" /> 
+  <SetColumn targetColumn="expected_delivery_date" sourceTableAlias="osoi" sourceColumn="expected_delivery_time" /> 
+  <SetColumn targetColumn="po_number" sourceTableAlias="opo" sourceColumn="po_number" /> 
+  <SetColumn targetColumn="po_create_time" sourceTableAlias="opo" sourceColumn="create_time" /> 
+  <SetColumn targetColumn="po_item_number" sourceTableAlias="opoi" sourceColumn="po_item_number" /> 
+  <SetColumn targetColumn="po_quantity" sourceTableAlias="opoi" sourceColumn="quantity" /> 
+  <SetColumn targetColumn="sales_order_number_id" sourceTableAlias="sonl" sourceColumn="sales_order_number_id" /> 
+  <SetColumn targetColumn="status_id" sourceTableAlias="sl" sourceColumn="status_id" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="osoi" sourceColumn="deleted" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+ <IncRefreshTask table="shipment_dim" insertDate="insert_date" updateDate="update_date">
+ <JoinExpression>
+  <Table name="ods_shipment" alias="os" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <Join isLeftOuterJoin="true" fromTableAlias="os" fromColumn="shipment_number" toColumn="shipment_number">
+  <Table name="shipment_number_lkp" alias="snl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="os" fromColumn="shipment_type" toColumn="shipment_type">
+  <Table name="shipment_type_lkp" alias="stl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="os" fromColumn="carrier_name" toColumn="carrier_name">
+  <Table name="carrier_lkp" alias="cl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="os" fromColumn="status" toColumn="status">
+  <Table name="status_lkp" alias="sl" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="ship_skey" sourceTableAlias="os" sourceColumn="ods_shipment_id" /> 
+  <SetColumn targetColumn="shipment_number" sourceTableAlias="os" sourceColumn="shipment_number" /> 
+  <SetColumn targetColumn="shipment_desc" sourceTableAlias="os" sourceColumn="shipment_desc" /> 
+  <SetColumn targetColumn="shipment_type" sourceTableAlias="os" sourceColumn="shipment_type" /> 
+  <SetColumn targetColumn="bol_number" sourceTableAlias="os" sourceColumn="bol_number" /> 
+  <SetColumn targetColumn="carrier_name" sourceTableAlias="os" sourceColumn="carrier_name" /> 
+  <SetColumn targetColumn="carrier_contact_name" sourceTableAlias="os" sourceColumn="carrier_contact_name" /> 
+  <SetColumn targetColumn="mfr_contact_name" sourceTableAlias="os" sourceColumn="mfr_contact_name" /> 
+  <SetColumn targetColumn="shipment_create_time" sourceTableAlias="os" sourceColumn="create_time" /> 
+  <SetColumn targetColumn="expected_delivery_date" sourceTableAlias="os" sourceColumn="expected_delivery_time" /> 
+  <SetColumn targetColumn="shipment_time" sourceTableAlias="os" sourceColumn="shipped_time" /> 
+  <SetColumn targetColumn="status" sourceTableAlias="os" sourceColumn="status" /> 
+  <SetColumn targetColumn="shipment_type_id" sourceTableAlias="stl" sourceColumn="shipment_type_id" /> 
+  <SetColumn targetColumn="shipment_number_id" sourceTableAlias="snl" sourceColumn="shipment_number_id" /> 
+  <SetColumn targetColumn="carrier_id" sourceTableAlias="cl" sourceColumn="carrier_id" /> 
+  <SetColumn targetColumn="status_id" sourceTableAlias="sl" sourceColumn="status_id" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="os" sourceColumn="deleted" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+ <IncRefreshTask table="shipment_item_dim" insertDate="insert_date" updateDate="update_date">
+ <JoinExpression>
+  <Table name="ods_shipment_item" alias="osi" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <Join isLeftOuterJoin="true" fromTableAlias="osi" fromColumn="ods_shipment_id" toColumn="ods_shipment_id">
+  <Table name="ods_shipment" alias="os" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="osi" fromColumn="ods_sales_order_item_id" toColumn="ods_sales_order_item_id">
+  <Table name="ods_sales_order_item" alias="osoi" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="osoi" fromColumn="ods_sales_order_id" toColumn="ods_sales_order_id">
+  <Table name="ods_sales_order" alias="oso" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="os" fromColumn="shipment_number" toColumn="shipment_number">
+  <Table name="shipment_number_lkp" alias="snl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="oso" fromColumn="order_number" toColumn="sales_order_number">
+  <Table name="sales_order_number_lkp" alias="sonl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="osi" fromColumn="status" toColumn="status">
+  <Table name="status_lkp" alias="sl" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="shipment_item_skey" sourceTableAlias="osi" sourceColumn="ods_shipment_item_id" /> 
+  <SetColumn targetColumn="shipment_item_number" sourceTableAlias="osi" sourceColumn="shipment_item_number" /> 
+  <SetColumn targetColumn="shipment_item_desc" sourceTableAlias="osi" sourceColumn="shipment_item_desc" /> 
+  <SetColumn targetColumn="shipment_number" sourceTableAlias="os" sourceColumn="shipment_number" /> 
+  <SetColumn targetColumn="shipment_number_id" sourceTableAlias="snl" sourceColumn="shipment_number_id" /> 
+  <SetColumn targetColumn="sales_order_number" sourceTableAlias="oso" sourceColumn="order_number" /> 
+  <SetColumn targetColumn="sales_order_number_id" sourceTableAlias="sonl" sourceColumn="sales_order_number_id" /> 
+  <SetColumn targetColumn="sales_order_item_number" sourceTableAlias="osoi" sourceColumn="order_item_number" /> 
+  <SetColumn targetColumn="status" sourceTableAlias="osi" sourceColumn="status" /> 
+  <SetColumn targetColumn="status_id" sourceTableAlias="sl" sourceColumn="status_id" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="osi" sourceColumn="deleted" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+ <IncRefreshTask table="tag_attr_group_dim" insertDate="insert_date" updateDate="update_date">
+  <Table name="v_object_attr_group_md" alias="oamd" schema="ODS" insertDate="insert_date" updateDate="update_date"/>
+  <ColumnMapping>
+  <SetPKColumn targetColumn="tag_attr_group_skey" sourceTableAlias="oamd" sourceColumn="custom_property_group_md_id"/>
+  <SetColumn targetColumn="name" sourceTableAlias="oamd" sourceColumn="label"/>
+  <SetColumn targetColumn="tag_attr_group_desc" sourceTableAlias="oamd" sourceColumn="description"/>
+  <SetColumn targetColumn="entity_type" sourceTableAlias="oamd" sourceColumn="type"/>
+  <SetColumn targetColumn="deleted" sourceTableAlias="oamd" sourceColumn="deleted"/>
+  <SetColumn targetColumn="is_analytic" sourceTableAlias="oamd" sourceColumn="is_analytic"/>
+  </ColumnMapping>
+  </IncRefreshTask>
+
+  <IncRefreshTask table="tag_attr_dim" insertDate="insert_date" updateDate="update_date">
+  <Table name="v_object_attribute_md" alias="oamd" schema="ODS" insertDate="insert_date" updateDate="update_date"/>
+  <ColumnMapping>
+  <SetPKColumn targetColumn="tag_attr_skey" sourceTableAlias="oamd" sourceColumn="custom_property_md_id"/>
+  <SetColumn targetColumn="tag_attr_group_skey" sourceTableAlias="oamd" sourceColumn="custom_property_group_md_id"/>
+  <SetColumn targetColumn="name" sourceTableAlias="oamd" sourceColumn="property_key"/>
+  <SetColumn targetColumn="tag_attr_desc" sourceTableAlias="oamd" sourceColumn="description"/>
+  <SetColumn targetColumn="data_type" sourceTableAlias="oamd" sourceColumn="type_definition"/>
+  <SetColumn targetColumn="ref_table" sourceTableAlias="oamd" sourceColumn="ref_table_name"/>
+  <SetColumn targetColumn="column_name" sourceTableAlias="oamd" sourceColumn="column_name"/>
+  <SetColumn targetColumn="object_state_type" sourceTableAlias="oamd" sourceColumn="object_state_type"/>
+  <SetColumn targetColumn="deleted" sourceTableAlias="oamd" sourceColumn="deleted"/>
+  <SetColumn targetColumn="is_cycle_control" sourceTableAlias="oamd" sourceColumn="is_cycle_control"/>
+  <SetColumn targetColumn="is_analytic" sourceTableAlias="oamd" sourceColumn="is_analytic"/>
+  </ColumnMapping>
+  </IncRefreshTask>
+  
+  <SQLExecTask desc = "Set is_analytic tag_attr_dim records to false if its tag_attr_group_dim is_analytic flag is set to false"><![CDATA[
+  UPDATE tag_attr_dim 
+  SET is_analytic = 'F'
+  WHERE tag_attr_dim.tag_attr_skey in
+        (SELECT tad.tag_attr_skey
+         FROM tag_attr_dim tad join tag_attr_group_dim tagd
+                on tad.tag_attr_group_skey = tagd.tag_attr_group_skey
+         WHERE tagd.is_analytic = 'F')
+  ]]></SQLExecTask>
+
+ <IncRefreshTask table="product_dim" insertDate="insert_date" updateDate="update_date">
+ <JoinExpression>
+  <Table name="ods_product" alias="op" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <Join isLeftOuterJoin="true" fromTableAlias="op" fromColumn="asset_type" toColumn="entity_type">
+   <Table name="tag_attr_group_dim" alias="tagd" />
+ </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="op" fromColumn="manufacturer_name" toColumn="manufacturer_name">
+  <Table name="manufacturer_lkp" alias="ml" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="op" fromColumn="product_group" toColumn="product_group">
+  <Table name="product_group_lkp" alias="pgl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="op" fromColumn="brand" toColumn="brand">
+  <Table name="brand_lkp" alias="bl" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="prod_skey" sourceTableAlias="op" sourceColumn="ods_product_id" /> 
+  <SetColumn targetColumn="product_name" sourceTableAlias="op" sourceColumn="product_name" /> 
+  <SetColumn targetColumn="sku" sourceTableAlias="op" sourceColumn="sku" /> 
+  <SetColumn targetColumn="style_code" sourceTableAlias="op" sourceColumn="style_code" /> 
+  <SetColumn targetColumn="uom" sourceTableAlias="op" sourceColumn="uom" /> 
+  <SetColumn targetColumn="gtin" sourceTableAlias="op" sourceColumn="gtin" /> 
+  <SetColumn targetColumn="upc" sourceTableAlias="op" sourceColumn="upc" /> 
+  <SetColumn targetColumn="supplier_product_num" sourceTableAlias="op" sourceColumn="supplier_product_num" /> 
+  <SetColumn targetColumn="max_containment" sourceTableAlias="op" sourceColumn="max_containment" /> 
+  <SetColumn targetColumn="manufacturer_name" sourceTableAlias="op" sourceColumn="manufacturer_name" /> 
+  <SetColumn targetColumn="brand" sourceTableAlias="op" sourceColumn="brand" /> 
+  <SetColumn targetColumn="product_group" sourceTableAlias="op" sourceColumn="product_group" /> 
+  <SetColumn targetColumn="manufacturer_id" sourceTableAlias="ml" sourceColumn="manufacturer_id" /> 
+  <SetColumn targetColumn="brand_id" sourceTableAlias="bl" sourceColumn="brand_id" /> 
+  <SetColumn targetColumn="product_group_id" sourceTableAlias="pgl" sourceColumn="product_group_id" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="op" sourceColumn="deleted" /> 
+  <SetColumn targetColumn="property_group_id" sourceTableAlias="op" sourceColumn="property_group_id" />
+  <SetColumn targetColumn="tag_attr_group_skey" sourceTableAlias="tagd" sourceColumn="tag_attr_group_skey"/>
+  </ColumnMapping>
+  </IncRefreshTask>
+  <IncRefreshTask table="tag_dim" insertDate="insert_date" updateDate="update_date">
+ <JoinExpression>
+  <Table name="ods_tag" alias="ot" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <Join isLeftOuterJoin="true" fromTableAlias="ot" schema="ODS" fromColumn="ods_product_id" toColumn="ods_product_id">
+  <Table name="ods_product" alias="op" schema="ODS" /> 
+  </Join>
+  <Join isLeftOuterJoin="true" fromTableAlias="ot" schema="ODS" fromColumn="ods_tag_id" toColumn="object_id">
+  <Table name="asn_li" alias="ai" schema="ODS" />
+  </Join>
+  <Join isLeftOuterJoin="true" fromTableAlias="ai" schema="ODS" fromColumn="purchase_order_id" toColumn="purchase_order_id">
+  <Table name="purchase_order" alias="po" schema="ODS" />
+  </Join>
+  <Join isLeftOuterJoin="true" fromTableAlias="ai" schema="ODS" fromColumn="asn_id" toColumn="asn_id">
+  <Table name="asn" alias="asn" schema="ODS" />
+  </Join>
+  <Join isLeftOuterJoin="true" fromTableAlias="asn" fromColumn="asn_number" toColumn="asn_number">
+  <Table name="asn_lkp" alias="asl" />
+  </Join>
+  <Join isLeftOuterJoin="true" onCondition="ot.ods_tag_id = os.object_id AND os.type = 'GENERIC_OBJECT_STATE'">
+     <Table name="v_object_state" alias="os" schema="ODS" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="tag_skey" sourceTableAlias="ot" sourceColumn="ods_tag_id" /> 
+  <SetColumn targetColumn="epc" sourceTableAlias="ot" sourceColumn="epc" /> 
+  <SetColumn targetColumn="serial_number" sourceTableAlias="ot" sourceColumn="serial_number" />
+  <SetColumn targetColumn="uom" sourceTableAlias="op" sourceColumn="uom" />
+  <SetColumn targetColumn="shipment_number" sourceTableAlias="os" sourceColumn="state_data_0" />
+  <SetColumn targetColumn="sales_order_number" sourceTableAlias="os" sourceColumn="state_data_1" /> 
+  <SetColumn targetColumn="pallet_tag_epc" sourceTableAlias="ai" sourceColumn="container_epc_uri" />
+  <SetColumn targetColumn="asn_id" sourceTableAlias="asl" sourceColumn="asn_id" />
+  <SetColumn targetColumn="asn_number" sourceTableAlias="asl" sourceColumn="asn_number" />
+  <SetColumn targetColumn="asn_receipt_time" sourceTableAlias="asn" sourceColumn="asn_receipt_ts" />
+  <SetColumn targetColumn="po_number" sourceTableAlias="po" sourceColumn="po_number" />
+  <SetColumn targetColumn="prod_skey" sourceTableAlias="op" sourceColumn="ods_product_id" />
+  <SetColumn targetColumn="deleted" sourceTableAlias="ot" sourceColumn="deleted" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+ <IncRefreshTask table="site_dim" insertDate="insert_date" updateDate="update_date" lookup_insert="true">
+ <JoinExpression>
+  <Table name="ods_site" alias="os" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <Join isLeftOuterJoin="true" fromTableAlias="os" fromColumn="ods_partner_id" toColumn="ods_partner_id">
+  <Table name="ods_partner" alias="op" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="os" fromColumn="site_type" toColumn="site_type">
+  <Table name="site_type_lkp" alias="stl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="os" fromColumn="site_subtype" toColumn="site_subtype">
+  <Table name="site_subtype_lkp" alias="ssl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" fromTableAlias="os" fromColumn="country" toColumn="country">
+  <Table name="country_lkp" alias="col" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" onCondition="spl.state_province = os.state_province AND spl.country_id = col.country_id">
+  <Table name="state_province_lkp" alias="spl" /> 
+  </Join>
+ <Join isLeftOuterJoin="true" onCondition="cl.city = os.city AND cl.state_id = spl.state_id">
+  <Table name="city_lkp" alias="cl" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="site_skey" sourceTableAlias="os" sourceColumn="ods_site_id" /> 
+  <SetColumn targetColumn="site_owner_name" sourceTableAlias="op" sourceColumn="partner_ext_id" /> 
+  <SetColumn targetColumn="site_type" sourceTableAlias="os" sourceColumn="site_type" /> 
+  <SetColumn targetColumn="site_subtype" sourceTableAlias="os" sourceColumn="site_subtype" /> 
+  <SetColumn targetColumn="site_number" sourceTableAlias="os" sourceColumn="site_number" /> 
+  <SetColumn targetColumn="site_name" sourceTableAlias="os" sourceColumn="site_name" /> 
+  <SetColumn targetColumn="duns" sourceTableAlias="os" sourceColumn="duns" /> 
+  <SetColumn targetColumn="gln" sourceTableAlias="os" sourceColumn="gln" /> 
+  <SetColumn targetColumn="internal_identifier" sourceTableAlias="os" sourceColumn="internal_identifier" /> 
+  <SetColumn targetColumn="street_address" sourceTableAlias="os" sourceColumn="address" /> 
+  <SetColumn targetColumn="city" sourceTableAlias="os" sourceColumn="city" /> 
+  <SetColumn targetColumn="state_province" sourceTableAlias="os" sourceColumn="state_province" /> 
+  <SetColumn targetColumn="postal_code" sourceTableAlias="os" sourceColumn="postal_code" /> 
+  <SetColumn targetColumn="country" sourceTableAlias="os" sourceColumn="country" /> 
+  <SetColumn targetColumn="phone" sourceTableAlias="os" sourceColumn="phone" /> 
+  <SetColumn targetColumn="site_owner_id" sourceTableAlias="os" sourceColumn="ods_partner_id" /> 
+  <SetColumn targetColumn="site_type_id" sourceTableAlias="stl" sourceColumn="site_type_id" /> 
+  <SetColumn targetColumn="site_subtype_id" sourceTableAlias="ssl" sourceColumn="site_subtype_id" /> 
+  <SetColumn targetColumn="city_id" sourceTableAlias="cl" sourceColumn="city_id" /> 
+  <SetColumn targetColumn="state_id" sourceTableAlias="spl" sourceColumn="state_id" /> 
+  <SetColumn targetColumn="country_id" sourceTableAlias="col" sourceColumn="country_id" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="os" sourceColumn="deleted" /> 
+  <SetColumn targetColumn="activation_date" sourceTableAlias="os" sourceColumn="rfid_active_date" />
+  <SetColumn targetColumn="property_group_id" sourceTableAlias="os" sourceColumn="property_group_id" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+
+<SQLExecTask desc = "Update site_dim records with NULL partner IDs to point to the owner"><![CDATA[
+  UPDATE site_dim SET site_owner_id = 0, site_owner_name = (SELECT site_owner_name FROM site_owner_lkp WHERE site_owner_id = 0)
+  WHERE site_owner_id IS NULL
+]]></SQLExecTask>
+
+ <IncRefreshTask table="site_group_dim" insertDate="insert_date" updateDate="update_date">
+ <JoinExpression>
+  <Table name="ods_site_group" alias="osg" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="site_group_skey" sourceTableAlias="osg" sourceColumn="ods_site_group_id" /> 
+  <SetColumn targetColumn="group_type" sourceTableAlias="osg" sourceColumn="group_type" /> 
+  <SetColumn targetColumn="group_id" sourceTableAlias="osg" sourceColumn="group_id" /> 
+  <SetColumn targetColumn="group_attr_1" sourceTableAlias="osg" sourceColumn="group_attr_1" /> 
+  <SetColumn targetColumn="group_attr_2" sourceTableAlias="osg" sourceColumn="group_attr_2" /> 
+  <SetColumn targetColumn="group_attr_3" sourceTableAlias="osg" sourceColumn="group_attr_3" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="osg" sourceColumn="deleted" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+
+ <IncRefreshTask table="sslt_dim" insertDate="insert_date" updateDate="update_date">
+  <Table name="sslt" alias="os" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <ColumnMapping>
+  <SetPKColumn targetColumn="sslt_skey" sourceTableAlias="os" sourceColumn="sslt_id" /> 
+  <SetColumn targetColumn="sslt_code" sourceTableAlias="os" sourceColumn="code" /> 
+  <SetColumn targetColumn="sslt_name" sourceTableAlias="os" sourceColumn="name" /> 
+  <SetColumn targetColumn="sslt_desc" sourceTableAlias="os" sourceColumn="description" /> 
+  <SetColumn targetColumn="sslt_type" sourceTableAlias="os" sourceColumn="type" />
+  <SetColumn targetColumn="deleted" sourceTableAlias="os" sourceColumn="deleted" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+
+ <IncRefreshTask table="sslta_dim" insertDate="insert_date" updateDate="update_date">
+  <Table name="sslta" alias="os" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <ColumnMapping>
+  <SetPKColumn targetColumn="sslta_skey" sourceTableAlias="os" sourceColumn="sslta_id" /> 
+  <SetColumn targetColumn="sslta_code" sourceTableAlias="os" sourceColumn="code" /> 
+  <SetColumn targetColumn="sslta_name" sourceTableAlias="os" sourceColumn="name" /> 
+  <SetColumn targetColumn="sslta_desc" sourceTableAlias="os" sourceColumn="description" /> 
+  <SetColumn targetColumn="sslta_type" sourceTableAlias="os" sourceColumn="type" />
+  <SetColumn targetColumn="deleted" sourceTableAlias="os" sourceColumn="deleted" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+
+ <IncRefreshTask table="business_loc_dim" insertDate="insert_date" updateDate="update_date">
+ <JoinExpression>
+  <Table name="ods_business_loc" alias="obl" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <Join isLeftOuterJoin="true" fromTableAlias="obl" fromColumn="business_loc_type" toColumn="business_loc_type">
+  <Table name="business_loc_type_lkp" alias="bltl" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="business_loc_skey" sourceTableAlias="obl" sourceColumn="ods_business_loc_id" /> 
+  <SetColumn targetColumn="site_skey" sourceTableAlias="obl" sourceColumn="ods_site_id" /> 
+  <SetColumn targetColumn="business_loc_name" sourceTableAlias="obl" sourceColumn="business_loc_name" /> 
+  <SetColumn targetColumn="business_loc_type" sourceTableAlias="obl" sourceColumn="business_loc_type" /> 
+  <SetColumn targetColumn="business_loc_type_id" sourceTableAlias="bltl" sourceColumn="business_loc_type_id" /> 
+  <SetColumn targetColumn="gln" sourceTableAlias="obl" sourceColumn="gln" /> 
+  <SetColumn targetColumn="sslt_skey" sourceTableAlias="obl" sourceColumn="sslt_id" /> 
+  <SetColumn targetColumn="sle" sourceTableAlias="obl" sourceColumn="sle" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="obl" sourceColumn="deleted" /> 
+  <SetColumn targetColumn="property_group_id" sourceTableAlias="obl" sourceColumn="property_group_id" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+
+ <IncRefreshTask table="read_point_dim" insertDate="insert_date" updateDate="update_date">
+ <JoinExpression>
+  <Table name="ods_read_point" alias="orp" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <Join isLeftOuterJoin="true" fromTableAlias="orp" fromColumn="read_point_type" toColumn="read_point_type">
+  <Table name="read_point_type_lkp" alias="rptl" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="read_point_skey" sourceTableAlias="orp" sourceColumn="ods_read_point_id" /> 
+  <SetColumn targetColumn="site_skey" sourceTableAlias="orp" sourceColumn="ods_site_id" /> 
+  <SetColumn targetColumn="read_point_name" sourceTableAlias="orp" sourceColumn="read_point_name" /> 
+  <SetColumn targetColumn="read_point_type" sourceTableAlias="orp" sourceColumn="read_point_type" /> 
+  <SetColumn targetColumn="read_point_type_code" sourceTableAlias="orp" sourceColumn="read_point_type_code" /> 
+  <SetColumn targetColumn="read_point_type_id" sourceTableAlias="rptl" sourceColumn="read_point_type_id" /> 
+  <SetColumn targetColumn="gln" sourceTableAlias="orp" sourceColumn="gln" /> 
+  <SetColumn targetColumn="sslt_skey" sourceTableAlias="orp" sourceColumn="sslt_id" /> 
+  <SetColumn targetColumn="sle" sourceTableAlias="orp" sourceColumn="sle" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="orp" sourceColumn="deleted" /> 
+  <SetColumn targetColumn="property_group_id" sourceTableAlias="orp" sourceColumn="property_group_id" />
+  </ColumnMapping>
+  </IncRefreshTask>
+
+ <IncRefreshTask table="promotion_dim" insertDate="insert_date" updateDate="update_date">
+  <Table name="ods_promo_event" alias="ope" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+ <ColumnMapping>
+  <SetPKColumn targetColumn="promotion_skey" sourceTableAlias="ope" sourceColumn="ods_promo_event_id" /> 
+  <SetColumn targetColumn="partner_skey" sourceTableAlias="ope" sourceColumn="partner_id" /> 
+  <SetColumn targetColumn="promotion_name" sourceTableAlias="ope" sourceColumn="event_name" /> 
+  <SetColumn targetColumn="promotion_desc" sourceTableAlias="ope" sourceColumn="event_desc" /> 
+  <SetColumn targetColumn="ship_start_date" sourceTableAlias="ope" sourceColumn="ship_start_date" /> 
+  <SetColumn targetColumn="ship_end_date" sourceTableAlias="ope" sourceColumn="ship_end_date" /> 
+  <SetColumn targetColumn="promo_start_date" sourceTableAlias="ope" sourceColumn="promo_start_date" /> 
+  <SetColumn targetColumn="promo_end_date" sourceTableAlias="ope" sourceColumn="promo_end_date" /> 
+  <SetColumn targetColumn="days_early" sourceTableAlias="ope" sourceColumn="days_early" /> 
+  <SetColumn targetColumn="days_late" sourceTableAlias="ope" sourceColumn="days_late" /> 
+  <SetColumn targetColumn="sellthru_start_date" sourceTableAlias="ope" sourceColumn="sellthru_start_date" /> 
+  <SetColumn targetColumn="sellthru_end_date" sourceTableAlias="ope" sourceColumn="sellthru_end_date" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="ope" sourceColumn="deleted" /> 
+  </ColumnMapping>
+   </IncRefreshTask>
+ <IncRefreshTask table="promotion_product_dim" insertDate="insert_date" updateDate="update_date">
+ <JoinExpression>
+  <Table name="ods_promo_prod" alias="opp" schema="ODS" insertDate="insert_date" updateDate="update_date" /> 
+  <Join fromTableAlias="opp" fromColumn="ods_promo_event_id" toColumn="ods_promo_event_id">
+  <Table name="ods_promo_event" schema="ODS" alias="ope" /> 
+  </Join>
+  <Join fromTableAlias="op" onCondition="opp.ods_product_id = orsm.ods_product_id AND ope.partner_id = orsm.partner_id" isLeftOuterJoin="true">
+  <Table name="ods_rtl_spl_product_map" schema="ODS" alias="orsm" /> 
+  </Join>
+  </JoinExpression>
+ <ColumnMapping>
+  <SetPKColumn targetColumn="promotion_product_skey" sourceTableAlias="opp" sourceColumn="ods_promo_prod_id" /> 
+  <SetColumn targetColumn="promotion_skey" sourceTableAlias="opp" sourceColumn="ods_promo_event_id" /> 
+  <SetColumn targetColumn="prod_skey" sourceTableAlias="opp" sourceColumn="ods_product_id" /> 
+  <SetColumn targetColumn="retailer_product_num" sourceTableAlias="orsm" sourceColumn="retailer_product_num" /> 
+  <SetColumn targetColumn="retailer_product_name" sourceTableAlias="orsm" sourceColumn="retailer_product_name" /> 
+  <SetColumn targetColumn="deleted" sourceTableAlias="opp" sourceColumn="deleted" /> 
+  </ColumnMapping>
+  </IncRefreshTask>
+  
+  <!-- FACT TABLES -->
+
+<SQLExecTaskForDatabase desc = "Delete entries from the work table tag_with_assn_changes">
+  <SQLForOracle><![CDATA[
+  TRUNCATE TABLE tag_with_assn_changes
+  ]]></SQLForOracle>
+  <SQLForSQLServer><![CDATA[
+  TRUNCATE TABLE tag_with_assn_changes
+  ]]></SQLForSQLServer>
+  <SQLForDB2><![CDATA[
+  DELETE FROM tag_with_assn_changes
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Identify tags with assn changes, or shipment # change, and insert them into tag_with_assn_changes"><![CDATA[
+INSERT INTO tag_with_assn_changes (tag_skey)
+  SELECT DISTINCT ot.ods_tag_id 
+  FROM ${ODS}.ods_tag_association ota 
+    JOIN ${ODS}.ods_tag ot ON ot.ods_tag_id = ota.ods_tag_id
+    LEFT OUTER JOIN ${ODS}.ods_case_shipped ocs ON ocs.object_id = ot.ods_tag_id
+    LEFT OUTER JOIN ${ODS}.asn_li oai ON oai.object_id = ot.ods_tag_id
+  WHERE ota.insert_date > ${last_processed_date} 
+    OR ota.update_date > ${last_processed_date} 
+    OR ot.update_date > ${last_processed_date}
+    OR ocs.update_date > ${last_processed_date}
+    OR oai.update_date > ${last_processed_date}
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Delete the least assn start time parameter"><![CDATA[
+DELETE FROM inc_etl_load_property WHERE property_key = 'least_assn_start_time'
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Identify the earliest time an association change was made in this upload"><![CDATA[
+INSERT INTO inc_etl_load_property (property_key, property_value_key, property_value_date) 
+  SELECT 'least_assn_start_time', ${get_date_skey()}(MIN(association_start_time)), MIN(association_start_time)
+  FROM ${ODS}.ods_tag_association ota
+  WHERE insert_date > ${last_processed_date} OR update_date > ${last_processed_date}
+]]></SQLExecTask>
+
+<!-- The next task should work for both sql server and oracle. Remove this element after is tested
+<SQLExecTaskForDatabase desc = "Compute the ODS tag associations with inferences">
+  <SQLForOracle><![CDATA[
+{CALL ${compute_inf_tag_association} }
+  ]]></SQLForOracle>
+  <SQLForSQLServer><![CDATA[
+EXEC ${compute_inf_tag_association}
+  ]]></SQLForSQLServer>
+  <SQLForDB2><![CDATA[
+{CALL ${compute_inf_tag_association} }
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+-->
+
+<SQLExecTask desc = "Compute the ODS tag associations with inferences"><![CDATA[
+{CALL ${compute_inf_tag_association} }
+]]></SQLExecTask>
+
+
+<SQLExecTask desc = "Remove all transit times that end before the least assn start time"><![CDATA[
+DELETE FROM transit_time_fact_temp WHERE to_date_skey >=
+   (SELECT property_value_key FROM inc_etl_load_property WHERE property_key = 'least_assn_start_time')
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Update the records that have NOT changed since the last backup"><![CDATA[
+UPDATE transit_time_fact_temp SET is_modified = 0
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Create transit time fact">
+ <SQLForOracle><![CDATA[
+INSERT INTO transit_time_fact_temp 
+  (from_site_skey, to_site_skey, from_date_skey, to_date_skey, tot_duration_ss, num_tags, is_modified)
+  SELECT from_site_skey, to_site_skey, ${get_date_skey()}(start_time), ${get_date_skey()}(end_time), 
+    SUM(CAST(${get_duration_in_ss()}(start_time, end_time) AS NUMBER(19))), COUNT(*), 1
+  FROM inf_tag_association ita
+  WHERE from_site_skey <> to_site_skey AND end_time IS NOT NULL AND start_row_source_id = 1 AND end_row_source_id = 1
+    AND end_time >= (SELECT property_value_date FROM inc_etl_load_property WHERE property_key = 'least_assn_start_time')
+  GROUP BY from_site_skey, to_site_skey, ${get_date_skey()}(start_time), ${get_date_skey()}(end_time)
+]]></SQLForOracle>
+
+<SQLForSQLServer><![CDATA[
+INSERT INTO transit_time_fact_temp 
+  (from_site_skey, to_site_skey, from_date_skey, to_date_skey, tot_duration_ss, num_tags, is_modified)
+  SELECT from_site_skey, to_site_skey, ${get_date_skey()}(start_time), ${get_date_skey()}(end_time), 
+    SUM(${get_duration_in_ss()}(start_time, end_time)), COUNT(*), 1
+  FROM inf_tag_association ita
+  WHERE from_site_skey <> to_site_skey AND end_time IS NOT NULL AND start_row_source_id = 1 AND end_row_source_id = 1
+    AND end_time >= (SELECT property_value_date FROM inc_etl_load_property WHERE property_key = 'least_assn_start_time')
+  GROUP BY from_site_skey, to_site_skey, ${get_date_skey()}(start_time), ${get_date_skey()}(end_time)
+]]></SQLForSQLServer>
+
+<SQLForDB2><![CDATA[
+ INSERT INTO transit_time_fact_temp 
+  (from_site_skey,to_site_skey,from_date_skey,to_date_skey, tot_duration_ss, num_tags, is_modified)
+  SELECT from_site_skey, to_site_skey,${get_date_skey()}(start_time)  start_time,${get_date_skey()}(end_time)  end_time,
+    SUM(${get_duration_in_ss()}(start_time, end_time)),COUNT(*),1 
+  FROM inf_tag_association ita
+  WHERE from_site_skey <> to_site_skey AND end_time IS NOT NULL AND start_row_source_id = 1 AND end_row_source_id = 1
+    AND end_time >= (SELECT property_value_date FROM inc_etl_load_property WHERE property_key = 'least_assn_start_time')
+  GROUP BY from_site_skey, to_site_skey,start_time,end_time
+]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<!-- Inference rules: Update only the records for which the transit time has changed, or the assn is new -->
+<SQLExecTaskForDatabase desc="Inference rule 2: start_time = MAX(other time + 1, end time - toTime(end time)">
+  <SQLForOracle><![CDATA[
+UPDATE inf_tag_association ita
+SET (start_time, first_seen_time, last_seen_time, is_modified) 
+  = (SELECT ${get_max_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, 1), 
+                                       ${add_seconds_to_date()}(ita.end_time, -tsttf.avg_duration)),
+            ${get_max_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, 1), 
+                                       ${add_seconds_to_date()}(ita.end_time, -tsttf.avg_duration)),
+            ${get_max_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, 1), 
+                                       ${add_seconds_to_date()}(ita.end_time, -tsttf.avg_duration)),
+            1
+     FROM to_site_transit_time_fact tsttf
+     WHERE ita.inf_pivot_date_skey = tsttf.date_skey
+       AND ita.from_site_skey = tsttf.from_site_skey
+       AND ita.to_site_skey = tsttf.to_site_skey)
+WHERE ita.inf_type = 2
+  AND (ita.inf_pivot_date_skey, ita.from_site_skey, ita.to_site_skey)
+        IN (SELECT date_skey, from_site_skey, to_site_skey
+            FROM to_site_transit_time_fact 
+            WHERE ita.is_modified = 1 OR is_modified = 1)
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE inf_tag_association 
+SET start_time = ${get_max_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, 1), 
+                                            ${add_seconds_to_date()}(ita.end_time, -tsttf.avg_duration)),
+    first_seen_time = ${get_max_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, 1), 
+                                                 ${add_seconds_to_date()}(ita.end_time, -tsttf.avg_duration)),
+    last_seen_time = ${get_max_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, 1), 
+                                                ${add_seconds_to_date()}(ita.end_time, -tsttf.avg_duration)),
+    is_modified = 1
+FROM inf_tag_association ita, to_site_transit_time_fact tsttf
+WHERE ita.inf_type = 2
+  AND ita.inf_pivot_date_skey = tsttf.date_skey
+  AND ita.from_site_skey = tsttf.from_site_skey
+  AND ita.to_site_skey = tsttf.to_site_skey
+  AND (ita.is_modified = 1 OR tsttf.is_modified = 1)
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE inf_tag_association ita
+SET (start_time, first_seen_time, last_seen_time, is_modified) =
+   	(SELECT ${get_max_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, 1),${add_seconds_to_date()}(ita.end_time, -tsttf.avg_duration)),
+          	${get_max_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, 1),${add_seconds_to_date()}(ita.end_time, -tsttf.avg_duration)),
+        	  ${get_max_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, 1),${add_seconds_to_date()}(ita.end_time, -tsttf.avg_duration)),
+            	1
+     FROM to_site_transit_time_fact tsttf
+     WHERE ita.inf_pivot_date_skey = tsttf.date_skey
+       AND ita.from_site_skey = tsttf.from_site_skey
+       AND ita.to_site_skey = tsttf.to_site_skey)
+ WHERE ita.inf_type = 2
+  AND (ita.inf_pivot_date_skey, ita.from_site_skey, ita.to_site_skey)
+        IN (SELECT date_skey, from_site_skey, to_site_skey
+            FROM to_site_transit_time_fact 
+            WHERE ita.is_modified = 1 OR is_modified = 1)
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Inference rule 1: end_time = MAX(start_time + 1, other time - toTime(other time)">
+  <SQLForOracle><![CDATA[
+UPDATE inf_tag_association ita
+SET (end_time, is_modified) 
+  = (SELECT ita_n.start_time, 1
+     FROM inf_tag_association ita_n
+     WHERE ita_n.prev_tag_association_id = ita.tag_association_id)
+WHERE ita.inf_type = 1
+  AND ita.tag_association_id IN
+    (SELECT prev_tag_association_id FROM inf_tag_association foo WHERE is_modified = 1)
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE ita
+SET end_time = ita_n.start_time,
+    is_modified = 1
+FROM inf_tag_association ita, inf_tag_association ita_n
+WHERE ita.inf_type = 1
+  AND ita_n.prev_tag_association_id = ita.tag_association_id
+  AND ita_n.is_modified = 1
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE inf_tag_association ita
+SET (end_time, is_modified) 
+  = (SELECT ita_n.start_time, 1
+     FROM inf_tag_association ita_n
+     WHERE ita_n.prev_tag_association_id = ita.tag_association_id)
+WHERE ita.inf_type = 1
+  AND ita.tag_association_id IN
+    (SELECT prev_tag_association_id FROM inf_tag_association foo WHERE is_modified = 1)
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Inference rule 3: end_time = MIN(start_time + fromTime(start_time), other time - 1 second)">
+  <SQLForOracle><![CDATA[
+UPDATE inf_tag_association ita
+SET (end_time, is_modified) 
+  = (SELECT ${get_min_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, -1), 
+                                       ${add_seconds_to_date()}(ita.start_time, fsttf.avg_duration)),
+            1
+     FROM from_site_transit_time_fact fsttf
+     WHERE ita.inf_pivot_date_skey = fsttf.date_skey
+       AND ita.from_site_skey = fsttf.from_site_skey
+       AND ita.to_site_skey = fsttf.to_site_skey)
+WHERE ita.inf_type = 3
+  AND (ita.inf_pivot_date_skey, ita.from_site_skey, ita.to_site_skey)
+    IN (SELECT date_skey, from_site_skey, to_site_skey
+        FROM from_site_transit_time_fact
+        WHERE ita.is_modified = 1 OR is_modified = 1)
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE inf_tag_association 
+SET end_time = ${get_min_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, -1), 
+                                          ${add_seconds_to_date()}(ita.start_time, fsttf.avg_duration)),
+    is_modified = 1
+FROM inf_tag_association ita, from_site_transit_time_fact fsttf
+WHERE ita.inf_type = 3
+  AND ita.inf_pivot_date_skey = fsttf.date_skey
+  AND ita.from_site_skey = fsttf.from_site_skey
+  AND ita.to_site_skey = fsttf.to_site_skey
+  AND (ita.is_modified = 1 OR fsttf.is_modified = 1)
+  ]]></SQLForSQLServer>
+
+   <SQLForDB2><![CDATA[
+UPDATE inf_tag_association ita
+SET (end_time, is_modified) 
+  = (SELECT ${get_min_non_null_date()}(${add_seconds_to_date()}(ita.inf_other_read_time, -1), 
+                                       ${add_seconds_to_date()}(ita.start_time, fsttf.avg_duration)),
+            1
+     FROM from_site_transit_time_fact fsttf
+     WHERE ita.inf_pivot_date_skey = fsttf.date_skey
+       AND ita.from_site_skey = fsttf.from_site_skey
+       AND ita.to_site_skey = fsttf.to_site_skey)
+WHERE ita.inf_type = 3
+  AND (ita.inf_pivot_date_skey, ita.from_site_skey, ita.to_site_skey)
+    IN (SELECT date_skey, from_site_skey, to_site_skey
+        FROM from_site_transit_time_fact
+        WHERE ita.is_modified = 1 OR is_modified = 1)
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Inference rule 4: start_time = MIN(other time + fromTime(other time), end - 1 second)">
+  <SQLForOracle><![CDATA[
+UPDATE inf_tag_association ita
+SET (start_time, first_seen_time, last_seen_time, is_modified) 
+  = (SELECT ita_p.end_time, ita_p.end_time, ita.end_time, 1
+     FROM inf_tag_association ita_p
+     WHERE ita.prev_tag_association_id = ita_p.tag_association_id)
+WHERE ita.inf_type = 4
+  AND ita.prev_tag_association_id IN
+    (SELECT tag_association_id FROM inf_tag_association foo WHERE is_modified = 1)
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE ita
+SET start_time = ita_p.end_time,
+  first_seen_time = ita_p.end_time, 
+  last_seen_time = ita_p.end_time,
+  is_modified = 1
+FROM inf_tag_association ita, inf_tag_association ita_p
+WHERE ita.inf_type = 4
+  AND ita.prev_tag_association_id = ita_p.tag_association_id
+  AND ita_p.is_modified = 1
+  ]]></SQLForSQLServer>
+
+ <SQLForDB2><![CDATA[
+UPDATE inf_tag_association ita
+SET (start_time, first_seen_time, last_seen_time, is_modified) 
+  = (SELECT ita_p.end_time, ita_p.end_time, ita.end_time, 1
+     FROM inf_tag_association ita_p
+     WHERE ita.prev_tag_association_id = ita_p.tag_association_id)
+WHERE ita.inf_type = 4
+  AND ita.prev_tag_association_id IN
+    (SELECT tag_association_id FROM inf_tag_association foo WHERE is_modified = 1)
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<!-- Inference rules for entry into a site, based on rule_on_entry table. 
+     This SQL adds new inferred associations on site entry if a site
+     has only one association corresponding to the tag's exit from that site.
+
+     The inference happens on an association that has business
+     location NULL, with no previous association, or a previous
+     association that belongs to another site. Of the former
+     associations, the ones that belong to the configured partner and site
+     type in the rule_on_entry table are selected. Inferred associations are added
+     with any business location and read point that belongs to the inferred types
+     of biz loc and read point (resp) in the rule_on_entry table. 
+ -->
+
+<SQLExecTaskForDatabase desc = "Remove records from the temp table with previous entry inferences">
+  <SQLForOracle><![CDATA[
+  TRUNCATE TABLE entry_inf_temp
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+  TRUNCATE TABLE entry_inf_temp
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+  DELETE FROM entry_inf_temp
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc="Identify rows in inf_tag_association that have entry inferences, and populate the temp table with this information"><![CDATA[
+INSERT INTO entry_inf_temp
+  SELECT ita_n.tag_association_id, 
+      ita_n.prev_tag_association_id, 
+      MIN(roe.rule_skey) AS rule_skey,
+      MIN(ibld.business_loc_skey) AS inf_bl_skey,
+      MIN(irpd.read_point_skey) AS inf_rp_skey
+  FROM tag_with_assn_changes twac
+    JOIN inf_tag_association ita_n ON ita_n.tag_skey = twac.tag_skey
+    JOIN ${ODS}.ods_tag_association ota ON ota.ods_tag_association_id = ita_n.tag_association_id
+    JOIN partner_dim pd ON pd.partner_skey = ota.ods_partner_id
+    JOIN site_dim sd ON sd.site_skey = ita_n.from_site_skey
+    JOIN rule_on_entry roe ON (roe.partner_ext_id = pd.partner_ext_id AND roe.entry_site_type = sd.site_type)
+    LEFT OUTER JOIN business_loc_dim ibld ON ibld.business_loc_type = roe.inf_bl_type AND ibld.site_skey = sd.site_skey
+    LEFT OUTER JOIN read_point_dim irpd ON irpd.read_point_type = roe.inf_rp_type AND irpd.site_skey = sd.site_skey
+    LEFT OUTER JOIN inf_tag_association ita_p ON ita_p.tag_association_id = ita_n.prev_tag_association_id
+  WHERE ita_n.business_loc_skey IS NULL 
+    AND (ita_p.tag_association_id IS NULL OR ita_p.from_site_skey <> ita_n.from_site_skey)
+  GROUP BY ita_n.tag_association_id, ita_n.prev_tag_association_id
+]]></SQLExecTask>
+
+<!-- For the inferred record: 
+       Start row source is inferred (2). 
+       End row source is actual (1). 
+       Inference type is 10. 
+       In external and out external are true (1).
+       Parent tag is set to NULL, since this operates only on partner data -->
+<SQLExecTask desc="Insert entry inferences into inf_tag_association"><![CDATA[
+INSERT INTO inf_tag_association 
+    (tag_association_id, tag_skey, business_loc_skey, 
+     read_point_skey, start_time, end_time, end_row_source_id, start_row_source_id,
+     inf_type, from_site_skey,
+     to_site_skey, first_seen_time, last_seen_time, is_modified,
+     prev_tag_association_id, last_defined_business_loc_skey, in_external, out_external)
+  SELECT 50000000 + eit.tag_association_id, ita.tag_skey, eit.inf_bl_skey,
+     eit.inf_rp_skey, ita.start_time, ita.start_time, 1,2,
+     10, ita.from_site_skey,
+     ita.from_site_skey, ita.start_time, ita.start_time, 1, 
+     eit.prev_tag_association_id, eit.inf_bl_skey, 1, 1
+  FROM entry_inf_temp eit
+    JOIN inf_tag_association ita ON ita.tag_association_id = eit.tag_association_id
+    JOIN rule_on_entry roe ON roe.rule_skey = eit.rule_skey
+]]></SQLExecTask>
+
+<SQLExecTask desc="Update previous associations with the inferred (2) end row source"><![CDATA[
+UPDATE inf_tag_association
+SET end_row_source_id = 2
+WHERE tag_association_id IN (SELECT prev_tag_association_id FROM entry_inf_temp)
+]]></SQLExecTask>
+
+<SQLExecTask desc="Update following associations with the correct previous_tag_association_id, and last_defined_business_loc_skey"><![CDATA[
+UPDATE inf_tag_association
+SET prev_tag_association_id = 50000000 + tag_association_id,
+  last_defined_business_loc_skey = (SELECT inf_bl_skey FROM entry_inf_temp eit WHERE eit.tag_association_id = inf_tag_association.tag_association_id)
+WHERE tag_association_id IN (SELECT tag_association_id FROM entry_inf_temp)
+]]></SQLExecTask>
+
+<!-- This SQL populates the child to parent association map. This table
+     links associations from child to parent that overlap with
+     associations from the parent to a location. Such linkages are
+     useful in computing the location at which a case is placed when it
+     is moving inside a pallet. 
+
+     If an object X belongs to new_tag_with_assn, 
+     * the child_parent_assn_map records with child_tag_id = X will be
+       modified.
+     * the child_parent_assn_map records with parent_tag_id = X will also
+       be modified.
+     * no other records will be affected by that object 
+-->
+
+<SQLExecTask desc = "Remove child parent assn mappings where the child tag has changed"><![CDATA[
+DELETE FROM child_parent_assn_map WHERE child_tag_skey IN (SELECT tag_skey FROM tag_with_assn_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Remove child parent assn mappings where the parent tag has changed"><![CDATA[
+DELETE FROM child_parent_assn_map WHERE parent_tag_skey IN (SELECT tag_skey FROM tag_with_assn_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Create new child-parent associations on all parent tag movements within sites owned (not partner sites)"><![CDATA[
+INSERT INTO child_parent_assn_map (child_assn_id, parent_assn_id, child_tag_skey, parent_tag_skey)
+  SELECT DISTINCT ita.tag_association_id AS child_assn_id, ita_parent.tag_association_id AS parent_assn_id,
+     ita.tag_skey, ita_parent.tag_skey
+  FROM tag_with_assn_changes twac
+    JOIN inf_tag_association ita ON (ita.parent_tag_skey = twac.tag_skey OR ita.tag_skey = twac.tag_skey)
+    JOIN inf_tag_association ita_parent ON ita_parent.tag_skey = ita.parent_tag_skey
+    JOIN site_dim sd ON ita_parent.from_site_skey = sd.site_skey
+  WHERE (ita.end_time IS NULL OR ita.end_time > ita_parent.start_time)
+    AND (ita_parent.end_time IS NULL OR ita.start_time < ita_parent.end_time)
+    AND sd.site_owner_id = 0
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Delete the work table maintaining tags with changes to location associations">
+  <SQLForOracle><![CDATA[
+  TRUNCATE TABLE tag_with_tag_loc_changes
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+  TRUNCATE TABLE tag_with_tag_loc_changes
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+  DELETE FROM tag_with_tag_loc_changes
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Populate tag_with_tag_loc_changes with all tags and their children that have changes"><![CDATA[
+INSERT INTO tag_with_tag_loc_changes (tag_skey) 
+  SELECT DISTINCT i.tag_skey
+  FROM inf_tag_association i 
+          join tag_with_assn_changes twac on (twac.tag_skey = i.tag_skey or twac.tag_skey = i.parent_tag_skey)
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Delete the temp table for tag_loc_fact">
+  <SQLForOracle><![CDATA[
+  TRUNCATE TABLE tag_loc_fact_aux
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+  TRUNCATE TABLE tag_loc_fact_aux
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+  DELETE FROM tag_loc_fact_aux
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Copy old tag_loc_fact data into tag_loc_fact_aux table"><![CDATA[
+INSERT INTO tag_loc_fact_aux(tag_skey, start_time, end_time, site_skey, business_loc_skey, in_pallet_skey, prod_skey, start_date_skey, 
+        end_date_skey, start_row_source_id, end_row_source_id, duration_ss, in_external, out_external)
+  SELECT tag_skey, start_time, end_time, site_skey, business_loc_skey, in_pallet_skey, prod_skey, start_date_skey, 
+        end_date_skey, start_row_source_id, end_row_source_id, duration_ss, in_external, out_external
+  FROM tag_loc_fact
+  WHERE tag_skey in (SELECT tag_skey FROM tag_with_tag_loc_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Remove tag_loc_fact records that are going to be repopulated"><![CDATA[
+DELETE FROM tag_loc_fact WHERE tag_skey IN (SELECT tag_skey FROM tag_with_tag_loc_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Compute the tag loc fact using the inf_tag_at_location view, for tags in tag_with_tag_loc_changes"><![CDATA[
+INSERT INTO tag_loc_fact 
+  (tag_skey, start_time, end_time, site_skey, 
+   business_loc_skey, enter_read_point_skey, in_pallet_skey, prod_skey, start_date_skey, 
+   end_date_skey, start_row_source_id, end_row_source_id, 
+   duration_ss, in_external, out_external)
+SELECT ital.tag_skey, ital.start_time, ital.end_time, ital.from_site_skey, 
+   ital.business_loc_skey, ital.read_point_skey, ital.parent_tag_skey, ot.ods_product_id, ${get_date_skey()}(ital.start_time), 
+   ${get_date_skey()}(ital.end_time), ital.start_row_source_id, ital.end_row_source_id, 
+   ${get_duration_in_ss()}(ital.start_time, ital.end_time), ital.in_external, ital.out_external
+FROM inf_tag_at_location ital 
+  JOIN ${ODS}.ods_tag ot ON ot.ods_tag_id = ital.tag_skey
+WHERE ital.business_loc_skey IS NOT NULL
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Remove tag_read_fact records that are going to be repopulated"><![CDATA[
+DELETE FROM tag_read_fact WHERE tag_skey IN (SELECT tag_skey FROM tag_with_tag_loc_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Compute the tag read fact using the inf_tag_at_location view for the common case: first seen and last seen times are the same"><![CDATA[
+INSERT INTO tag_read_fact
+  (tag_skey, start_time, end_time, read_point_skey, 
+   site_skey, prod_skey, start_date_skey, end_date_skey, 
+   in_pallet_tag_skey, start_row_source_id, end_row_source_id, 
+   bizstep,
+   duration_ss, from_business_loc_skey, to_business_loc_skey, insert_date)
+SELECT ital.tag_skey, ital.first_seen_time, ital.last_seen_time, ital.read_point_skey, 
+   ital.from_site_skey, ot.ods_product_id, 
+   ${get_date_skey()}(ital.first_seen_time), 
+   ${get_date_skey()}(ital.last_seen_time), 
+   ital.parent_tag_skey, ital.start_row_source_id, ital.start_row_source_id,
+   ital.bizstep,
+   ${get_duration_in_ss()}(ital.first_seen_time, ital.last_seen_time),
+   CASE WHEN ital.prev_tag_association_id is null THEN null ELSE (SELECT max(ital_pre.last_defined_business_loc_skey) 
+                                                                  FROM inf_tag_at_location ital_pre
+                                                                  WHERE ital.tag_skey = ital_pre.tag_skey and ital_pre.tag_association_id = ital.prev_tag_association_id) END,
+   ital.last_defined_business_loc_skey, ot.insert_date
+FROM inf_tag_at_location ital 
+  JOIN ${ODS}.ods_tag ot ON ot.ods_tag_id = ital.tag_skey
+WHERE ital.read_point_skey IS NOT NULL
+  AND ital.first_seen_time = ital.last_seen_time
+]]></SQLExecTask>
+
+<!-- The next 2 steps were added and the previous code was commented out as a result of 
+     AXI-1679. The condition that caused this was a SFT read, then a BC read, then another
+     SFT read. All of these reads placed the EPC in the sales floor biz loc, so inf_tag_association
+     contained a single row, with RP of SFT, and first_seen_time of the 1st read and 
+     last_seen_time of the 3rd read. Because of this, in tag_read_fact the BC read showed up as 
+     an independent read, while the SFT read showed up with start time of the 1st read and end time 
+     of the 3rd read, screwing up the Track and Trace at Read Point report.
+
+     Fix is to use a temp table to calculate the tag reads' end_time correctly, then populate
+     tag_read_fact.
+-->
+
+<SQLExecTaskForDatabase desc = "Compute tag_read_temp rows, to be used in next step">
+<SQLForOracle><![CDATA[
+{CALL compute_tag_read_temp}
+]]></SQLForOracle>
+
+<SQLForSQLServer><![CDATA[
+{CALL dbo.compute_tag_read_temp}
+]]></SQLForSQLServer>
+
+<SQLForDB2><![CDATA[
+{CALL compute_tag_read_temp()}
+]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Compute the tag read fact using the tag_read_temp temporary table for the case when multiple read points result in the same record in inf_tag_at_location"><![CDATA[
+INSERT INTO tag_read_fact
+  (tag_skey, start_time, end_time, read_point_skey, 
+   site_skey, prod_skey, start_date_skey, end_date_skey, 
+   in_pallet_tag_skey, start_row_source_id, end_row_source_id, 
+   bizstep,
+   duration_ss, from_business_loc_skey, to_business_loc_skey, insert_date)
+SELECT trt.tag_skey, trt.start_time, trt.end_time, trt.ods_read_point_id, 
+   trt.from_site_skey, trt.ods_product_id, 
+   ${get_date_skey()}(trt.start_time), 
+   ${get_date_skey()}(trt.end_time), 
+   trt.parent_tag_skey, trt.start_row_source_id, trt.start_row_source_id,
+   trt.bizstep,
+   ${get_duration_in_ss()}(trt.start_time, trt.end_time), from_business_loc_skey, to_business_loc_skey, trt.insert_date
+FROM tag_read_temp trt
+]]></SQLExecTask>
+
+<!-- Not required; replaced by the procedure compute_tag_read_temp and the step above
+
+<SQLExecTask desc = "Compute the tag read fact using the inf_tag_at_location view for the case when multiple read points result in the same record in inf_tag_at_location"><![CDATA[
+INSERT INTO tag_read_fact
+  (tag_skey, start_time, end_time, read_point_skey, 
+   site_skey, prod_skey, start_date_skey, end_date_skey, 
+   in_pallet_tag_skey, start_row_source_id, end_row_source_id, 
+   bizstep,
+   duration_ss)
+SELECT ital.tag_skey, MIN(ota.association_start_time), MAX(ota.association_start_time), ota.ods_read_point_id, 
+   ital.from_site_skey, ot.ods_product_id, 
+   ${get_date_skey()}(MIN(ota.association_start_time)), 
+   ${get_date_skey()}(MAX(ota.association_start_time)), 
+   ital.parent_tag_skey, ital.start_row_source_id, ital.start_row_source_id,
+   ital.bizstep,
+   ${get_duration_in_ss()}(MIN(ota.association_start_time), MAX(ota.association_start_time))
+FROM inf_tag_at_location ital 
+  JOIN ${ODS}.ods_tag_association ota ON ota.ods_tag_id = ital.tag_skey AND ota.association_start_time BETWEEN ital.first_seen_time AND ital.last_seen_time
+  JOIN ${ODS}.ods_tag ot ON ot.ods_tag_id = ital.tag_skey
+WHERE ital.read_point_skey IS NOT NULL
+  AND ital.first_seen_time <> ital.last_seen_time
+GROUP BY ital.tag_skey, ota.ods_read_point_id, ital.from_site_skey, 
+  ot.ods_product_id, ital.parent_tag_skey, ital.start_row_source_id, ital.bizstep, ital.start_time 
+]]></SQLExecTask>
+-->
+
+<SQLExecTaskForDatabase desc = "Clear the work table with PROMOTION_PRODUCT_UPDATE">
+  <SQLForOracle><![CDATA[
+  TRUNCATE TABLE PROMOTION_PRODUCT_UPDATE
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+  TRUNCATE TABLE PROMOTION_PRODUCT_UPDATE
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+  DELETE FROM PROMOTION_PRODUCT_UPDATE
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "insert the records to update the promotion product for newly changes tags where the serial number range is defined"><![CDATA[
+INSERT INTO promotion_product_update(tag_skey, prod_skey, promotion_product_skey) 
+SELECT trf.tag_skey, trf.prod_skey, max(v.ods_promo_prod_id) 
+FROM tag_read_fact trf  
+  JOIN tag_dim td ON trf.tag_skey = td.tag_skey  
+  JOIN ${ODS}.v_ods_promo_prod_sn_range v ON 
+                        trf.prod_skey = v.ods_product_id AND
+                        (td.serial_number between v.start_sn and v.end_sn) 
+WHERE trf.tag_skey in (SELECT c.tag_skey FROM tag_with_tag_loc_changes c) 
+GROUP BY trf.tag_skey, trf.prod_skey
+]]></SQLExecTask>
+
+<SQLExecTask desc = "insert the records to update the promotion product for newly changes tags where the serial number range is not defined"><![CDATA[
+INSERT INTO promotion_product_update(tag_skey, prod_skey, promotion_product_skey) 
+SELECT trf.tag_skey, trf.prod_skey, max(v.ods_promo_prod_id) 
+FROM tag_read_fact trf  
+  JOIN tag_dim td ON trf.tag_skey = td.tag_skey  
+  JOIN ${ODS}.v_ods_promo_prod_sn_range v ON 
+                        trf.prod_skey = v.ods_product_id AND
+                        (v.start_sn is null) 
+WHERE trf.tag_skey in (SELECT c.tag_skey FROM tag_with_tag_loc_changes c) AND
+      (trf.tag_skey not in (SELECT tag_skey FROM promotion_product_update) OR
+       trf.prod_skey not in (SELECT prod_skey FROM promotion_product_update))
+GROUP BY trf.tag_skey, trf.prod_skey
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "reset promotion product update for all updated promotion product">
+  <SQLForOracle><![CDATA[
+  INSERT INTO promotion_product_update 
+    (tag_skey, prod_skey, promotion_product_skey)  
+  SELECT trf.tag_skey, trf.prod_skey, null 
+  FROM tag_read_fact trf  
+    JOIN ${ODS}.ods_promo_prod opp on trf.promotion_product_skey = opp.ods_promo_prod_id  
+  WHERE trf.tag_skey not in (SELECT tag_skey FROM tag_with_tag_loc_changes) AND
+        trf.prod_skey != opp.ods_product_id AND
+        opp.update_date > ${last_processed_date}
+GROUP BY trf.tag_skey, trf.prod_skey
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+  INSERT INTO promotion_product_update 
+    (tag_skey, prod_skey, promotion_product_skey)  
+  SELECT trf.tag_skey, trf.prod_skey, null 
+  FROM tag_read_fact trf  
+    JOIN ${ODS}.ods_promo_prod opp on trf.promotion_product_skey = opp.ods_promo_prod_id  
+  WHERE trf.tag_skey not in (SELECT tag_skey FROM tag_with_tag_loc_changes) AND
+        trf.prod_skey != opp.ods_product_id AND
+        opp.update_date > ${last_processed_date}
+GROUP BY trf.tag_skey, trf.prod_skey
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+  INSERT INTO promotion_product_update 
+    (tag_skey, prod_skey, promotion_product_skey)  
+  SELECT trf.tag_skey, trf.prod_skey, NULLIF(1,1) 
+  FROM tag_read_fact trf  
+    JOIN ${ODS}.ods_promo_prod opp on trf.promotion_product_skey = opp.ods_promo_prod_id  
+  WHERE trf.tag_skey not in (SELECT tag_skey FROM tag_with_tag_loc_changes) AND
+        trf.prod_skey != opp.ods_product_id AND
+        opp.update_date > ${last_processed_date}
+GROUP BY trf.tag_skey, trf.prod_skey
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+
+<SQLExecTask desc = "insert the records to update the promotion product for updated promtion product or ranges where the serial number range is defined"><![CDATA[
+INSERT INTO promotion_product_update 
+  (tag_skey, prod_skey, promotion_product_skey) 
+SELECT trf.tag_skey, trf.prod_skey, max(v.ods_promo_prod_id) 
+FROM tag_read_fact trf  
+  JOIN tag_dim td on trf.tag_skey = td.tag_skey  
+  LEFT OUTER JOIN ${ODS}.v_ods_promo_prod_sn_range v ON 
+                       (trf.prod_skey = v.ods_product_id AND
+                        (td.serial_number between v.start_sn and v.end_sn))
+WHERE trf.tag_skey not in (SELECT tag_skey FROM tag_with_tag_loc_changes) AND
+      trf.prod_skey in (SELECT v2.ods_product_id
+                        FROM ${ODS}.v_ods_promo_prod_sn_range v2
+                        WHERE (v2.opp_insert_date > ${last_processed_date}) or 
+                              (v2.opp_update_date > ${last_processed_date}) or 
+                              (v2.sr_insert_date > ${last_processed_date}) or 
+                              (v2.sr_update_date > ${last_processed_date}))
+GROUP BY trf.tag_skey, trf.prod_skey 
+]]></SQLExecTask>
+
+<SQLExecTask desc = "insert the records to update the promotion product for updated promtion product or ranges where the serial number range is not defined"><![CDATA[
+INSERT INTO promotion_product_update 
+  (tag_skey, prod_skey, promotion_product_skey) 
+SELECT trf.tag_skey, trf.prod_skey, max(v.ods_promo_prod_id) 
+FROM tag_read_fact trf  
+  JOIN tag_dim td on trf.tag_skey = td.tag_skey  
+  LEFT OUTER JOIN ${ODS}.v_ods_promo_prod_sn_range v ON 
+                       (trf.prod_skey = v.ods_product_id AND
+                        v.start_sn is null)
+WHERE trf.tag_skey not in (SELECT tag_skey FROM tag_with_tag_loc_changes) AND
+      trf.prod_skey in (SELECT v2.ods_product_id
+                        FROM ${ODS}.v_ods_promo_prod_sn_range v2
+                        WHERE (v2.opp_insert_date > ${last_processed_date}) or 
+                              (v2.opp_update_date > ${last_processed_date}) or 
+                              (v2.sr_insert_date > ${last_processed_date}) or 
+                              (v2.sr_update_date > ${last_processed_date}))AND
+      (trf.tag_skey not in (SELECT tag_skey FROM promotion_product_update) OR
+       trf.prod_skey not in (SELECT prod_skey FROM promotion_product_update))
+GROUP BY trf.tag_skey, trf.prod_skey 
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Update tag_loc_fact for promotion product info">
+  <SQLForOracle><![CDATA[
+UPDATE tag_loc_fact
+SET promotion_product_skey
+  = (SELECT promotion_product_skey
+     FROM promotion_product_update  ppu 
+     WHERE tag_loc_fact.tag_skey = ppu.tag_skey AND
+           tag_loc_fact.prod_skey = ppu.prod_skey)
+WHERE (tag_skey,  prod_skey) IN
+  (SELECT tag_skey,  prod_skey
+   FROM promotion_product_update)
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE tag_loc_fact
+SET promotion_product_skey = ppu.promotion_product_skey
+FROM promotion_product_update  ppu 
+     WHERE tag_loc_fact.tag_skey = ppu.tag_skey AND
+           tag_loc_fact.prod_skey = ppu.prod_skey
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE tag_loc_fact
+SET promotion_product_skey
+  = (SELECT promotion_product_skey
+     FROM promotion_product_update  ppu 
+     WHERE tag_loc_fact.tag_skey = ppu.tag_skey AND
+           tag_loc_fact.prod_skey = ppu.prod_skey)
+WHERE (tag_skey,  prod_skey) IN
+  (SELECT tag_skey,  prod_skey
+   FROM promotion_product_update)
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Update tag_read_fact for promotion product info">
+  <SQLForOracle><![CDATA[
+UPDATE tag_read_fact
+SET promotion_product_skey
+  = (SELECT promotion_product_skey
+     FROM promotion_product_update  ppu 
+     WHERE tag_read_fact.tag_skey = ppu.tag_skey AND
+           tag_read_fact.prod_skey = ppu.prod_skey)
+WHERE (tag_skey,  prod_skey) IN
+  (SELECT tag_skey,  prod_skey
+   FROM promotion_product_update)
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE tag_read_fact
+SET promotion_product_skey = ppu.promotion_product_skey
+FROM promotion_product_update  ppu 
+     WHERE tag_read_fact.tag_skey = ppu.tag_skey AND
+           tag_read_fact.prod_skey = ppu.prod_skey
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE tag_read_fact
+SET promotion_product_skey
+  = (SELECT promotion_product_skey
+     FROM promotion_product_update  ppu 
+     WHERE tag_read_fact.tag_skey = ppu.tag_skey AND
+           tag_read_fact.prod_skey = ppu.prod_skey)
+WHERE (tag_skey,  prod_skey) IN
+  (SELECT tag_skey,  prod_skey
+   FROM promotion_product_update)
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<!-- SQL for populating tag_site_read_fact -->
+
+<SQLExecTask desc = "Remove tag_site_read_fact records that are going to be repopulated"><![CDATA[
+DELETE FROM tag_site_read_fact WHERE tag_skey IN (SELECT tag_skey FROM tag_with_tag_loc_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Compute tag_site_read_fact"><![CDATA[
+Insert into tag_site_read_fact (site_skey, prod_skey, promotion_product_skey, tag_skey, first_enter_site_date_skey, 
+                                first_enter_site_time, first_enter_rp_skey, first_enter_sf_date_skey, first_enter_sf_time, first_enter_sf_rp_skey)
+select fest.site_skey, fest.prod_skey, fest.promotion_product_skey, fest.tag_skey, fest.min_start_date_skey,
+       fest.min_start_time, max(trf3.read_point_skey), fesf.min_sf_start_date_skey, fesf.min_sf_start_time, max(trf4.read_point_skey)
+from ( SELECT trf.site_skey, trf.prod_skey, trf.promotion_product_skey, trf.tag_skey,
+              min(trf.start_date_skey) as min_start_date_skey, min(trf.start_time) as min_start_time
+       FROM tag_read_fact trf
+	   Group by trf.site_skey, trf.prod_skey, trf.promotion_product_skey, trf.tag_skey ) fest left outer join
+	 ( select trf2.site_skey, trf2.prod_skey, trf2.promotion_product_skey, trf2.tag_skey,
+	          min(trf2.start_date_skey) as min_sf_start_date_skey, min(trf2.start_time) as min_sf_start_time
+       from tag_read_fact trf2 join business_loc_dim bld on trf2.to_business_loc_skey = bld.business_loc_skey 
+                                join read_point_dim rpd on trf2.read_point_skey = rpd.read_point_skey
+       where  (bld.business_loc_type = 'Sales Floor') AND 
+              (rpd.read_point_type = 'Sales Floor Transition')
+	   Group by trf2.site_skey, trf2.prod_skey, trf2.promotion_product_skey, trf2.tag_skey) fesf on
+	     (fest.site_skey = fesf.site_skey and 
+		  fest.tag_skey = fesf.tag_skey) 
+	   left outer join tag_read_fact trf3 on
+	     (fest.site_skey = trf3.site_skey and 
+		  fest.tag_skey = trf3.tag_skey and
+		  fest.min_start_time = trf3.start_time) 
+	   left outer join tag_read_fact trf4 on
+	     (fesf.site_skey = trf4.site_skey and 
+		  fesf.tag_skey = trf4.tag_skey and
+		  fesf.min_sf_start_time = trf4.start_time)
+where fest.tag_skey in (SELECT tag_skey FROM tag_with_tag_loc_changes)
+group by fest.site_skey, fest.prod_skey, fest.promotion_product_skey, fest.tag_skey, fest.min_start_date_skey,
+       fest.min_start_time,fesf.min_sf_start_date_skey, fesf.min_sf_start_time
+]]></SQLExecTask>
+
+<!-- SQL for populating tag_state_fact -->
+
+<SQLExecTaskForDatabase desc = "Delete entries from the work table tag_with_state_changes">
+  <SQLForOracle><![CDATA[
+  TRUNCATE TABLE tag_with_state_changes
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+  TRUNCATE TABLE tag_with_state_changes
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+  DELETE FROM tag_with_state_changes
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Identify tags with state changes and insert them into tag_with_state_changes"><![CDATA[
+INSERT INTO tag_with_state_changes (tag_skey)
+  SELECT DISTINCT ota.ods_tag_id 
+  FROM ${ODS}.ods_tag_association ota 
+  WHERE ota.insert_date > ${last_processed_date} 
+    OR ota.update_date > ${last_processed_date} 
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Compute tag_state_fact rows">
+<SQLForOracle><![CDATA[
+{CALL compute_tag_state_fact}
+]]></SQLForOracle>
+
+<SQLForSQLServer><![CDATA[
+{CALL dbo.compute_tag_state_fact}
+]]></SQLForSQLServer>
+
+<SQLForDB2><![CDATA[
+{CALL compute_tag_state_fact()}
+]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<!--  NOT REQUIRED, THIS HAS BEEN MOVED TO PROCEDURE compute_tag_state_fact.
+      IN ANY CASE, THIS HAS BUGS
+
+<SQLExecTask desc = "Insert new records from ods_tag_association into tag_state_fact"><![CDATA[
+INSERT INTO tag_state_fact(tag_skey, state_start_time, state_value, state_name)
+SELECT tsf4.ods_tag_id, tsf4.association_start_time, tsf4.disposition, 'disposition' FROM 
+(SELECT temp.ods_tag_id, temp.association_start_time, temp.disposition, temp.tag_skey, 
+        temp.prev_start_time, tsf3.state_value as prev_state_value
+FROM 
+  (SELECT ota.ods_tag_id, ota.association_start_time, ota.disposition, tsf.tag_skey, 
+          max(tsf.state_start_time) as prev_start_time 
+   FROM ods_tag_association ota 
+   LEFT JOIN tag_state_fact tsf on tsf.tag_skey = ota.ods_tag_id AND tsf.state_start_time < ota.association_start_time
+   WHERE ota.disposition IS NOT NULL AND ota.insert_date > ${last_processed_date}  
+   GROUP BY tsf.tag_skey, ota.ods_tag_id, ota.association_start_time, ota.disposition) temp
+LEFT JOIN tag_state_fact tsf3 
+ON tsf3.tag_skey = temp.tag_skey AND tsf3.state_start_time = temp.prev_start_time
+WHERE tsf3.state_value is null OR temp.disposition != tsf3.state_value) tsf4
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Delete from temp table tsf_temp before inserting into it again"><![CDATA[
+DELETE FROM tsf_temp
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Insert into tsf_temp all rows that need to be updated in tag_state_fact"><![CDATA[
+INSERT INTO tsf_temp( tag_skey, state_name, state_start_time, state_end_time )
+(SELECT tsf.tag_skey, tsf.state_name, tsf.state_start_time, min(tsf2.state_start_time) as state_end_time
+FROM tag_state_fact tsf 
+JOIN tag_state_fact tsf2 
+ON     tsf.tag_skey = tsf2.tag_skey 
+   AND tsf.state_name = tsf2.state_name 
+   AND tsf.state_start_time < tsf2.state_start_time
+WHERE tsf.state_end_time IS NULL 
+   OR tsf.state_start_time >= 
+        (SELECT min(association_start_time) FROM ods_tag_association ota 
+        WHERE ota.insert_date > ${last_processed_date} OR ota.update_date > ${last_processed_date})
+   OR tsf.state_end_time >= 
+        (SELECT min(association_start_time) FROM ods_tag_association ota 
+        WHERE ota.insert_date > ${last_processed_date} or ota.update_date > ${last_processed_date})
+GROUP BY tsf.tag_skey, tsf.state_name, tsf.state_start_time)
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Update tag_state_fact from temp table tsf_temp">
+  <SQLForOracle><![CDATA[
+UPDATE tag_state_fact
+SET state_end_time
+  = (SELECT state_end_time
+     FROM tsf_temp t2 
+     WHERE tag_state_fact.tag_skey = t2.tag_skey 
+       AND tag_state_fact.state_start_time = t2.state_start_time
+       AND tag_state_fact.state_name = t2.state_name)
+WHERE (tag_skey, state_start_time, state_name) IN
+  (SELECT tag_skey,  state_start_time, state_name
+   FROM tsf_temp)
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE tag_state_fact 
+SET state_end_time = t2.state_end_time
+FROM tsf_temp t2
+WHERE tag_state_fact.tag_skey = t2.tag_skey 
+  AND tag_state_fact.state_start_time = t2.state_start_time 
+  AND tag_state_fact.state_name = t2.state_name
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE tag_state_fact
+SET state_end_time
+  = (SELECT state_end_time
+     FROM tsf_temp t2 
+     WHERE tag_state_fact.tag_skey = t2.tag_skey 
+       AND tag_state_fact.state_start_time = t2.state_start_time
+       AND tag_state_fact.state_name = t2.state_name)
+WHERE (tag_skey, state_start_time, state_name) IN
+  (SELECT tag_skey,  state_start_time, state_name
+   FROM tsf_temp)
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+-->
+
+<SQLExecTaskForDatabase desc = "Compute the inventory">
+<SQLForOracle><![CDATA[
+{CALL compute_inventory_using_deltas}
+]]></SQLForOracle>
+
+<SQLForSQLServer><![CDATA[
+{CALL dbo.compute_inventory_using_deltas}
+]]></SQLForSQLServer>
+
+<SQLForDB2><![CDATA[
+{CALL compute_inventory_using_deltas()}
+]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<!-- This is now part of the stored procedure
+<SQLExecTask desc = "Set the current inventory indicator to the 'current' state (1) for the most recent day slice for each (product,location)"><![CDATA[
+UPDATE inventory_fact  
+  SET current_ind = '1'
+  WHERE date_skey =
+          (SELECT MAX(date_skey)  
+             FROM inventory_fact i1  
+            WHERE i1.prod_skey = inventory_fact.prod_skey
+              AND i1.business_loc_skey = inventory_fact.business_loc_skey)
+    AND day_slice_skey =
+          (SELECT MAX(day_slice_skey)  
+             FROM inventory_fact i2  
+            WHERE i2.prod_skey = inventory_fact.prod_skey
+              AND i2.business_loc_skey = inventory_fact.business_loc_skey
+              AND i2.date_skey = inventory_fact.date_skey)  
+]]></SQLExecTask>
+-->
+
+<SQLExecTask desc = "Remove tag_shipped_fact records that are going to be repopulated"><![CDATA[
+DELETE FROM tag_shipped_fact WHERE tag_skey IN (SELECT tag_skey FROM tag_with_tag_loc_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Calculate the tag_shipped_fact with shipments that have ERP information"><![CDATA[
+INSERT INTO tag_shipped_fact 
+  (tag_skey, sent_time, received_time, shipment_item_skey,
+   shipment_number, sales_order_number,
+   in_pallet_skey, prod_skey, start_date_skey, date_skey, 
+   from_site_skey, to_site_skey,  to_business_loc_skey, 
+   from_read_point_skey, 
+   arrived_to_target_ind, arrived_on_time_ind, 
+   duration_ss, start_row_source_id, end_row_source_id,
+   ship_skey, sales_order_skey, sales_order_item_skey, partner_skey 
+   )
+   SELECT ocs.object_id, ocs.shipped_time, ocs.arrived_time, ocs.ods_shipment_item_id,
+          os.shipment_number, oso.order_number,
+          ops.object_id, ot.ods_product_id, ${get_date_skey()}(ocs.shipped_time),
+          ${get_date_skey()}(ocs.arrived_time) AS date_skey,
+          ocs.ods_shipped_site_id,
+          obl.ods_site_id AS to_site_skey,
+          ocs.ods_arrived_business_loc_id,
+          ocs.ods_shipped_read_point_id,
+          CASE WHEN ocs.ods_arrived_business_loc_id IS NULL THEN NULL
+               WHEN s.internal_identifier = oso.ship_to_id THEN 'T'
+               ELSE 'F'
+          END  as arrived_to_target_ind,
+          CASE WHEN ocs.ods_arrived_business_loc_id IS NULL THEN null
+               WHEN s.internal_identifier = oso.ship_to_id AND ocs.arrived_time <= os.expected_delivery_time
+                 THEN 'T'
+                 ELSE 'F'
+          END  as arrived_on_time_ind,
+          CASE WHEN ocs.arrived_time IS NULL THEN NULL
+               ELSE ${get_duration_in_ss()}(ocs.shipped_time, ocs.arrived_time)
+           END AS duration_ss,
+          1,1, 
+          osi.ods_shipment_id, osoi.ods_sales_order_id, osi.ods_sales_order_item_id, oso.partner_id
+     FROM ${ODS}.ods_case_shipped   ocs
+     JOIN tag_with_tag_loc_changes  twtlc  ON ocs.object_id            = twtlc.tag_skey
+     JOIN ${ODS}.ods_tag            ot     ON ocs.object_id            = ot.ods_tag_id
+     JOIN ${ODS}.ods_pallet_shipped ops    ON ocs.ods_pallet_shipped_id = ops.ods_pallet_shipped_id
+     JOIN ${ODS}.ods_shipment_item  osi    ON ocs.ods_shipment_item_id  = osi.ods_shipment_item_id
+     JOIN ${ODS}.ods_shipment       os     ON osi.ods_shipment_id       = os.ods_shipment_id
+     LEFT OUTER JOIN ${ODS}.ods_sales_order_item osoi ON osi.ods_sales_order_item_id = osoi.ods_sales_order_item_id
+     LEFT OUTER JOIN ${ODS}.ods_sales_order    oso    ON osoi.ods_sales_order_id   = oso.ods_sales_order_id
+     LEFT OUTER JOIN ${ODS}.ods_business_loc obl ON ocs.ods_arrived_business_loc_id = obl.ods_business_loc_id
+     LEFT OUTER JOIN ${ODS}.ods_site         s   ON obl.ods_site_id                 = s.ods_site_id
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Update modifyable fields for tag_shipped_fact records with ERP information">
+  <SQLForOracle><![CDATA[
+UPDATE tag_shipped_fact tsf
+SET (sales_order_number, ship_skey, sales_order_skey, sales_order_item_skey, partner_skey)
+  = (SELECT oso.order_number, osi.ods_shipment_id, osoi.ods_sales_order_id, osi.ods_sales_order_item_id, oso.partner_id
+     FROM ${ODS}.ods_shipment_item  osi 
+         JOIN ${ODS}.ods_shipment       os     ON osi.ods_shipment_id       = os.ods_shipment_id
+         LEFT OUTER JOIN ${ODS}.ods_sales_order_item osoi ON osi.ods_sales_order_item_id = osoi.ods_sales_order_item_id
+         LEFT OUTER JOIN ${ODS}.ods_sales_order    oso    ON osoi.ods_sales_order_id   = oso.ods_sales_order_id
+     WHERE osi.ods_shipment_item_id = tsf.shipment_item_skey)
+WHERE shipment_item_skey IN 
+  (SELECT osi.ods_shipment_item_id
+   FROM ${ODS}.ods_shipment_item  osi 
+     JOIN ${ODS}.ods_shipment       os     ON osi.ods_shipment_id       = os.ods_shipment_id
+     LEFT OUTER JOIN ${ODS}.ods_sales_order_item osoi ON osi.ods_sales_order_item_id = osoi.ods_sales_order_item_id
+     LEFT OUTER JOIN ${ODS}.ods_sales_order    oso    ON osoi.ods_sales_order_id   = oso.ods_sales_order_id
+    WHERE osi.update_date > ${last_processed_date}
+     OR os.update_date > ${last_processed_date}
+     OR osoi.update_date > ${last_processed_date}
+     OR oso.update_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE tag_shipped_fact
+SET sales_order_number = oso.order_number, 
+  ship_skey = osi.ods_shipment_id, 
+  sales_order_skey = osoi.ods_sales_order_id, 
+  sales_order_item_skey = osi.ods_sales_order_item_id, 
+  partner_skey = oso.partner_id
+FROM tag_shipped_fact tsf
+  JOIN ${ODS}.ods_shipment_item  osi ON osi.ods_shipment_item_id = tsf.shipment_item_skey
+  JOIN ${ODS}.ods_shipment       os     ON osi.ods_shipment_id       = os.ods_shipment_id
+  LEFT OUTER JOIN ${ODS}.ods_sales_order_item osoi ON osi.ods_sales_order_item_id = osoi.ods_sales_order_item_id
+  LEFT OUTER JOIN ${ODS}.ods_sales_order    oso    ON osoi.ods_sales_order_id   = oso.ods_sales_order_id
+WHERE osi.update_date > ${last_processed_date}
+  OR os.update_date > ${last_processed_date}
+  OR osoi.update_date > ${last_processed_date}
+  OR oso.update_date > ${last_processed_date}
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE tag_shipped_fact tsf
+SET (sales_order_number, ship_skey, sales_order_skey, sales_order_item_skey, partner_skey)
+  = (SELECT oso.order_number, osi.ods_shipment_id, osoi.ods_sales_order_id, osi.ods_sales_order_item_id, oso.partner_id
+     FROM ${ODS}.ods_shipment_item  osi 
+         JOIN ${ODS}.ods_shipment       os     ON osi.ods_shipment_id       = os.ods_shipment_id
+         LEFT OUTER JOIN ${ODS}.ods_sales_order_item osoi ON osi.ods_sales_order_item_id = osoi.ods_sales_order_item_id
+         LEFT OUTER JOIN ${ODS}.ods_sales_order    oso    ON osoi.ods_sales_order_id   = oso.ods_sales_order_id
+     WHERE osi.ods_shipment_item_id = tsf.shipment_item_skey)
+WHERE shipment_item_skey IN 
+  (SELECT osi.ods_shipment_item_id
+   FROM ${ODS}.ods_shipment_item  osi 
+     JOIN ${ODS}.ods_shipment       os     ON osi.ods_shipment_id       = os.ods_shipment_id
+     LEFT OUTER JOIN ${ODS}.ods_sales_order_item osoi ON osi.ods_sales_order_item_id = osoi.ods_sales_order_item_id
+     LEFT OUTER JOIN ${ODS}.ods_sales_order    oso    ON osoi.ods_sales_order_id   = oso.ods_sales_order_id
+    WHERE osi.update_date > ${last_processed_date}
+     OR os.update_date > ${last_processed_date}
+     OR osoi.update_date > ${last_processed_date}
+     OR oso.update_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Update the to_read_point_skey - if arrived time is not null"><![CDATA[
+UPDATE tag_shipped_fact 
+   SET to_read_point_skey = (
+       SELECT MIN(read_point_skey)
+         FROM inf_tag_association ita
+        WHERE (    ita.tag_skey = tag_shipped_fact.tag_skey
+                OR ita.tag_skey = tag_shipped_fact.in_pallet_skey)
+          AND ita.start_time = tag_shipped_fact.received_time
+        )
+ WHERE received_time IS NOT NULL
+   AND to_read_point_skey IS NULL 
+   AND tag_skey IN (SELECT tag_skey FROM tag_with_assn_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Update the from_business_loc_skey using the last_defined_business_loc_skey of a corresponding association on that tag"><![CDATA[
+UPDATE tag_shipped_fact 
+   SET from_business_loc_skey = (
+       SELECT MIN(last_defined_business_loc_skey)
+         FROM inf_tag_association ita
+        WHERE (    ita.tag_skey = tag_shipped_fact.tag_skey
+                OR ita.tag_skey = tag_shipped_fact.in_pallet_skey)
+          AND ita.start_time = tag_shipped_fact.sent_time
+        )
+ WHERE tag_skey IN (SELECT tag_skey FROM tag_with_assn_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Populate tag shipped fact with shipments that do not have ERP information"><![CDATA[
+INSERT INTO tag_shipped_fact
+  (tag_skey, sent_time, received_time,
+   shipment_number, sales_order_number,
+   in_pallet_skey, prod_skey, start_date_skey, date_skey, 
+   from_site_skey, to_site_skey, from_business_loc_skey, to_business_loc_skey, 
+   from_read_point_skey, to_read_point_skey, 
+   duration_ss, start_row_source_id, end_row_source_id,
+   partner_skey)
+  SELECT ital_n.tag_skey, ital_p.start_time, ital_n.start_time,
+    CASE WHEN (${first_non_null()}(site_p.site_owner_name, '@@') <> ${first_non_null()}(site_n.site_owner_name, '@@')) THEN os.state_data_0 ELSE NULL END,
+    CASE WHEN (${first_non_null()}(site_p.site_owner_name, '@@') <> ${first_non_null()}(site_n.site_owner_name, '@@')) THEN os.state_data_1 ELSE NULL END,
+    ${first_non_null()}(ital_n.parent_tag_skey, ital_p.parent_tag_skey), ot.ods_product_id,
+    ${get_date_skey()}(ital_p.start_time), ${get_date_skey()}(ital_n.start_time),
+    ital_p.from_site_skey, ital_n.from_site_skey,
+    ital_p.last_defined_business_loc_skey, ital_n.business_loc_skey,
+    ital_p.read_point_skey, ital_n.read_point_skey,
+    ${get_duration_in_ss()}(ital_p.start_time, ital_n.start_time),
+    ital_p.start_row_source_id, ital_p.end_row_source_id,
+    op.ods_partner_id
+  FROM inf_tag_at_location ital_p 
+    JOIN inf_tag_at_location ital_n ON ital_n.tag_skey = ital_p.tag_skey AND ital_n.prev_tag_association_id = ital_p.tag_association_id 
+    JOIN ${ODS}.ods_tag ot ON ot.ods_tag_id = ital_n.tag_skey
+    LEFT OUTER JOIN ${ODS}.v_object_state os ON ot.ods_tag_id = os.object_id AND os.type = 'GENERIC_OBJECT_STATE' 
+    JOIN site_dim site_p ON site_p.site_skey = ital_p.from_site_skey
+    JOIN site_dim site_n ON site_n.site_skey = ital_n.from_site_skey
+    JOIN ${ODS}.ods_site op ON op.ods_site_id = ital_n.from_site_skey
+  WHERE ital_p.from_site_skey <> ital_n.from_site_skey
+    AND (ital_n.end_time IS NULL OR ital_n.start_time <> ital_n.end_time)
+    AND NOT EXISTS (SELECT 1 FROM tag_shipped_fact WHERE tag_skey = ital_n.tag_skey AND 
+          ABS(${get_duration_in_ss()}(sent_time, ital_p.start_time)) <= ${max_shipment_time_error_between_wms_and_rfid_ss})
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Update tag_shipped_fact for promotion product info">
+  <SQLForOracle><![CDATA[
+UPDATE tag_shipped_fact
+SET promotion_product_skey
+  = (SELECT promotion_product_skey
+     FROM promotion_product_update  ppu 
+     WHERE tag_shipped_fact.tag_skey = ppu.tag_skey AND
+           tag_shipped_fact.prod_skey = ppu.prod_skey)
+WHERE (tag_skey,  prod_skey) IN
+  (SELECT tag_skey,  prod_skey
+   FROM promotion_product_update)
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE tag_shipped_fact
+SET promotion_product_skey = ppu.promotion_product_skey
+FROM promotion_product_update  ppu 
+     WHERE tag_shipped_fact.tag_skey = ppu.tag_skey AND
+           tag_shipped_fact.prod_skey = ppu.prod_skey
+  ]]></SQLForSQLServer>
+
+   <SQLForDB2><![CDATA[
+UPDATE tag_shipped_fact
+SET promotion_product_skey
+  = (SELECT promotion_product_skey
+     FROM promotion_product_update  ppu 
+     WHERE tag_shipped_fact.tag_skey = ppu.tag_skey AND
+           tag_shipped_fact.prod_skey = ppu.prod_skey)
+WHERE (tag_skey,  prod_skey) IN
+  (SELECT tag_skey,  prod_skey
+   FROM promotion_product_update)
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Update tag_loc_fact records that overlap with tag_shipped_records this happens when a tag is not removed from the previous business location before arriving at the next one">
+  <SQLForOracle><![CDATA[
+UPDATE tag_loc_fact 
+SET end_row_source_id = 3, end_time = start_time, end_date_skey = start_date_skey, duration_ss = 0
+WHERE (tag_skey, start_time, end_time) IN 
+  (SELECT tlf.tag_skey, tlf.start_time, tlf.end_time
+   FROM tag_loc_fact tlf
+     JOIN tag_with_tag_loc_changes twtlc ON twtlc.tag_skey = tlf.tag_skey
+     JOIN tag_shipped_fact tsf ON tsf.tag_skey = tlf.tag_skey AND tsf.sent_time = tlf.start_time AND tsf.received_time = tlf.end_time
+   WHERE tlf.start_time < tlf.end_time)
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE tag_loc_fact
+SET end_row_source_id = 3, end_time = tlf.start_time, end_date_skey = tlf.start_date_skey, duration_ss = 0
+FROM tag_loc_fact tlf
+  JOIN tag_with_tag_loc_changes twtlc ON twtlc.tag_skey = tlf.tag_skey
+  JOIN tag_shipped_fact tsf ON tsf.tag_skey = tlf.tag_skey AND tsf.sent_time = tlf.start_time AND tsf.received_time = tlf.end_time
+WHERE tlf.start_time < tlf.end_time
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE tag_loc_fact 
+SET end_row_source_id = 3, end_time = start_time, end_date_skey = start_date_skey, duration_ss = 0
+WHERE (tag_skey, start_time, end_time) IN 
+  (SELECT tlf.tag_skey, tlf.start_time, tlf.end_time
+   FROM tag_loc_fact tlf
+     JOIN tag_with_tag_loc_changes twtlc ON twtlc.tag_skey = tlf.tag_skey
+     JOIN tag_shipped_fact tsf ON tsf.tag_skey = tlf.tag_skey AND tsf.sent_time = tlf.start_time AND tsf.received_time = tlf.end_time
+   WHERE tlf.start_time < tlf.end_time)
+    ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Remove shipment_qty_fact records that are going to be repopulated"><![CDATA[
+DELETE FROM shipment_qty_fact WHERE shipment_item_skey IN 
+  (SELECT shipment_item_skey FROM tag_with_tag_loc_changes twtlc JOIN tag_shipped_fact tsf ON tsf.tag_skey = twtlc.tag_skey)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Processing shipment_qty_fact"><![CDATA[
+  INSERT INTO shipment_qty_fact 
+    (shipment_item_skey, row_source_id, ship_skey, sales_order_skey,     sales_order_item_skey,
+     prod_skey,     partner_skey, from_site_skey, to_site_skey, start_date_skey,
+     expected_delivery_date_skey,    UOM, WMS_shipped_ct,
+     RFID_shipped_ct,     arrived_to_target_ct,     arrived_elsewhere_ct,     last_shipped_time,
+     first_received_time,     duration_ss)
+   SELECT tsf.shipment_item_skey, 1, tsf.ship_skey, tsf.sales_order_skey,      tsf.sales_order_item_skey,
+          tsf.prod_skey, tsf.partner_skey,
+          tsf.from_site_skey, to_sd.site_skey, ${get_date_skey()}(sd.shipment_time),
+          ${get_date_skey()}(osoi.expected_delivery_time),
+          td.uom, osi.quantity,    COUNT(*),
+          SUM(CASE WHEN tsf.arrived_to_target_ind = 'T' THEN 1 ELSE 0 END),
+    SUM(CASE WHEN tsf.arrived_to_target_ind = 'F' THEN 1 ELSE 0 END),
+    MAX(tsf.sent_time),     MIN(tsf.received_time),
+    CASE WHEN MIN(tsf.received_time) IS NULL THEN NULL
+               ELSE ${get_duration_in_ss()}(MAX(tsf.sent_time), MIN(tsf.received_time))
+       END  as duration_ss 
+     FROM tag_with_tag_loc_changes twtlc
+     JOIN tag_shipped_fact tsf ON tsf.tag_skey = twtlc.tag_skey
+     JOIN tag_dim td ON tsf.tag_skey = td.tag_skey
+     JOIN shipment_dim sd ON sd.ship_skey = tsf.ship_skey
+     JOIN ${ODS}.ods_shipment_item osi on tsf.shipment_item_skey = osi.ods_shipment_item_id
+     JOIN ${ODS}.ods_sales_order_item osoi ON osi.ods_sales_order_item_id = osoi.ods_sales_order_item_id
+     JOIN ${ODS}.ods_sales_order oso ON osoi.ods_sales_order_id = oso.ods_sales_order_id
+     LEFT JOIN site_dim to_sd ON oso.ship_to_id = to_sd.internal_identifier
+    GROUP BY tsf.shipment_item_skey, tsf.ship_skey, tsf.sales_order_skey, tsf.sales_order_item_skey, tsf.prod_skey, tsf.partner_skey,
+            tsf.from_site_skey, to_sd.site_skey, sd.shipment_time,    osoi.expected_delivery_time, 
+          td.uom,osi.quantity
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Set the disabled flag on sites, not incremental. Phase I"><![CDATA[
+UPDATE site_dim SET disabled = 'T'
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Set the disabled flag on sites, not incremental. Phase II"><![CDATA[
+UPDATE site_dim SET disabled = 'F' WHERE site_skey IN (SELECT DISTINCT from_site_skey FROM inf_tag_association)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Set the disabled flag on business locations, not incremental"><![CDATA[
+UPDATE business_loc_dim
+SET disabled = (SELECT disabled FROM site_dim WHERE site_skey = business_loc_dim.site_skey)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Set the disabled flag on business locations, not incremental"><![CDATA[
+UPDATE read_point_dim
+SET disabled = (SELECT disabled FROM site_dim WHERE site_skey = read_point_dim.site_skey)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Populate pos_unit_dim from ${ODS}.ods_promo_prod_item only for UPCs that don't exist already"><![CDATA[
+INSERT INTO pos_unit_dim(upc, item_desc, deleted, insert_date, update_date)
+SELECT temp.upc, max(temp.item_desc),
+'F', min(temp.insert_date), min(temp.update_date) from
+( select /*+NO_MERGE*/ oppi.upc, oppi.item_desc, oppi.insert_date, oppi.update_date 
+from 
+${ODS}.ods_promo_prod_item oppi
+        JOIN ${ODS}.ods_promo_prod opp ON oppi.ods_promo_prod_id = opp.ods_promo_prod_id
+        JOIN ${ODS}.ods_promo_event ope ON opp.ods_promo_event_id = ope.ods_promo_event_id
+        where ( oppi.insert_date >  ${last_processed_date}
+OR oppi.update_date > ${last_processed_date} )) temp
+WHERE temp.upc NOT IN (SELECT DISTINCT upc FROM pos_unit_dim) 
+GROUP BY temp.upc
+
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Populate pos_unit_dim from ${ODS}.ods_generic_prod_item only for UPCs that don't exist already"><![CDATA[
+INSERT INTO pos_unit_dim(upc, item_desc, deleted, insert_date, update_date)
+SELECT  temp.upc, max(temp.item_desc), 'F', min(temp.insert_date), min(temp.update_date) 
+from (SELECT /*+NO_MERGE*/ ogpi.upc, ogpi.item_desc, ogpi.insert_date, ogpi.update_date
+      from ${ODS}.ods_generic_prod_item ogpi        
+            JOIN ${ODS}.ods_product op ON ogpi.ods_product_id = op.ods_product_id   
+      where ogpi.insert_date >  ${last_processed_date} OR ogpi.update_date > ${last_processed_date} ) temp
+WHERE temp.upc NOT IN (SELECT DISTINCT upc FROM pos_unit_dim) 
+GROUP BY temp.upc 
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Delete promotion_product_item_fact for newly added records if they are already inserted">
+  <SQLForOracle><![CDATA[
+DELETE FROM promotion_product_item_fact 
+WHERE (promotion_product_skey, pos_unit_skey) IN
+    (SELECT pp.promotion_product_skey, pu.pos_unit_skey
+     FROM promotion_product_dim pp 
+     JOIN promotion_dim pd ON pp.promotion_skey = pd.promotion_skey
+     JOIN  ${ODS}.ods_promo_prod opp ON pp.prod_skey = opp.ods_product_id AND pp.promotion_skey = opp.ods_promo_event_id
+     JOIN ${ODS}.ods_promo_prod_item oppi ON opp.ods_promo_prod_id = oppi.ods_promo_prod_id
+     JOIN pos_unit_dim pu ON oppi.upc = pu.upc 
+     WHERE pp.insert_date > ${last_processed_date} 
+        OR pd.insert_date > ${last_processed_date} 
+        OR pu.insert_date > ${last_processed_date}
+        OR oppi.insert_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+DELETE promotion_product_item_fact
+FROM promotion_product_item_fact ppif JOIN
+    (SELECT pp.promotion_product_skey, pu.pos_unit_skey
+     FROM promotion_product_dim pp 
+     JOIN promotion_dim pd ON pp.promotion_skey = pd.promotion_skey
+     JOIN  ${ODS}.ods_promo_prod opp ON pp.prod_skey = opp.ods_product_id AND pp.promotion_skey = opp.ods_promo_event_id
+     JOIN ${ODS}.ods_promo_prod_item oppi ON opp.ods_promo_prod_id = oppi.ods_promo_prod_id
+     JOIN pos_unit_dim pu ON oppi.upc = pu.upc 
+     WHERE pp.insert_date > ${last_processed_date} 
+        OR pd.insert_date > ${last_processed_date} 
+        OR pu.insert_date > ${last_processed_date}
+        OR oppi.insert_date > ${last_processed_date}) t ON ppif.promotion_product_skey = t.promotion_product_skey AND ppif.pos_unit_skey = t.pos_unit_skey
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+DELETE FROM promotion_product_item_fact 
+WHERE (promotion_product_skey, pos_unit_skey) IN
+    (SELECT pp.promotion_product_skey, pu.pos_unit_skey
+     FROM promotion_product_dim pp 
+     JOIN promotion_dim pd ON pp.promotion_skey = pd.promotion_skey
+     JOIN  ${ODS}.ods_promo_prod opp ON pp.prod_skey = opp.ods_product_id AND pp.promotion_skey = opp.ods_promo_event_id
+     JOIN ${ODS}.ods_promo_prod_item oppi ON opp.ods_promo_prod_id = oppi.ods_promo_prod_id
+     JOIN pos_unit_dim pu ON oppi.upc = pu.upc 
+     WHERE pp.insert_date > ${last_processed_date} 
+        OR pd.insert_date > ${last_processed_date} 
+        OR pu.insert_date > ${last_processed_date}
+        OR oppi.insert_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Populate promotion_product_item_fact for newly added records"><![CDATA[
+INSERT INTO promotion_product_item_fact (promotion_product_skey, pos_unit_skey, pos_unit_quantity, unit_price, unit_cost)
+    SELECT pp.promotion_product_skey, pu.pos_unit_skey, oppi.upc_quantity, oppi.unit_price, oppi.unit_cost
+     FROM promotion_product_dim pp 
+     JOIN promotion_dim pd ON pp.promotion_skey = pd.promotion_skey
+     JOIN  ${ODS}.ods_promo_prod opp ON pp.prod_skey = opp.ods_product_id AND pp.promotion_skey = opp.ods_promo_event_id
+     JOIN ${ODS}.ods_promo_prod_item oppi ON opp.ods_promo_prod_id = oppi.ods_promo_prod_id
+     JOIN pos_unit_dim pu ON oppi.upc = pu.upc 
+     WHERE pp.insert_date > ${last_processed_date} 
+        OR pd.insert_date > ${last_processed_date} 
+        OR pu.insert_date > ${last_processed_date}
+        OR oppi.insert_date > ${last_processed_date}
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Delete product_upc_item_fact for newly added records if they are already inserted">
+  <!-- TODO - TO BE PORTED TO ORACLE, DB2 -->
+  <SQLForOracle><![CDATA[
+DELETE FROM product_upc_item_fact
+WHERE (partner_skey, prod_skey, pos_unit_skey) IN
+    (SELECT ogpi.ods_partner_id, pd.prod_skey, pu.pos_unit_skey
+     FROM product_dim pd
+     JOIN  ${ODS}.ods_product op ON pd.prod_skey = op.ods_product_id
+     JOIN ${ODS}.ods_generic_prod_item ogpi ON ogpi.ods_product_id = op.ods_product_id
+     JOIN pos_unit_dim pu ON ogpi.upc = pu.upc
+     WHERE pd.insert_date > ${last_processed_date}
+        OR op.insert_date > ${last_processed_date}
+        OR ogpi.insert_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+DELETE product_upc_item_fact
+FROM product_upc_item_fact puif JOIN
+    (SELECT ogpi.ods_partner_id, pd.prod_skey, pu.pos_unit_skey
+     FROM product_dim pd
+     JOIN  ${ODS}.ods_product op ON pd.prod_skey = op.ods_product_id
+     JOIN ${ODS}.ods_generic_prod_item ogpi ON ogpi.ods_product_id = op.ods_product_id
+     JOIN pos_unit_dim pu ON ogpi.upc = pu.upc
+     WHERE pd.insert_date > ${last_processed_date}
+        OR op.insert_date > ${last_processed_date}
+        OR ogpi.insert_date > ${last_processed_date}) t ON puif.partner_skey = t.ods_partner_id AND puif.prod_skey=t.prod_skey AND puif.pos_unit_skey=t.pos_unit_skey
+  ]]></SQLForSQLServer>
+  
+  <SQLForDB2><![CDATA[
+DELETE FROM product_upc_item_fact puif 
+WHERE (partner_skey, prod_skey, pos_unit_skey) IN 
+    (SELECT ogpi.ods_partner_id, pd.prod_skey, pu.pos_unit_skey
+     FROM product_dim pd
+     JOIN  ${ODS}.ods_product op ON pd.prod_skey = op.ods_product_id
+     JOIN ${ODS}.ods_generic_prod_item ogpi ON ogpi.ods_product_id = op.ods_product_id
+     JOIN pos_unit_dim pu ON ogpi.upc = pu.upc 
+		WHERE pd.insert_date > ${last_processed_date}
+        OR op.insert_date > ${last_processed_date}
+        OR ogpi.insert_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Populate product_upc_item_fact for newly added records"><![CDATA[
+INSERT INTO product_upc_item_fact (partner_skey, prod_skey, pos_unit_skey, pos_unit_quantity, unit_price, unit_cost, history_period_weeks, live_monitor_period_start_date)
+    SELECT ogpi.ods_partner_id,op.ods_product_id, pu.pos_unit_skey, ogpi.upc_quantity, ogpi.unit_price, ogpi.unit_cost, ogpi.history_period_weeks, ogpi.live_monitor_period_start_date
+     FROM product_dim pd
+     JOIN ${ODS}.ods_product op ON pd.prod_skey = op.ods_product_id
+     JOIN ${ODS}.ods_generic_prod_item ogpi ON ogpi.ods_product_id = op.ods_product_id
+     JOIN pos_unit_dim pu ON ogpi.upc = pu.upc 
+     WHERE pd.insert_date > ${last_processed_date}
+        OR op.insert_date > ${last_processed_date}
+        OR ogpi.insert_date > ${last_processed_date}
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Update promotion_product_item_fact for modified records">
+  <SQLForOracle><![CDATA[
+UPDATE promotion_product_item_fact 
+SET (pos_unit_quantity, unit_price, unit_cost)
+  = (SELECT oppi.upc_quantity, oppi.unit_price, oppi.unit_cost
+     FROM ${ODS}.ods_promo_prod opp 
+     JOIN ${ODS}.ods_promo_prod_item oppi ON opp.ods_promo_prod_id = oppi.ods_promo_prod_id
+     JOIN ${ODS}.ods_promo_event ope ON opp.ods_promo_event_id = ope.ods_promo_event_id
+     JOIN pos_unit_dim pu ON oppi.upc = pu.upc 
+     WHERE promotion_product_item_fact.promotion_product_skey = opp.ods_promo_prod_id AND
+           promotion_product_item_fact.pos_unit_skey = pu.pos_unit_skey)
+WHERE (promotion_product_item_fact.promotion_product_skey, promotion_product_item_fact.pos_unit_skey) IN
+      (SELECT pp.promotion_product_skey, pu1.pos_unit_skey
+       FROM promotion_product_dim pp 
+       JOIN promotion_dim pd ON pp.promotion_skey = pd.promotion_skey
+       JOIN  ${ODS}.ods_promo_prod opp1 ON pp.prod_skey = opp1.ods_product_id AND pp.promotion_skey = opp1.ods_promo_event_id
+       JOIN ${ODS}.ods_promo_prod_item oppi1 ON opp1.ods_promo_prod_id = oppi1.ods_promo_prod_id
+       JOIN pos_unit_dim pu1 ON oppi1.upc = pu1.upc 
+       WHERE pp.update_date > ${last_processed_date} 
+          OR pd.update_date > ${last_processed_date} 
+          OR pu1.update_date > ${last_processed_date}
+          OR oppi1.update_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE promotion_product_item_fact 
+SET pos_unit_quantity = oppi.upc_quantity, unit_price = oppi.unit_price, unit_cost = oppi.unit_cost 
+FROM promotion_product_dim pp 
+     JOIN promotion_dim pd ON pp.promotion_skey = pd.promotion_skey
+     JOIN  ${ODS}.ods_promo_prod opp ON pp.prod_skey = opp.ods_product_id AND pp.promotion_skey = opp.ods_promo_event_id
+     JOIN ${ODS}.ods_promo_prod_item oppi ON opp.ods_promo_prod_id = oppi.ods_promo_prod_id
+     JOIN pos_unit_dim pu ON oppi.upc = pu.upc 
+WHERE promotion_product_item_fact.promotion_product_skey = pp.promotion_product_skey AND
+      promotion_product_item_fact.pos_unit_skey = pu.pos_unit_skey AND
+      (pp.update_date > ${last_processed_date} 
+       OR pd.update_date > ${last_processed_date} 
+       OR pu.update_date > ${last_processed_date}
+       OR oppi.update_date > ${last_processed_date})
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE promotion_product_item_fact 
+SET (pos_unit_quantity, unit_price, unit_cost)
+  = (SELECT oppi.upc_quantity, oppi.unit_price, oppi.unit_cost
+     FROM ${ODS}.ods_promo_prod opp 
+     JOIN ${ODS}.ods_promo_prod_item oppi ON opp.ods_promo_prod_id = oppi.ods_promo_prod_id
+     JOIN ${ODS}.ods_promo_event ope ON opp.ods_promo_event_id = ope.ods_promo_event_id
+     JOIN pos_unit_dim pu ON oppi.upc = pu.upc 
+     WHERE promotion_product_item_fact.promotion_product_skey = opp.ods_promo_prod_id AND
+           promotion_product_item_fact.pos_unit_skey = pu.pos_unit_skey)
+WHERE (promotion_product_item_fact.promotion_product_skey, promotion_product_item_fact.pos_unit_skey) IN
+      (SELECT pp.promotion_product_skey, pu1.pos_unit_skey
+       FROM promotion_product_dim pp 
+       JOIN promotion_dim pd ON pp.promotion_skey = pd.promotion_skey
+       JOIN  ${ODS}.ods_promo_prod opp1 ON pp.prod_skey = opp1.ods_product_id AND pp.promotion_skey = opp1.ods_promo_event_id
+       JOIN ${ODS}.ods_promo_prod_item oppi1 ON opp1.ods_promo_prod_id = oppi1.ods_promo_prod_id
+       JOIN pos_unit_dim pu1 ON oppi1.upc = pu1.upc 
+       WHERE pp.update_date > ${last_processed_date} 
+          OR pd.update_date > ${last_processed_date} 
+          OR pu1.update_date > ${last_processed_date}
+          OR oppi1.update_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Update product_upc_item_fact for modified records">
+  <!-- TODO - TO BE PORTED TO ORACLE, DB2 -->
+    <SQLForOracle><![CDATA[
+UPDATE product_upc_item_fact
+SET (pos_unit_quantity, unit_price, unit_cost, history_period_weeks, live_monitor_period_start_date)
+  = (SELECT ogpi.upc_quantity, ogpi.unit_price, ogpi.unit_cost, ogpi.history_period_weeks, ogpi.live_monitor_period_start_date
+     FROM ${ODS}.ods_product op
+     JOIN ${ODS}.ods_generic_prod_item ogpi ON ogpi.ods_product_id = op.ods_product_id
+     JOIN pos_unit_dim pu ON ogpi.upc = pu.upc 
+     WHERE product_upc_item_fact.prod_skey = op.ods_product_id AND
+           product_upc_item_fact.pos_unit_skey = pu.pos_unit_skey)
+WHERE (product_upc_item_fact.prod_skey, product_upc_item_fact.pos_unit_skey) IN
+      (SELECT pd.prod_skey, pu1.pos_unit_skey
+       FROM product_dim pd
+       JOIN  ${ODS}.ods_product op1 ON pd.prod_skey = op1.ods_product_id
+       JOIN ${ODS}.ods_generic_prod_item ogpi1 ON op1.ods_product_id = ogpi1.ods_product_id
+       JOIN pos_unit_dim pu1 ON ogpi1.upc = pu1.upc 
+       WHERE pd.update_date > ${last_processed_date}
+          OR pu1.update_date > ${last_processed_date}
+          OR ogpi1.update_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE product_upc_item_fact
+SET pos_unit_quantity = ogpi.upc_quantity, unit_price = ogpi.unit_price, unit_cost = ogpi.unit_cost, history_period_weeks = ogpi.history_period_weeks, live_monitor_period_start_date = ogpi.live_monitor_period_start_date
+FROM product_dim pd
+     JOIN  ${ODS}.ods_product op ON pd.prod_skey = op.ods_product_id
+     JOIN ${ODS}.ods_generic_prod_item ogpi ON op.ods_product_id = ogpi.ods_product_id
+     JOIN pos_unit_dim pu ON ogpi.upc = pu.upc 
+WHERE product_upc_item_fact.prod_skey = pd.prod_skey AND
+      product_upc_item_fact.pos_unit_skey = pu.pos_unit_skey AND
+      (pd.update_date > ${last_processed_date}
+       OR pu.update_date > ${last_processed_date}
+       OR ogpi.update_date > ${last_processed_date})
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE product_upc_item_fact
+SET (pos_unit_quantity, unit_price, unit_cost, history_period_weeks, live_monitor_period_start_date)
+  = (SELECT ogpi.upc_quantity, ogpi.unit_price, ogpi.unit_cost, ogpi.history_period_weeks, ogpi.live_monitor_period_start_date
+     FROM ${ODS}.ods_product op
+     JOIN ${ODS}.ods_generic_prod_item ogpi ON ogpi.ods_product_id = op.ods_product_id
+     JOIN pos_unit_dim pu ON ogpi.upc = pu.upc 
+     WHERE product_upc_item_fact.prod_skey = op.ods_product_id AND
+           product_upc_item_fact.pos_unit_skey = pu.pos_unit_skey)
+WHERE (product_upc_item_fact.prod_skey, product_upc_item_fact.pos_unit_skey) IN
+      (SELECT pd.prod_skey, pu1.pos_unit_skey
+       FROM product_dim pd
+       JOIN  ${ODS}.ods_product op1 ON pd.prod_skey = op1.ods_product_id
+       JOIN ${ODS}.ods_generic_prod_item ogpi1 ON op1.ods_product_id = ogpi1.ods_product_id
+       JOIN pos_unit_dim pu1 ON ogpi1.upc = pu1.upc 
+       WHERE pd.update_date > ${last_processed_date}
+          OR pu1.update_date > ${last_processed_date}
+          OR ogpi1.update_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+
+
+<SQLExecTask desc = "remove records in forecast_fact for newly added entry"><![CDATA[
+DELETE FROM forecast_fact 
+WHERE promotion_product_skey in (SELECT ods_promo_prod_id
+                                 FROM ${ODS}.ods_promo_forecast 
+                                 WHERE insert_date > ${last_processed_date}) AND
+      site_skey in (SELECT ods_site_id
+                    FROM ${ODS}.ods_promo_forecast 
+                    WHERE insert_date > ${last_processed_date}) 
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Populate forecast_fact for newly added records"><![CDATA[
+INSERT INTO forecast_fact (promotion_product_skey, site_skey, quantity)
+    SELECT ods_promo_prod_id, ods_site_id, quantity
+     FROM ${ODS}.ods_promo_forecast 
+     WHERE insert_date > ${last_processed_date} 
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Update forecast_fact for modified records">
+  <SQLForOracle><![CDATA[
+UPDATE forecast_fact 
+SET quantity = (SELECT opf.quantity
+                FROM ${ODS}.ods_promo_forecast opf
+                WHERE opf.ods_promo_prod_id = forecast_fact.promotion_product_skey AND
+                      opf.ods_site_id = forecast_fact.site_skey)
+WHERE (forecast_fact.promotion_product_skey, forecast_fact.site_skey) IN
+      (SELECT opf1.ods_promo_prod_id, opf1.ods_site_id 
+       FROM ${ODS}.ods_promo_forecast opf1
+       WHERE opf1.update_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE forecast_fact 
+SET quantity = opf.quantity
+FROM ${ODS}.ods_promo_forecast opf
+WHERE opf.ods_promo_prod_id = forecast_fact.promotion_product_skey AND
+      opf.ods_site_id = forecast_fact.site_skey AND
+      opf.update_date > ${last_processed_date}
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE forecast_fact 
+SET quantity = (SELECT opf.quantity
+                FROM ${ODS}.ods_promo_forecast opf
+                WHERE opf.ods_promo_prod_id = forecast_fact.promotion_product_skey AND
+                      opf.ods_site_id = forecast_fact.site_skey)
+WHERE (forecast_fact.promotion_product_skey, forecast_fact.site_skey) IN
+      (SELECT opf1.ods_promo_prod_id, opf1.ods_site_id 
+       FROM ${ODS}.ods_promo_forecast opf1
+       WHERE opf1.update_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Populate forecast_fact for 0 quantity records"><![CDATA[
+INSERT INTO forecast_fact (promotion_product_skey, site_skey, quantity)
+    SELECT base.promotion_product_skey, base.site_skey, 0
+    FROM (SELECT distinct v1.promotion_product_skey, v2.site_skey
+           FROM v_promo_forcast_fact v1 join v_promo_forcast_fact v2 on v1.promotion_skey = v2.promotion_skey)  base 
+                      LEFT OUTER JOIN forecast_fact ff on (base.promotion_product_skey = ff.promotion_product_skey AND
+                                                           base.site_skey = ff.site_skey)
+    WHERE ff.quantity is null 
+]]></SQLExecTask>
+
+<!-- COMMENTED FOR KETTLE ETL
+
+<SQLExecTaskForDatabase desc = "delete pos_fact for newly added records if it is already inserted">
+  <SQLForOracle><![CDATA[
+DELETE FROM pos_fact 
+WHERE (pos_unit_skey, site_skey, date_skey) IN 
+    (SELECT pud.pos_unit_skey, pos.ods_site_id, ${get_date_skey()}(pos.sale_date)
+     FROM ${ODS}.ods_pos pos
+     JOIN  pos_unit_dim pud ON pud.upc = pos.upc
+     WHERE pud.insert_date > ${last_processed_date} 
+        OR pos.insert_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+DELETE pos_fact
+FROM pos_fact pf JOIN 
+    (SELECT pud.pos_unit_skey, pos.ods_site_id, ${get_date_skey()}(pos.sale_date) AS date_skey
+     FROM ${ODS}.ods_pos pos
+     JOIN  pos_unit_dim pud ON pud.upc = pos.upc
+     WHERE pud.insert_date > ${last_processed_date} 
+        OR pos.insert_date > ${last_processed_date}) t ON pf.pos_unit_skey = t.pos_unit_skey and pf.site_skey = t.ods_site_id and pf.date_skey = t.date_skey
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+DELETE FROM pos_fact 
+WHERE (pos_unit_skey, site_skey, date_skey) IN 
+    (SELECT pud.pos_unit_skey, pos.ods_site_id, ${get_date_skey()}(pos.sale_date)
+     FROM ${ODS}.ods_pos pos
+     JOIN  pos_unit_dim pud ON pud.upc = pos.upc
+     WHERE pud.insert_date > ${last_processed_date} 
+        OR pos.insert_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Populate pos_fact for newly added records"><![CDATA[
+INSERT INTO pos_fact (pos_unit_skey, site_skey, date_skey, quantity, amount, baseline_qty)
+    SELECT pud.pos_unit_skey, pos.ods_site_id, ${get_date_skey()}(pos.sale_date), pos.quantity, pos.amount, pos.baseline_qty
+     FROM ${ODS}.ods_pos pos
+     JOIN  pos_unit_dim pud ON pud.upc = pos.upc
+     WHERE pud.insert_date > ${last_processed_date} 
+        OR pos.insert_date > ${last_processed_date}
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Update pos_fact for modified records">
+  <SQLForOracle><![CDATA[
+UPDATE pos_fact 
+SET (quantity, amount, baseline_qty) = (SELECT pos.quantity, pos.amount, pos.baseline_qty
+                FROM ${ODS}.ods_pos pos
+                     JOIN  pos_unit_dim pud ON pud.upc = pos.upc
+                WHERE pud.pos_unit_skey = pos_fact.pos_unit_skey AND
+                      pos.ods_site_id = pos_fact.site_skey AND
+                      ${get_date_skey()}(pos.sale_date) = pos_fact.date_skey)
+WHERE (pos_fact.pos_unit_skey, pos_fact.site_skey, pos_fact.date_skey) IN
+      (SELECT pud1.pos_unit_skey , pos1.ods_site_id, ${get_date_skey()}(pos1.sale_date) 
+       FROM ${ODS}.ods_pos pos1
+            JOIN  pos_unit_dim pud1 ON pud1.upc = pos1.upc
+       WHERE pud1.update_date > ${last_processed_date}
+             OR pos1.update_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+UPDATE pos_fact 
+SET quantity = pos.quantity,
+amount = pos.amount,
+baseline_qty = pos.baseline_qty
+FROM ${ODS}.ods_pos pos
+     JOIN  pos_unit_dim pud ON pud.upc = pos.upc
+WHERE pud.pos_unit_skey = pos_fact.pos_unit_skey AND
+      pos.ods_site_id = pos_fact.site_skey AND
+      ${get_date_skey()}(pos.sale_date) = pos_fact.date_skey AND
+      (pud.update_date > ${last_processed_date}
+       OR pos.update_date > ${last_processed_date})
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+UPDATE pos_fact 
+SET quantity = (SELECT pos.quantity
+                FROM ${ODS}.ods_pos pos
+                     JOIN  pos_unit_dim pud ON pud.upc = pos.upc
+                WHERE pud.pos_unit_skey = pos_fact.pos_unit_skey AND
+                      pos.ods_site_id = pos_fact.site_skey AND
+                      ${get_date_skey()}(pos.sale_date) = pos_fact.date_skey)
+WHERE (pos_fact.pos_unit_skey, pos_fact.site_skey, pos_fact.date_skey) IN
+      (SELECT pud1.pos_unit_skey , pos1.ods_site_id, ${get_date_skey()}(pos1.sale_date) 
+       FROM ${ODS}.ods_pos pos1
+            JOIN  pos_unit_dim pud1 ON pud1.upc = pos1.upc
+       WHERE pud1.update_date > ${last_processed_date}
+             OR pos1.update_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+-->
+    
+<SQLExecTaskForDatabase desc = "delete ral_sslta_read_point for newly added records if it is already inserted">
+  <SQLForOracle><![CDATA[
+DELETE FROM ral_sslta_read_point 
+WHERE (sslta_skey, read_point_skey) IN 
+    (SELECT rsm.sslta_id, rsm.ods_read_point_id
+     FROM ${ODS}.ods_rp_sslta_map rsm
+     WHERE rsm.insert_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+DELETE ral_sslta_read_point
+FROM ral_sslta_read_point rsrp JOIN 
+    (SELECT rsm.sslta_id, rsm.ods_read_point_id
+     FROM ${ODS}.ods_rp_sslta_map rsm
+     WHERE rsm.insert_date > ${last_processed_date}) t ON rsrp.sslta_skey = t.sslta_id AND rsrp.read_point_skey =  t.ods_read_point_id
+  ]]></SQLForSQLServer>
+
+   <SQLForDB2><![CDATA[
+DELETE FROM ral_sslta_read_point 
+WHERE (sslta_skey, read_point_skey) IN 
+    (SELECT rsm.sslta_id, rsm.ods_read_point_id
+     FROM ${ODS}.ods_rp_sslta_map rsm
+     WHERE rsm.insert_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Populate ral_sslta_read_point for newly added records"><![CDATA[
+INSERT INTO ral_sslta_read_point (sslta_skey, read_point_skey)
+    SELECT rsm.sslta_id, rsm.ods_read_point_id
+     FROM ${ODS}.ods_rp_sslta_map rsm
+     WHERE rsm.insert_date > ${last_processed_date} 
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Update ral_sslta_read_point for modified records"><![CDATA[
+ UPDATE ral_sslta_read_point  
+ SET sslta_skey = (SELECT rsm.sslta_id
+                        FROM ${ODS}.ods_rp_sslta_map rsm, 
+                             ${ODS}.sslta os , 
+                             sslta_dim sd                           
+						WHERE rsm.sslta_id = os.sslta_id AND
+						      sd.sslta_skey = ral_sslta_read_point.sslta_skey AND
+						      rsm.ods_read_point_id = ral_sslta_read_point.read_point_skey AND 
+						      os.code = sd.sslta_code) 
+ WHERE (ral_sslta_read_point.read_point_skey) IN       
+          (SELECT rsm1.ods_read_point_id          
+		   FROM ${ODS}.ods_rp_sslta_map rsm1
+           WHERE rsm1.update_date > ${last_processed_date})
+]]></SQLExecTask>  
+
+<SQLExecTaskForDatabase desc = "delete ral_sslta_business_loc for newly added records if it is already inserted">
+  <SQLForOracle><![CDATA[
+DELETE FROM ral_sslta_business_loc 
+WHERE (sslta_skey, business_loc_skey) IN 
+    (SELECT bsm.sslta_id, bsm.ods_business_loc_id
+     FROM ${ODS}.ods_bl_sslta_map bsm
+     WHERE bsm.insert_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+DELETE ral_sslta_business_loc
+FROM ral_sslta_business_loc rsbl JOIN 
+    (SELECT bsm.sslta_id, bsm.ods_business_loc_id
+     FROM ${ODS}.ods_bl_sslta_map bsm
+     WHERE bsm.insert_date > ${last_processed_date}) t ON rsbl.sslta_skey = t.sslta_id AND rsbl.business_loc_skey =  t.ods_business_loc_id
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+DELETE FROM ral_sslta_business_loc 
+WHERE (sslta_skey, business_loc_skey) IN 
+    (SELECT bsm.sslta_id, bsm.ods_business_loc_id
+     FROM ${ODS}.ods_bl_sslta_map bsm
+     WHERE bsm.insert_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Populate ral_sslta_business_loc for newly added records"><![CDATA[
+INSERT INTO ral_sslta_business_loc (sslta_skey, business_loc_skey)
+    SELECT bsm.sslta_id, bsm.ods_business_loc_id
+     FROM ${ODS}.ods_bl_sslta_map bsm
+     WHERE bsm.insert_date > ${last_processed_date} 
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Update ral_sslta_business_loc for modified records"><![CDATA[
+ UPDATE ral_sslta_business_loc  
+ SET sslta_skey = (SELECT bsm.sslta_id
+                        FROM ${ODS}.ods_bl_sslta_map bsm, 
+                             ${ODS}.sslta os , 
+                             sslta_dim sd                           
+						WHERE bsm.sslta_id = os.sslta_id AND
+						      sd.sslta_skey = ral_sslta_business_loc.sslta_skey AND
+						      bsm.ods_business_loc_id = ral_sslta_business_loc.business_loc_skey AND 
+						      os.code = sd.sslta_code) 
+ WHERE (ral_sslta_business_loc.business_loc_skey) IN       
+          (SELECT bsm1.ods_business_loc_id          
+		   FROM ${ODS}.ods_bl_sslta_map bsm1
+           WHERE bsm1.update_date > ${last_processed_date})
+]]></SQLExecTask>  
+
+<SQLExecTaskForDatabase desc = "delete ral_site_group_site for newly added records if it is already inserted">
+  <SQLForOracle><![CDATA[
+DELETE FROM ral_site_group_site 
+WHERE (site_group_skey, site_skey) IN 
+    (SELECT sgm.ods_site_group_id, sgm.ods_site_id
+     FROM ${ODS}.ods_site_group_map sgm
+     WHERE sgm.insert_date > ${last_processed_date} 
+        OR sgm.insert_date > ${last_processed_date})
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer><![CDATA[
+DELETE ral_site_group_site
+FROM ral_site_group_site rsgs JOIN 
+    (SELECT sgm.ods_site_group_id, sgm.ods_site_id
+     FROM ${ODS}.ods_site_group_map sgm
+     WHERE sgm.insert_date > ${last_processed_date} 
+        OR sgm.insert_date > ${last_processed_date}) t ON rsgs.site_group_skey = t.ods_site_group_id AND rsgs.site_skey = t.ods_site_id
+  ]]></SQLForSQLServer>
+
+  <SQLForDB2><![CDATA[
+DELETE FROM ral_site_group_site 
+WHERE (site_group_skey, site_skey) IN 
+    (SELECT sgm.ods_site_group_id, sgm.ods_site_id
+     FROM ${ODS}.ods_site_group_map sgm
+     WHERE sgm.insert_date > ${last_processed_date} 
+        OR sgm.insert_date > ${last_processed_date})
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Populate ral_site_group_site for newly added records"><![CDATA[
+INSERT INTO ral_site_group_site (site_group_skey, site_skey, deleted)
+    SELECT sgm.ods_site_group_id, sgm.ods_site_id, sgm.deleted
+     FROM ${ODS}.ods_site_group_map sgm
+     WHERE sgm.insert_date > ${last_processed_date} 
+        OR sgm.insert_date > ${last_processed_date}
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Update ral_site_group_site for modified records"><![CDATA[
+ UPDATE ral_site_group_site  
+ SET site_group_skey = (SELECT sgm.ods_site_group_id
+                        FROM ${ODS}.ods_site_group_map sgm, 
+                             ${ODS}.ods_site_group sg , 
+                             site_group_dim sd                           
+						WHERE sgm.ods_site_group_id = sg.ods_site_group_id AND
+						      sd.site_group_skey = ral_site_group_site.site_group_skey AND
+						      sgm.ods_site_id = ral_site_group_site.site_skey AND                              
+						      sg.group_type = sd.group_type) 
+ WHERE (ral_site_group_site.site_skey) IN       
+          (SELECT sgm1.ods_site_id          
+		   FROM ${ODS}.ods_site_group_map sgm1
+           WHERE sgm1.update_date > ${last_processed_date})
+]]></SQLExecTask>  
+
+<SQLExecTaskForDatabase desc = "refresh materialized view v_back_room_inv">
+  <SQLForOracle><![CDATA[
+    {CALL DBMS_MVIEW.REFRESH('V_BACK_ROOM_INV')}
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer/>
+
+  <SQLForDB2><![CDATA[
+    REFRESH TABLE v_back_room_inv
+  ]]></SQLForDB2>
+
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "refresh materialized view v_sales_floor_inv">
+  <SQLForOracle><![CDATA[
+    {CALL DBMS_MVIEW.REFRESH('V_SALES_FLOOR_INV')}
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer/>
+
+  <SQLForDB2><![CDATA[
+    REFRESH TABLE v_sales_floor_inv
+  ]]></SQLForDB2>
+
+
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Update tag group attribute referencing in product_dim when tag_attr_group_dim is changed">
+  
+   <SQLForOracle><![CDATA[
+      UPDATE product_dim
+	  SET tag_attr_group_skey = (SELECT min(tagd.tag_attr_group_skey)
+	                             FROM ${ODS}.ods_product op join
+	                                    tag_attr_group_dim tagd on
+	                                      tagd.entity_type = op.asset_type 
+	                             WHERE product_dim.prod_skey = op.ods_product_id)
+      WHERE (product_dim.prod_skey) in
+            (SELECT op.ods_product_id
+	         FROM ${ODS}.ods_product op join
+	                tag_attr_group_dim tagd on tagd.entity_type = op.asset_type
+	         WHERE tagd.insert_date > ${last_processed_date} OR
+	               tagd.update_date > ${last_processed_date})
+  ]]></SQLForOracle>
+  	
+  <SQLForSQLServer><![CDATA[
+      UPDATE product_dim
+	  SET tag_attr_group_skey = tagd.tag_attr_group_skey 
+	  FROM ${ODS}.ods_product op join
+	         tag_attr_group_dim tagd on tagd.entity_type = op.asset_type 
+	  WHERE product_dim.prod_skey = op.ods_product_id AND
+	        (tagd.insert_date > ${last_processed_date} OR
+	         tagd.update_date > ${last_processed_date})
+  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+      UPDATE product_dim
+	  SET tag_attr_group_skey = (SELECT min(tagd.tag_attr_group_skey)
+	                             FROM ${ODS}.ods_product op join
+	                                    tag_attr_group_dim tagd on
+	                                      tagd.entity_type = op.asset_type 
+	                             WHERE product_dim.prod_skey = op.ods_product_id)
+      WHERE (product_dim.prod_skey) in
+            (SELECT op.ods_product_id
+	         FROM ${ODS}.ods_product op join
+	                tag_attr_group_dim tagd on tagd.entity_type = op.asset_type
+	         WHERE tagd.insert_date > ${last_processed_date} OR
+	               tagd.update_date > ${last_processed_date})
+  ]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Delete everything from tag_with_attr_change table"><![CDATA[
+	DELETE FROM tag_with_attr_change
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Populate tag_with_attr_change table"><![CDATA[
+	INSERT INTO tag_with_attr_change(tag_skey, tag_attr_skey)
+	SELECT DISTINCT osh.object_id, tad.tag_attr_skey
+	FROM ${ODS}.object_state_history osh  
+	    JOIN ${ODS}.object_state_type ost 
+              ON osh.object_state_type_id = ost.object_state_type_id 
+            JOIN tag_dim td 
+              ON osh.object_id = td.tag_skey 
+            JOIN product_dim pd 
+              ON td.prod_skey = pd.prod_skey 
+            JOIN tag_attr_group_dim tagd 
+              ON  pd.tag_attr_group_skey = tagd.tag_attr_group_skey 
+            JOIN  tag_attr_dim tad 
+              ON (ost.type = tad.object_state_type  AND 
+                  tad.tag_attr_group_skey = tagd.tag_attr_group_skey)
+	WHERE  osh.insert_date > ${last_processed_date} OR
+	       osh.update_date > ${last_processed_date} OR
+               tad.insert_date > ${last_processed_date} OR
+               tad.update_date > ${last_processed_date} OR
+               td.insert_date > ${last_processed_date} OR
+               pd.insert_date > ${last_processed_date} OR
+               pd.update_date > ${last_processed_date} 
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Delete entries from the work table tag_attr_fact_temp">
+  <SQLForOracle><![CDATA[
+  TRUNCATE TABLE tag_attr_fact_temp
+  ]]></SQLForOracle>
+  <SQLForSQLServer><![CDATA[
+  TRUNCATE TABLE tag_attr_fact_temp
+  ]]></SQLForSQLServer>
+  <SQLForDB2><![CDATA[
+  DELETE FROM tag_attr_fact_temp
+  ]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "populate the tag_attr_fact_temp table">
+ <![CDATA[
+    INSERT INTO tag_attr_fact_temp(tag_skey, tag_attr_skey, attr_value, 
+     start_ts, start_date_skey)  
+     SELECT osh.object_id, 
+            tad.tag_attr_skey,       
+            (CASE WHEN tad.column_name = 'state_data_0' THEN 
+     osh.state_data_0 
+                  WHEN tad.column_name = 'state_data_1' THEN 
+     osh.state_data_1 
+                  WHEN tad.column_name = 'state_data_2' THEN 
+     osh.state_data_2 
+                 WHEN tad.column_name = 'state_data_3' THEN 
+     osh.state_data_3 
+                  WHEN tad.column_name = 'state_data_4' THEN 
+     osh.state_data_4 
+                  WHEN tad.column_name = 'state_data_5' THEN 
+     osh.state_data_5 
+                  WHEN tad.column_name = 'state_data_6' THEN 
+     osh.state_data_6 
+                  WHEN tad.column_name = 'state_data_7' THEN 
+     osh.state_data_7 
+                  WHEN tad.column_name = 'state_data_8' THEN 
+     osh.state_data_8 
+                  WHEN tad.column_name = 'state_data_9' THEN 
+     osh.state_data_9 ELSE null END), 
+            osh.start_ts, 
+            ${get_date_skey()}(osh.start_ts)
+     FROM ${ODS}.object_state_history osh 
+            JOIN ${ODS}.object_state_type ost 
+              ON osh.object_state_type_id = ost.object_state_type_id 
+            JOIN tag_dim td 
+              ON osh.object_id = td.tag_skey 
+            JOIN product_dim pd 
+              ON td.prod_skey = pd.prod_skey 
+            JOIN tag_attr_group_dim tagd 
+              ON  pd.tag_attr_group_skey = tagd.tag_attr_group_skey 
+            JOIN  tag_attr_dim tad 
+              ON (ost.type = tad.object_state_type  AND 
+                  tad.tag_attr_group_skey = tagd.tag_attr_group_skey)
+            JOIN tag_with_attr_change tac
+              ON (tac.tag_skey = osh.object_id AND
+                  tac.tag_attr_skey = tad.tag_attr_skey)
+     WHERE tad.deleted = 'F'
+  ]]>
+</SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Populate tag_attr_fact table">
+<SQLForOracle><![CDATA[
+{CALL compute_tag_attr_fact}
+]]></SQLForOracle>
+
+<SQLForSQLServer><![CDATA[
+{CALL dbo.compute_tag_attr_fact}
+]]></SQLForSQLServer>
+
+<SQLForDB2><![CDATA[
+{CALL compute_tag_attr_fact()}
+]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "populate the tag_attr_fact table for extra records between min tag read timestamp and min tag attribute timestamp ">
+ <![CDATA[
+   INSERT INTO tag_attr_fact(tag_skey,  start_ts, start_date_skey,
+                          end_ts, end_date_skey, insert_date)
+   SELECT twac.tag_skey,
+       min(trf.start_time),
+       ${get_date_skey()}(min(trf.start_time)),
+       min(taf.start_ts),
+       ${get_date_skey()}(min(taf.start_ts)),
+       ${curdate()}
+   FROM tag_with_attr_change twac 
+      join tag_read_fact trf on trf.tag_skey = twac.tag_skey
+      join tag_attr_fact taf on taf.tag_skey = twac.tag_skey
+   GROUP BY twac.tag_skey
+   HAVING min(trf.start_time) != min(taf.start_ts)
+  ]]>
+</SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Reset the end_ts so that all records are not overlap or have gap for each tag + attribute">
+  
+   <SQLForOracle><![CDATA[
+      UPDATE tag_attr_fact
+      SET end_ts = (SELECT min(start_ts)
+                    FROM tag_attr_fact taf
+                    WHERE tag_attr_fact.tag_skey = taf.tag_skey and
+                          tag_attr_fact.tag_attr_skey = taf.tag_attr_skey and
+                          taf.start_ts > tag_attr_fact.start_ts)
+      WHERE (tag_attr_fact.tag_skey,tag_attr_fact.tag_attr_skey) in
+            (SELECT tag_skey, tag_attr_skey 
+             FROM tag_with_attr_change)
+  ]]></SQLForOracle>
+  	
+  <SQLForSQLServer><![CDATA[
+      UPDATE tag_attr_fact
+      SET end_ts = (SELECT min(start_ts)
+                    FROM tag_attr_fact taf
+                    WHERE tag_attr_fact.tag_skey = taf.tag_skey and
+                          tag_attr_fact.tag_attr_skey = taf.tag_attr_skey and
+                          taf.start_ts > tag_attr_fact.start_ts) 
+      FROM tag_with_attr_change twac
+      WHERE (tag_attr_fact.tag_skey = twac.tag_skey and
+             tag_attr_fact.tag_attr_skey = twac.tag_attr_skey)
+  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+      UPDATE tag_attr_fact
+      SET end_ts = (SELECT min(start_ts)
+                    FROM tag_attr_fact taf
+                    WHERE tag_attr_fact.tag_skey = taf.tag_skey and
+                          tag_attr_fact.tag_attr_skey = taf.tag_attr_skey and
+                          taf.start_ts > tag_attr_fact.start_ts)
+      WHERE (tag_attr_fact.tag_skey,tag_attr_fact.tag_attr_skey) in
+            (SELECT tag_skey, tag_attr_skey 
+             FROM tag_with_attr_change)
+  ]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Delete everything from tag_with_cycle_change table"><![CDATA[
+	DELETE FROM tag_with_cycle_change
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Populate tag_with_cycle_change table"><![CDATA[
+	INSERT INTO tag_with_cycle_change(tag_skey, cycle_source) 
+	SELECT DISTINCT taf.tag_skey, 1 FROM tag_attr_fact taf join tag_attr_dim tad on taf.tag_attr_skey = tad.tag_attr_skey
+	                       join tag_with_attr_change twac on 
+	                          taf.tag_skey = twac.tag_skey and
+	                          taf.tag_attr_skey = twac.tag_attr_skey
+	WHERE tad.is_cycle_control='T'
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Populate tag_with_cycle_change table for MV"><![CDATA[
+	INSERT INTO tag_with_cycle_change(tag_skey, cycle_source) 
+	SELECT DISTINCT oph.object_id, 2 FROM ${ODS}.object_product_history oph WHERE oph.deleted='F'
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Set the cycle_skey foreign key value to null in tag_read_fact"><![CDATA[
+	UPDATE tag_read_fact SET start_cycle_skey = NULL, end_cycle_skey = NULL where tag_skey in (select tag_skey from tag_with_cycle_change)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Set the cycle_skey foreign key value to null in tag_loc_fact"><![CDATA[
+	UPDATE tag_loc_fact SET enter_cycle_skey = NULL where tag_skey in (select tag_skey from tag_with_cycle_change)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Set the cycle_skey foreign key value to null in tag_site_read_fact"><![CDATA[
+	UPDATE tag_site_read_fact SET fest_cycle_skey = NULL, fesf_cycle_skey = NULL where tag_skey in (select tag_skey from tag_with_cycle_change)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Set the cycle_skey foreign key value to null in tag_shipped_fact"><![CDATA[
+	UPDATE tag_shipped_fact SET from_cycle_skey = NULL where tag_skey in (select tag_skey from tag_with_cycle_change)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Delete all old record in cycle_dim for all the tags in tag_with_cycle_change"><![CDATA[
+	DELETE from cycle_dim where (tag_skey in (select tag_skey from tag_with_cycle_change)) or (tag_skey is null)
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Insert into cycle_dim table for AT">
+  
+   <SQLForOracle><![CDATA[
+    	INSERT INTO cycle_dim(tag_skey, cycle_id, assn_read_point_skey,assn_read_fact_ts, assn_ts, assn_date_skey, 
+    	disassn_read_point_skey,disassn_read_fact_ts, disassn_ts, disassn_date_skey, duration_in_ss, insert_date, deleted)
+		SELECT taf.tag_skey, 
+       		       taf.attr_value,
+                       (SELECT max(trf.read_point_skey) 
+                        FROM tag_read_fact trf 
+       			WHERE trf.tag_skey = taf.tag_skey AND 
+       			      (ABS(${get_duration_in_ss()}(trf.start_time,taf.start_ts))) = 
+           			(SELECT min(ABS(${get_duration_in_ss()}(trf1.start_time,taf.start_ts)))
+            			 FROM tag_read_fact trf1
+            			 WHERE trf1.tag_skey = trf.tag_skey)),
+            	       (SELECT max(trf.start_time) 
+                        FROM tag_read_fact trf 
+       			WHERE trf.tag_skey = taf.tag_skey AND 
+       			      (ABS(${get_duration_in_ss()}(trf.start_time,taf.start_ts))) = 
+           			(SELECT min(ABS(${get_duration_in_ss()}(trf1.start_time,taf.start_ts)))
+            			 FROM tag_read_fact trf1
+            			 WHERE trf1.tag_skey = trf.tag_skey)),	 
+       			   taf.start_ts,
+       			   taf.start_date_skey,
+       		       (CASE WHEN taf.end_ts is null THEN null ELSE 	   
+                        (SELECT max(trf.read_point_skey) 
+                         FROM tag_read_fact trf 
+       			 WHERE trf.tag_skey = taf.tag_skey AND 
+       			      (ABS(${get_duration_in_ss()}(trf.start_time,taf.end_ts))) = 
+           			(SELECT min(ABS(${get_duration_in_ss()}(trf1.start_time,taf.end_ts)))
+            			 FROM tag_read_fact trf1
+            			 WHERE trf1.tag_skey = trf.tag_skey)) END),
+            	       (CASE WHEN taf.end_ts is null THEN null ELSE 		 
+            	        (SELECT max(trf.start_time) 
+                         FROM tag_read_fact trf 
+       			 WHERE trf.tag_skey = taf.tag_skey AND 
+       			      (ABS(${get_duration_in_ss()}(trf.start_time,taf.end_ts))) = 
+           			(SELECT min(ABS(${get_duration_in_ss()}(trf1.start_time,taf.end_ts)))
+            			 FROM tag_read_fact trf1
+            			 WHERE trf1.tag_skey = trf.tag_skey)) END),	 
+        		   taf.end_ts,
+         		   taf.end_date_skey,
+        		   ${get_duration_in_ss()}(taf.start_ts, taf.end_ts),
+        		   sysdate,
+        		   'F'
+	        FROM tag_attr_fact taf join tag_attr_dim tad on taf.tag_attr_skey = tad.tag_attr_skey
+                       join tag_dim td on taf.tag_skey = td.tag_skey
+                       join product_dim pd on td.prod_skey = pd.prod_skey 
+                       join tag_attr_group_dim tagd on pd.tag_attr_group_skey = tagd.tag_attr_group_skey and tad.tag_attr_group_skey = tagd.tag_attr_group_skey
+		WHERE taf.tag_skey in (select tag_skey from tag_with_cycle_change) AND 
+		      tad.is_cycle_control='T' AND 
+		      tad.deleted = 'F' AND 
+		      taf.attr_value is not null
+  	]]></SQLForOracle>
+  	
+  	<SQLForSQLServer><![CDATA[
+	 INSERT INTO cycle_dim(tag_skey, cycle_id, assn_read_point_skey, assn_read_fact_ts, assn_ts, assn_date_skey, 
+			disassn_read_point_skey,disassn_read_fact_ts, disassn_ts, disassn_date_skey, duration_in_ss, insert_date, deleted, prod_skey, cycle_source)
+				SELECT taf.tag_skey, 
+				       taf.attr_value,
+				       (SELECT TOP(1) trf.read_point_skey 
+				        FROM tag_read_fact trf 
+				        WHERE trf.tag_skey = taf.tag_skey  
+				        ORDER BY ABS(${get_duration_in_ss()}(trf.start_time, taf.start_ts))),
+				       (SELECT TOP(1) trf.start_time 
+				       	FROM tag_read_fact trf 
+				       	WHERE trf.tag_skey = taf.tag_skey  
+				        ORDER BY ABS(${get_duration_in_ss()}(trf.start_time, taf.start_ts))),
+		       			taf.start_ts,
+		       			taf.start_date_skey,
+				       (CASE WHEN taf.end_ts is null THEN null ELSE 
+				        (SELECT TOP(1) trf.read_point_skey 
+				         FROM tag_read_fact trf 
+				         WHERE trf.tag_skey = taf.tag_skey  
+				         ORDER BY ABS(${get_duration_in_ss()}(trf.start_time, taf.end_ts))) END),
+				       (CASE WHEN taf.end_ts is null THEN null ELSE   
+				        (SELECT TOP(1) trf.start_time 
+				         FROM tag_read_fact trf 
+				       	 WHERE trf.tag_skey = taf.tag_skey  
+				         ORDER BY ABS(${get_duration_in_ss()}(trf.start_time, taf.end_ts))) END),
+		        		taf.end_ts,
+		        		taf.end_date_skey,
+		        		${get_duration_in_ss()}(taf.start_ts,taf.end_ts),
+		        		getdate(),
+		        		'F',
+		        		td.prod_skey,
+		        	        (SELECT cycle_source from tag_with_cycle_change twcc where twcc.tag_skey = taf.tag_skey)
+				FROM tag_attr_fact as taf join tag_attr_dim as tad on taf.tag_attr_skey = tad.tag_attr_skey
+		                       join tag_dim as td on taf.tag_skey = td.tag_skey
+		                       join product_dim as pd on td.prod_skey = pd.prod_skey 
+		                       join tag_attr_group_dim tagd on pd.tag_attr_group_skey = tagd.tag_attr_group_skey and 
+							   tad.tag_attr_group_skey = tagd.tag_attr_group_skey
+				WHERE taf.tag_skey in (select tag_skey from tag_with_cycle_change) AND
+		      		  tad.is_cycle_control='T' AND 
+		      		  tad.deleted = 'F' AND 
+			      taf.attr_value is not null
+	  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+    	INSERT INTO cycle_dim(tag_skey, cycle_id, assn_read_point_skey,assn_read_fact_ts, assn_ts, assn_date_skey, 
+    	disassn_read_point_skey,disassn_read_fact_ts, disassn_ts, disassn_date_skey, duration_in_ss, insert_date, deleted)
+		SELECT taf.tag_skey, 
+       		       taf.attr_value,
+                       (SELECT max(trf.read_point_skey) 
+                        FROM tag_read_fact trf 
+       			WHERE trf.tag_skey = taf.tag_skey AND 
+       			      (ABS(${get_duration_in_ss()}(trf.start_time,taf.start_ts))) = 
+           			(SELECT min(ABS(${get_duration_in_ss()}(trf1.start_time,taf.start_ts)))
+            			 FROM tag_read_fact trf1
+            			 WHERE trf1.tag_skey = trf.tag_skey)),
+            	       (SELECT max(trf.start_time) 
+                        FROM tag_read_fact trf 
+       			WHERE trf.tag_skey = taf.tag_skey AND 
+       			      (ABS(${get_duration_in_ss()}(trf.start_time,taf.start_ts))) = 
+           			(SELECT min(ABS(${get_duration_in_ss()}(trf1.start_time,taf.start_ts)))
+            			 FROM tag_read_fact trf1
+            			 WHERE trf1.tag_skey = trf.tag_skey)),	 
+       			   taf.start_ts,
+       			   taf.start_date_skey,
+       		       (CASE WHEN taf.end_ts is null THEN null ELSE 	   
+                        (SELECT max(trf.read_point_skey) 
+                         FROM tag_read_fact trf 
+       			 WHERE trf.tag_skey = taf.tag_skey AND 
+       			      (ABS(${get_duration_in_ss()}(trf.start_time,taf.end_ts))) = 
+           			(SELECT min(ABS(${get_duration_in_ss()}(trf1.start_time,taf.end_ts)))
+            			 FROM tag_read_fact trf1
+            			 WHERE trf1.tag_skey = trf.tag_skey)) END),
+            	       (CASE WHEN taf.end_ts is null THEN null ELSE 		 
+            	        (SELECT max(trf.start_time) 
+                         FROM tag_read_fact trf 
+       			 WHERE trf.tag_skey = taf.tag_skey AND 
+       			      (ABS(${get_duration_in_ss()}(trf.start_time,taf.end_ts))) = 
+           			(SELECT min(ABS(${get_duration_in_ss()}(trf1.start_time,taf.end_ts)))
+            			 FROM tag_read_fact trf1
+            			 WHERE trf1.tag_skey = trf.tag_skey)) END),	 
+        		   taf.end_ts,
+         		   taf.end_date_skey,
+        		   ${get_duration_in_ss()}(taf.start_ts, taf.end_ts),    
+        		   CURRENT TIMESTAMP,
+        		   'F'
+	        FROM tag_attr_fact taf join tag_attr_dim tad on taf.tag_attr_skey = tad.tag_attr_skey
+                       join tag_dim td on taf.tag_skey = td.tag_skey
+                       join product_dim pd on td.prod_skey = pd.prod_skey 
+                       join tag_attr_group_dim tagd on pd.tag_attr_group_skey = tagd.tag_attr_group_skey and tad.tag_attr_group_skey = tagd.tag_attr_group_skey
+			WHERE taf.tag_skey in (select tag_skey from tag_with_cycle_change) AND 
+			      tad.is_cycle_control='T' AND 
+			      tad.deleted = 'F' AND 
+		          taf.attr_value is not null
+  	]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Insert into cycle_dim table for MV">
+  
+   <SQLForOracle><![CDATA[
+  	]]></SQLForOracle>
+  	
+  	<SQLForSQLServer><![CDATA[
+		INSERT INTO cycle_dim(tag_skey, cycle_id, assn_read_point_skey, assn_read_fact_ts, assn_ts, assn_date_skey, 
+		disassn_read_point_skey,disassn_read_fact_ts, disassn_ts, disassn_date_skey, duration_in_ss, insert_date, deleted, prod_skey, cycle_source)
+		SELECT oph.object_id,
+		       pd.sku,
+		       (SELECT TOP(1) trf.read_point_skey FROM tag_read_fact trf 
+			WHERE trf.tag_skey = oph.object_id  
+			ORDER BY ABS(${get_duration_in_ss()}(trf.start_time, oph.start_ts))),
+			(SELECT TOP(1) trf.start_time FROM tag_read_fact trf 
+			WHERE trf.tag_skey = oph.object_id  
+			ORDER BY ABS(${get_duration_in_ss()}(trf.start_time, oph.start_ts))),
+		       	oph.start_ts,
+		       	${get_date_skey()}(oph.start_ts),
+			(CASE WHEN oph.end_ts is null THEN null ELSE 
+			(SELECT TOP(1) trf.read_point_skey 
+			FROM tag_read_fact trf 
+			WHERE trf.tag_skey = oph.object_id  
+			ORDER BY ABS(${get_duration_in_ss()}(trf.start_time, oph.end_ts))) END),
+			(CASE WHEN oph.end_ts is null THEN null ELSE   
+			(SELECT TOP(1) trf.start_time 
+			FROM tag_read_fact trf 
+			WHERE trf.tag_skey = oph.object_id  
+			ORDER BY ABS(${get_duration_in_ss()}(trf.start_time, oph.end_ts))) END),
+		        (select min(oph2.start_ts) from ${ODS}.object_product_history oph2 where oph2.object_id = oph.object_id and oph2.start_ts > oph.start_ts) as disassn_ts,
+		        ${get_date_skey()}(oph.end_ts),
+		        ${get_duration_in_ss()}(oph.start_ts,oph.end_ts),
+		        oph.insert_date,
+		        'F',
+		        oph.product_id,
+		        (SELECT cycle_source from tag_with_cycle_change twcc where twcc.tag_skey = oph.object_id)
+		        FROM ${ODS}.object_product_history as oph 
+		        join product_dim as pd on oph.product_id = pd.prod_skey
+		        join tag_dim as td on oph.object_id = td.tag_skey
+		        WHERE oph.object_id in (select tag_skey from tag_with_cycle_change) AND 
+		        oph.deleted='F'
+	  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+  	]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Resolving cycle_skey in tag_read_fact table for none cycle start/end read point">
+  
+   <SQLForOracle><![CDATA[
+    	UPDATE tag_read_fact
+	SET (start_cycle_skey, end_cycle_skey) = 
+	            (SELECT min(cd.cycle_skey), min(cd.cycle_skey)                     
+                     FROM cycle_dim cd
+                     WHERE tag_read_fact.tag_skey = cd.tag_skey AND
+                           cd.assn_ts <= tag_read_fact.start_time AND
+			   (cd.disassn_ts > tag_read_fact.start_time OR
+		           cd.disassn_ts is null))
+	WHERE  ((tag_read_fact.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (tag_read_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes))) AND
+	       (tag_read_fact.tag_skey, tag_read_fact.read_point_skey, tag_read_fact.start_time) in
+	       (SELECT trf.tag_skey, trf.read_point_skey, trf.start_time
+	        FROM tag_read_fact trf join cycle_dim cd1 on
+		       (trf.tag_skey = cd1.tag_skey AND
+		        cd1.assn_ts <= trf.start_time AND
+	            (cd1.disassn_ts > trf.start_time OR
+	             cd1.disassn_ts is null) AND
+		        (((cd1.assn_read_point_skey is null) OR 
+                 (NOT (trf.read_point_skey = cd1.assn_read_point_skey AND
+	                   trf.start_time = cd1.assn_read_fact_ts))) AND
+                ((cd1.disassn_read_point_skey is null) OR
+	              (NOT (trf.read_point_skey = cd1.disassn_read_point_skey AND
+	                    trf.start_time = cd1.disassn_read_fact_ts))))))
+  ]]></SQLForOracle>
+  	
+  <SQLForSQLServer><![CDATA[
+	UPDATE tag_read_fact
+	SET start_cycle_skey = cd.cycle_skey,                      
+	    end_cycle_skey = cd.cycle_skey
+	FROM tag_read_fact trf join cycle_dim cd on
+	       (trf.tag_skey = cd.tag_skey AND
+	        cd.assn_ts <= trf.start_time AND
+	        (cd.disassn_ts > trf.start_time OR
+	         cd.disassn_ts is null) AND
+	        (((cd.assn_read_point_skey is null) OR 
+                 (NOT (trf.read_point_skey = cd.assn_read_point_skey AND
+	                   trf.start_time = cd.assn_read_fact_ts))) AND
+                ((cd.disassn_read_point_skey is null) OR
+	              (NOT (trf.read_point_skey = cd.disassn_read_point_skey AND
+	                    trf.start_time = cd.disassn_read_fact_ts)))))
+        WHERE ((trf.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (trf.tag_skey in (select tag_skey from tag_with_tag_loc_changes)))
+  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+    	UPDATE tag_read_fact
+	SET (start_cycle_skey, end_cycle_skey) = 
+	            (SELECT min(cd.cycle_skey), min(cd.cycle_skey)                     
+                     FROM cycle_dim cd
+                     WHERE tag_read_fact.tag_skey = cd.tag_skey AND
+                           cd.assn_ts <= tag_read_fact.start_time AND
+			   (cd.disassn_ts > tag_read_fact.start_time OR
+		           cd.disassn_ts is null))
+	WHERE  ((tag_read_fact.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (tag_read_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes))) AND
+	       (tag_read_fact.tag_skey, tag_read_fact.read_point_skey, tag_read_fact.start_time) in
+	       (SELECT trf.tag_skey, trf.read_point_skey, trf.start_time
+	        FROM tag_read_fact trf join cycle_dim cd1 on
+		       (trf.tag_skey = cd1.tag_skey AND
+		        cd1.assn_ts <= trf.start_time AND
+	            (cd1.disassn_ts > trf.start_time OR
+	             cd1.disassn_ts is null) AND
+		        (((cd1.assn_read_point_skey is null) OR 
+                 (NOT (trf.read_point_skey = cd1.assn_read_point_skey AND
+	                   trf.start_time = cd1.assn_read_fact_ts))) AND
+                ((cd1.disassn_read_point_skey is null) OR
+	              (NOT (trf.read_point_skey = cd1.disassn_read_point_skey AND
+	                    trf.start_time = cd1.disassn_read_fact_ts))))))
+  ]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Resolving cycle_skey in tag_read_fact table for cycle start read point">
+  
+   <SQLForOracle><![CDATA[
+      UPDATE tag_read_fact
+      SET start_cycle_skey = 
+            (SELECT min(cd1.cycle_skey) 
+             FROM cycle_dim cd1 
+             WHERE  (tag_read_fact.tag_skey = cd1.tag_skey AND
+                    (tag_read_fact.read_point_skey = cd1.assn_read_point_skey AND
+                     tag_read_fact.start_time = cd1.assn_read_fact_ts)))
+      WHERE ((tag_read_fact.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (tag_read_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes))) AND
+            (tag_read_fact.tag_skey, tag_read_fact.read_point_skey, tag_read_fact.start_time) in
+	     (SELECT trf.tag_skey, trf.read_point_skey, trf.start_time
+	      FROM tag_read_fact trf join cycle_dim cd2 on
+		      (trf.tag_skey = cd2.tag_skey AND
+		       (trf.read_point_skey = cd2.assn_read_point_skey AND
+                        trf.start_time = cd2.assn_read_fact_ts)))
+  ]]></SQLForOracle>
+  	
+  <SQLForSQLServer><![CDATA[
+      UPDATE tag_read_fact
+      SET start_cycle_skey = cd1.cycle_skey 
+      FROM tag_read_fact trf join cycle_dim cd1 on
+            (trf.tag_skey = cd1.tag_skey AND
+            (trf.read_point_skey = cd1.assn_read_point_skey AND
+             trf.start_time = cd1.assn_read_fact_ts))
+      WHERE ((trf.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (trf.tag_skey in (select tag_skey from tag_with_tag_loc_changes)))
+  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+      UPDATE tag_read_fact
+      SET start_cycle_skey = 
+            (SELECT min(cd1.cycle_skey) 
+             FROM cycle_dim cd1 
+             WHERE  (tag_read_fact.tag_skey = cd1.tag_skey AND
+                    (tag_read_fact.read_point_skey = cd1.assn_read_point_skey AND
+                     tag_read_fact.start_time = cd1.assn_read_fact_ts)))
+      WHERE ((tag_read_fact.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (tag_read_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes))) AND
+            (tag_read_fact.tag_skey, tag_read_fact.read_point_skey, tag_read_fact.start_time) in
+	     (SELECT trf.tag_skey, trf.read_point_skey, trf.start_time
+	      FROM tag_read_fact trf join cycle_dim cd2 on
+		      (trf.tag_skey = cd2.tag_skey AND
+		       (trf.read_point_skey = cd2.assn_read_point_skey AND
+                        trf.start_time = cd2.assn_read_fact_ts)))
+  ]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "Resolving cycle_skey in tag_read_fact table for cycle end read point">
+  
+   <SQLForOracle><![CDATA[
+      UPDATE tag_read_fact
+      SET end_cycle_skey = 
+            (SELECT min(cd1.cycle_skey) 
+             FROM cycle_dim cd1 
+             WHERE  (tag_read_fact.tag_skey = cd1.tag_skey AND
+                    (tag_read_fact.read_point_skey = cd1.disassn_read_point_skey AND
+                     tag_read_fact.start_time = cd1.disassn_read_fact_ts)))
+      WHERE ((tag_read_fact.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (tag_read_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes))) AND
+            (tag_read_fact.tag_skey, tag_read_fact.read_point_skey, tag_read_fact.start_time) in
+	     (SELECT trf.tag_skey, trf.read_point_skey, trf.start_time
+	      FROM tag_read_fact trf join cycle_dim cd2 on
+		      (trf.tag_skey = cd2.tag_skey AND
+		       (trf.read_point_skey = cd2.disassn_read_point_skey AND
+                        trf.start_time = cd2.disassn_read_fact_ts)))
+  ]]></SQLForOracle>
+  	
+  <SQLForSQLServer><![CDATA[
+      UPDATE tag_read_fact
+      SET   end_cycle_skey = cd2.cycle_skey 
+      FROM tag_read_fact trf join cycle_dim cd2 on
+            (trf.tag_skey = cd2.tag_skey AND
+             (trf.read_point_skey = cd2.disassn_read_point_skey AND
+              trf.start_time = cd2.disassn_read_fact_ts))
+      WHERE ((trf.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (trf.tag_skey in (select tag_skey from tag_with_tag_loc_changes)))
+  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+      UPDATE tag_read_fact
+      SET end_cycle_skey = 
+            (SELECT min(cd1.cycle_skey) 
+             FROM cycle_dim cd1 
+             WHERE (tag_read_fact.tag_skey = cd1.tag_skey AND
+                    (tag_read_fact.read_point_skey = cd1.disassn_read_point_skey AND
+                     tag_read_fact.start_time = cd1.disassn_read_fact_ts)))
+      WHERE ((tag_read_fact.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (tag_read_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes))) AND
+            (tag_read_fact.tag_skey, tag_read_fact.read_point_skey, tag_read_fact.start_time) in
+	     (SELECT trf.tag_skey, trf.read_point_skey, trf.start_time
+	      FROM tag_read_fact trf join cycle_dim cd2 on
+		      (trf.tag_skey = cd2.tag_skey AND
+		       (trf.read_point_skey = cd2.disassn_read_point_skey AND
+                        trf.start_time = cd2.disassn_read_fact_ts)))
+  ]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Resolving cycle_skey in tag_loc_fact table"><![CDATA[
+      UPDATE tag_loc_fact
+      SET enter_cycle_skey = (SELECT start_cycle_skey
+                              FROM tag_read_fact trf
+                              WHERE tag_loc_fact.tag_skey = trf.tag_skey and
+                                    tag_loc_fact.enter_read_point_skey = trf.read_point_skey and
+                                    tag_loc_fact.start_time = trf.start_time)
+      WHERE ((tag_loc_fact.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (tag_loc_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes)))
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Resolving cycle_skey in tag_shipped_fact table"><![CDATA[
+      UPDATE tag_shipped_fact
+      SET from_cycle_skey = (SELECT start_cycle_skey
+                              FROM tag_read_fact trf
+                              WHERE tag_shipped_fact.tag_skey = trf.tag_skey and
+                                    tag_shipped_fact.from_read_point_skey = trf.read_point_skey and
+                                    tag_shipped_fact.sent_time = trf.start_time)
+      WHERE ((tag_shipped_fact.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (tag_shipped_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes)))
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Resolving cycle_skey in tag_site_read_fact table"><![CDATA[
+    UPDATE tag_site_read_fact
+    SET fest_cycle_skey = (SELECT start_cycle_skey
+                            FROM tag_read_fact trf
+                            WHERE tag_site_read_fact.tag_skey = trf.tag_skey and
+                                  tag_site_read_fact.first_enter_rp_skey = trf.read_point_skey and
+                                  tag_site_read_fact.first_enter_site_time = trf.start_time),
+        fesf_cycle_skey = (SELECT start_cycle_skey
+                            FROM tag_read_fact trf
+                            WHERE tag_site_read_fact.tag_skey = trf.tag_skey and
+                                  tag_site_read_fact.first_enter_sf_rp_skey = trf.read_point_skey and
+                                  tag_site_read_fact.first_enter_sf_time = trf.start_time)
+    WHERE ((tag_site_read_fact.tag_skey in (select tag_skey from tag_with_cycle_change)) OR
+	        (tag_site_read_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes)))
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Update max_inv_date_skey for tag inventory calculation"><![CDATA[
+  UPDATE tag_loc_fact
+  SET max_inv_date_skey = (SELECT CASE WHEN tag_loc_fact.end_date_skey is null THEN 
+                                    (CASE WHEN max(tlf.end_date_skey) > max(tlf.start_date_skey) THEN
+                                          max(tlf.end_date_skey) ELSE max(tlf.start_date_skey) END) ELSE tag_loc_fact.end_date_skey END
+                           FROM tag_loc_fact tlf
+                           WHERE tag_loc_fact.site_skey = tlf.site_skey )
+  WHERE tag_skey in (select tag_skey from tag_with_tag_loc_changes)
+]]></SQLExecTask>   
+
+<SQLExecTask desc = "Delete tag_inv_fact table"><![CDATA[
+	DELETE FROM tag_inv_fact WHERE tag_skey in (select tag_skey from tag_with_tag_loc_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Populate tag_inv_fact table"><![CDATA[
+  INSERT INTO tag_inv_fact(tag_skey, prod_skey, business_loc_skey, site_skey, date_skey, day_slice_skey,
+                          is_inv, in_flag, in_ct, out_flag, out_ct, is_current, tag_attr_end_time)
+  SELECT tift.tag_skey, tift.prod_skey, tift.business_loc_skey, tift.site_skey, tift.date_skey, tift.day_slice_skey,
+        (CASE WHEN sum(tift.is_inv) > 0 THEN 'T' ELSE 'F' END),
+        (CASE WHEN sum(tift.in_flag) > 0 THEN 'T' ELSE 'F' END),
+        sum(tift.in_flag),
+        (CASE WHEN sum(tift.out_flag) > 0 THEN 'T' ELSE 'F' END),
+        sum(tift.out_flag),
+        'F',
+        (select max(tawt.attr_ts) 
+        from ((SELECT distinct taf2.tag_skey, taf2.start_ts as attr_ts 
+               FROM tag_attr_fact taf2) UNION 
+              (SELECT distinct taf3.tag_skey, taf3.end_ts as attr_ts 
+               FROM tag_attr_fact taf3 
+               WHERE taf3.end_ts is not null)) tawt
+        where  tawt.tag_skey = tift.tag_skey and
+               tawt.attr_ts <= tift.end_time)  
+  FROM  (SELECT  tlf.tag_skey, tlf.prod_skey, tlf.business_loc_skey, tlf.site_skey,
+               dd.date_skey, dsd.day_slice_skey, db.end_time,
+               (CASE WHEN (tlf.start_time < db.end_time) and (tlf.end_time >= db.end_time or tlf.end_time is null)
+                THEN 1 ELSE 0 END) is_inv,
+               (CASE WHEN (tlf.start_time >= db.start_time) and (tlf.start_time < db.end_time)
+                THEN 1 ELSE 0 END) in_flag,
+               (CASE WHEN (tlf.end_time >= db.start_time) and (tlf.end_time < db.end_time)
+                THEN 1 ELSE 0 END) out_flag 
+       FROM tag_loc_fact tlf, date_dim dd, day_slice_dim dsd, day_slice_boundary_time db
+       WHERE  (dd.date_skey >= tlf.start_date_skey and
+               dd.date_skey <= tlf.max_inv_date_skey) and
+              dd.date_skey = db.date_skey and dsd.day_slice_skey = db.day_slice_skey and
+              tlf.tag_skey in (select tag_skey from tag_with_tag_loc_changes)) tift               
+  GROUP BY tift.tag_skey, tift.prod_skey, tift.business_loc_skey, tift.site_skey, tift.date_skey, tift.day_slice_skey, tift.end_time
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Update is_current flag in tag_inv_fact table">
+  
+   <SQLForOracle><![CDATA[
+      UPDATE tag_inv_fact
+      SET is_current = 'T'
+      WHERE tag_inv_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes) AND
+            (tag_inv_fact.prod_skey, tag_inv_fact.business_loc_skey, tag_inv_fact.date_skey) in
+            ( SELECT tif2.prod_skey, tif2.business_loc_skey, tif2.date_skey
+              FROM (SELECT tif3.prod_skey,
+                           tif3.business_loc_skey,
+                           tif3.date_skey,
+                           SUM(tif3.in_ct) in_flow_ct,
+                           SUM(tif3.out_ct) out_flow_ct
+                    FROM tag_inv_fact tif3
+                    GROUP BY tif3.prod_skey,tif3.business_loc_skey,tif3.date_skey) tif2
+              WHERE tif2.in_flow_ct != tif2.out_flow_ct) 
+  ]]></SQLForOracle>
+  	
+  <SQLForSQLServer><![CDATA[
+      UPDATE tag_inv_fact
+        SET is_current = 'T'
+        FROM (SELECT tif2.prod_skey, tif2.business_loc_skey, tif2.date_skey 
+              FROM (SELECT tif3.prod_skey,
+                           tif3.business_loc_skey,
+                           tif3.date_skey,
+                           SUM(tif3.in_ct) in_flow_ct,
+                           SUM(tif3.out_ct) out_flow_ct
+                    FROM tag_inv_fact tif3
+                    GROUP BY tif3.prod_skey,tif3.business_loc_skey,tif3.date_skey) tif2
+              WHERE tif2.in_flow_ct != tif2.out_flow_ct) tif_max
+        WHERE tag_inv_fact.prod_skey = tif_max.prod_skey and
+              tag_inv_fact.business_loc_skey = tif_max.business_loc_skey and
+              tag_inv_fact.date_skey = tif_max.date_skey and
+              tag_inv_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes)  
+  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+      UPDATE tag_inv_fact
+      SET is_current = 'T'
+      WHERE tag_inv_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes) AND
+            (tag_inv_fact.prod_skey, tag_inv_fact.business_loc_skey, tag_inv_fact.date_skey) in
+            ( SELECT tif2.prod_skey, tif2.business_loc_skey, tif2.date_skey
+              FROM (SELECT tif3.prod_skey,
+                           tif3.business_loc_skey,
+                           tif3.date_skey,
+                           SUM(tif3.in_ct) in_flow_ct,
+                           SUM(tif3.out_ct) out_flow_ct
+                    FROM tag_inv_fact tif3
+                    GROUP BY tif3.prod_skey,tif3.business_loc_skey,tif3.date_skey) tif2
+              WHERE tif2.in_flow_ct != tif2.out_flow_ct) 
+  ]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Update tag attribute timestamps in fact table"><![CDATA[
+  UPDATE tag_read_fact
+  SET tag_attr_start_time = 
+       (select max(tawt.attr_ts) 
+        from ((SELECT distinct taf2.tag_skey, taf2.start_ts as attr_ts 
+               FROM tag_attr_fact taf2) UNION 
+              (SELECT distinct taf3.tag_skey, taf3.end_ts as attr_ts 
+               FROM tag_attr_fact taf3 
+               WHERE taf3.end_ts is not null)) tawt
+        where  tawt.tag_skey = tag_read_fact.tag_skey and
+               tawt.attr_ts <= tag_read_fact.start_time),
+      tag_attr_end_time = 
+       (select max(tawt.attr_ts) 
+        from ((SELECT distinct taf2.tag_skey, taf2.start_ts as attr_ts 
+               FROM tag_attr_fact taf2) UNION 
+              (SELECT distinct taf3.tag_skey, taf3.end_ts as attr_ts 
+               FROM tag_attr_fact taf3 
+               WHERE taf3.end_ts is not null)) tawt
+        where  tawt.tag_skey = tag_read_fact.tag_skey and
+               tawt.attr_ts <= tag_read_fact.end_time)  
+  WHERE tag_read_fact.tag_skey in (select tag_skey from tag_with_attr_change) OR
+        tag_read_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Update tag attribute timestamps in fact table"><![CDATA[
+  UPDATE tag_loc_fact
+  SET tag_attr_start_time = 
+       (select max(tawt.attr_ts) 
+        from ((SELECT distinct taf2.tag_skey, taf2.start_ts as attr_ts 
+               FROM tag_attr_fact taf2) UNION 
+              (SELECT distinct taf3.tag_skey, taf3.end_ts as attr_ts 
+               FROM tag_attr_fact taf3 
+               WHERE taf3.end_ts is not null)) tawt
+        where  tawt.tag_skey = tag_loc_fact.tag_skey and
+               tawt.attr_ts <= tag_loc_fact.start_time),
+      tag_attr_end_time = 
+       (select max(tawt.attr_ts) 
+        from ((SELECT distinct taf2.tag_skey, taf2.start_ts as attr_ts 
+               FROM tag_attr_fact taf2) UNION 
+              (SELECT distinct taf3.tag_skey, taf3.end_ts as attr_ts 
+               FROM tag_attr_fact taf3 
+               WHERE taf3.end_ts is not null)) tawt
+        where  tawt.tag_skey = tag_loc_fact.tag_skey and
+               tawt.attr_ts <= tag_loc_fact.end_time)  
+  WHERE tag_loc_fact.tag_skey in (select tag_skey from tag_with_attr_change) OR
+        tag_loc_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Update tag attribute timestamps in fact table"><![CDATA[
+  UPDATE tag_shipped_fact
+  SET tag_attr_sent_time = 
+       (select max(tawt.attr_ts) 
+        from ((SELECT distinct taf2.tag_skey, taf2.start_ts as attr_ts 
+               FROM tag_attr_fact taf2) UNION 
+              (SELECT distinct taf3.tag_skey, taf3.end_ts as attr_ts 
+               FROM tag_attr_fact taf3 
+               WHERE taf3.end_ts is not null)) tawt
+        where  tawt.tag_skey = tag_shipped_fact.tag_skey and
+               tawt.attr_ts <= tag_shipped_fact.sent_time),
+      tag_attr_recv_time = 
+       (select max(tawt.attr_ts) 
+        from ((SELECT distinct taf2.tag_skey, taf2.start_ts as attr_ts 
+               FROM tag_attr_fact taf2) UNION 
+              (SELECT distinct taf3.tag_skey, taf3.end_ts as attr_ts 
+               FROM tag_attr_fact taf3 
+               WHERE taf3.end_ts is not null)) tawt
+        where  tawt.tag_skey = tag_shipped_fact.tag_skey and
+               tawt.attr_ts <= tag_shipped_fact.received_time)  
+  WHERE tag_shipped_fact.tag_skey in (select tag_skey from tag_with_attr_change) OR
+        tag_shipped_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes)
+]]></SQLExecTask>
+
+<SQLExecTask desc = "Update tag attribute timestamps in fact table"><![CDATA[
+  UPDATE tag_site_read_fact
+  SET tag_attr_fest_time = 
+       (select max(tawt.attr_ts) 
+        from ((SELECT distinct taf2.tag_skey, taf2.start_ts as attr_ts 
+               FROM tag_attr_fact taf2) UNION 
+              (SELECT distinct taf3.tag_skey, taf3.end_ts as attr_ts 
+               FROM tag_attr_fact taf3 
+               WHERE taf3.end_ts is not null)) tawt
+        where  tawt.tag_skey = tag_site_read_fact.tag_skey and
+               tawt.attr_ts <= tag_site_read_fact.first_enter_site_time),
+      tag_attr_fesf_time = 
+       (select max(tawt.attr_ts) 
+        from ((SELECT distinct taf2.tag_skey, taf2.start_ts as attr_ts 
+               FROM tag_attr_fact taf2) UNION 
+              (SELECT distinct taf3.tag_skey, taf3.end_ts as attr_ts 
+               FROM tag_attr_fact taf3 
+               WHERE taf3.end_ts is not null)) tawt
+        where  tawt.tag_skey = tag_site_read_fact.tag_skey and
+               tawt.attr_ts <= tag_site_read_fact.first_enter_sf_time)  
+  WHERE tag_site_read_fact.tag_skey in (select tag_skey from tag_with_attr_change) OR
+        tag_site_read_fact.tag_skey in (select tag_skey from tag_with_tag_loc_changes)
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Cleanup prod_attr_fact table">
+  
+   <SQLForOracle><![CDATA[
+      DELETE 
+      FROM prod_attr_fact 
+      WHERE (prod_attr_fact.prod_skey,prod_attr_fact.attr_key) in
+            (SELECT pd.prod_skey, pg.property_key 
+             FROM product_dim pd
+		          join ${ODS}.PML_property pg 
+		              on pd.property_group_id = pg.property_group_id 
+	         WHERE  (pg.insert_date > ${last_processed_date} or
+                     pg.update_date > ${last_processed_date} or
+                     pd.insert_date > ${last_processed_date})) 
+  ]]></SQLForOracle>
+  	
+  <SQLForSQLServer><![CDATA[
+      DELETE prod_attr_fact 
+      FROM prod_attr_fact 
+            join product_dim pd on
+             (prod_attr_fact.prod_skey = pd.prod_skey)
+            join ${ODS}.PML_property pg on
+             (pd.property_group_id = pg.property_group_id and
+              prod_attr_fact.attr_key = pg.property_key)
+      WHERE (pg.insert_date > ${last_processed_date} or
+             pg.update_date > ${last_processed_date} or
+             pd.insert_date > ${last_processed_date})
+  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+      DELETE 
+      FROM prod_attr_fact 
+      WHERE (prod_attr_fact.prod_skey,prod_attr_fact.attr_key) in
+            (SELECT pd.prod_skey, pg.property_key 
+             FROM product_dim pd
+		          join ${ODS}.PML_property pg 
+		              on pd.property_group_id = pg.property_group_id 
+	         WHERE  (pg.insert_date > ${last_processed_date} or
+                     pg.update_date > ${last_processed_date} or
+                     pd.insert_date > ${last_processed_date})) 
+
+  ]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Populate prod_attr_fact table"><![CDATA[
+  INSERT INTO prod_attr_fact(prod_skey, attr_key, attr_value, deleted)
+  SELECT pd.prod_skey, pg.property_key, pg.property_value, pg.deleted
+  FROM product_dim pd
+         join ${ODS}.PML_property pg 
+          on pd.property_group_id = pg.property_group_id 
+  WHERE pg.insert_date > ${last_processed_date} or
+        pg.update_date > ${last_processed_date} or
+        pd.insert_date > ${last_processed_date} 
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Cleanup loc_attr_fact table">
+  
+   <SQLForOracle><![CDATA[
+      DELETE 
+      FROM loc_attr_fact 
+      WHERE (loc_attr_fact.loc_skey,loc_attr_fact.attr_key) in
+            (SELECT l.location_id, pg.property_key 
+             FROM ${ODS}.location l
+		          join ${ODS}.physical_property pg 
+		              on l.property_group_id = pg.property_group_id 
+	         WHERE (pg.insert_date > ${last_processed_date} or
+                    pg.update_date > ${last_processed_date} or
+                     l.insert_date > ${last_processed_date})) 
+  ]]></SQLForOracle>
+  	
+  <SQLForSQLServer><![CDATA[
+      DELETE loc_attr_fact 
+      FROM loc_attr_fact 
+            join ${ODS}.location l on
+             (loc_attr_fact.loc_skey = l.location_id)
+            join ${ODS}.physical_property pg on
+             (l.property_group_id = pg.property_group_id and
+              loc_attr_fact.attr_key = pg.property_key)
+      WHERE (pg.insert_date > ${last_processed_date} or
+             pg.update_date > ${last_processed_date} or
+             l.insert_date > ${last_processed_date})
+  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+      DELETE 
+      FROM loc_attr_fact 
+      WHERE (loc_attr_fact.loc_skey,loc_attr_fact.attr_key) in
+            (SELECT l.location_id, pg.property_key 
+             FROM ${ODS}.location l
+		          join ${ODS}.physical_property pg 
+		              on l.property_group_id = pg.property_group_id 
+	         WHERE (pg.insert_date > ${last_processed_date} or
+                    pg.update_date > ${last_processed_date} or
+                     l.insert_date > ${last_processed_date})) 
+  ]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+
+<SQLExecTask desc = "Populate loc_attr_fact table"><![CDATA[
+  INSERT INTO loc_attr_fact(loc_skey, attr_key, attr_value, location_type, deleted)
+  SELECT l.location_id, pg.property_key, pg.property_value, l.location_type, pg.deleted
+  FROM ${ODS}.location l 
+         join ${ODS}.physical_property pg 
+          on l.property_group_id = pg.property_group_id 
+  WHERE pg.insert_date > ${last_processed_date} or
+        pg.update_date > ${last_processed_date} or
+        l.insert_date > ${last_processed_date} 
+]]></SQLExecTask>
+
+<SQLExecTaskForDatabase desc = "Populate location_owner in site_dim">
+  
+   <SQLForOracle><![CDATA[
+      UPDATE site_dim
+      SET location_owner = (SELECT pg.property_value
+                            FROM ${ODS}.location l 
+                                   join ${ODS}.physical_property pg 
+                                     on l.property_group_id = pg.property_group_id 
+                            WHERE site_dim.site_skey = l.location_id AND
+                                 (pg.property_key = 'location_owner' AND
+                                  pg.property_value is not null))
+      WHERE site_dim.site_skey in
+            ( SELECT l.location_id
+              FROM ${ODS}.location l 
+                   join ${ODS}.physical_property pg 
+                     on l.property_group_id = pg.property_group_id 
+              WHERE (pg.insert_date > ${last_processed_date} or
+                     pg.update_date > ${last_processed_date} or
+                     l.insert_date > ${last_processed_date} ) AND
+                    (pg.property_key = 'location_owner' AND
+                     pg.property_value is not null))
+  ]]></SQLForOracle>
+  	
+  <SQLForSQLServer><![CDATA[
+      UPDATE site_dim
+      SET location_owner = pg.property_value
+      FROM  ${ODS}.location l 
+            join ${ODS}.physical_property pg 
+               on l.property_group_id = pg.property_group_id 
+      WHERE  site_dim.site_skey = l.location_id  AND
+            (pg.insert_date > ${last_processed_date} or
+             pg.update_date > ${last_processed_date} or
+             l.insert_date > ${last_processed_date} ) AND
+            (pg.property_key = 'location_owner' AND
+             pg.property_value is not null)
+  ]]>
+  </SQLForSQLServer>
+  
+    <SQLForDB2><![CDATA[
+      UPDATE site_dim
+      SET location_owner = (SELECT pg.property_value
+                            FROM ${ODS}.location l 
+                                   join ${ODS}.physical_property pg 
+                                     on l.property_group_id = pg.property_group_id 
+                            WHERE site_dim.site_skey = l.location_id AND
+                                 (pg.property_key = 'location_owner' AND
+                                  pg.property_value is not null))
+      WHERE site_dim.site_skey in
+            ( SELECT l.location_id
+              FROM ${ODS}.location l 
+                   join ${ODS}.physical_property pg 
+                     on l.property_group_id = pg.property_group_id 
+              WHERE (pg.insert_date > ${last_processed_date} or
+                     pg.update_date > ${last_processed_date} or
+                     l.insert_date > ${last_processed_date} ) AND
+                    (pg.property_key = 'location_owner' AND
+                     pg.property_value is not null))
+  ]]></SQLForDB2>
+  
+</SQLExecTaskForDatabase>
+
+<SQLExecTask desc = "Assign default location owner as 'default' for locations that without location owner. This is a temp workaround for MSTR issue that empty location owner break the location filter. This should be removed after MSTR bug is fixed"><![CDATA[
+     UPDATE site_dim
+     set location_owner = 'default'
+     WHERE location_owner is null 
+]]></SQLExecTask>
+
+
+<SQLExecTaskForDatabase desc = "Create Meterialized Views">
+<SQLForOracle><![CDATA[
+{CALL create_mviews}
+]]></SQLForOracle>
+
+<SQLForSQLServer><![CDATA[
+{CALL dbo.create_mviews}
+]]></SQLForSQLServer>
+
+<SQLForDB2><![CDATA[
+{CALL create_mviews()}
+]]></SQLForDB2>
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "refresh materialized view v_tag_attr_dim">
+  <SQLForOracle/>
+
+  <SQLForSQLServer/>
+
+  <SQLForDB2><![CDATA[
+    REFRESH TABLE v_tag_attr_dim
+  ]]></SQLForDB2>
+
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "refresh materialized view v_prod_attr_dim">
+  <SQLForOracle><![CDATA[
+    {CALL DBMS_MVIEW.REFRESH('V_PROD_ATTR_DIM')}
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer/>
+
+  <SQLForDB2><![CDATA[
+    REFRESH TABLE v_prod_attr_dim
+  ]]></SQLForDB2>
+
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "refresh materialized view v_SITE_attr_dim">
+  <SQLForOracle><![CDATA[
+    {CALL DBMS_MVIEW.REFRESH('V_SITE_ATTR_DIM')}
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer/>
+
+  <SQLForDB2><![CDATA[
+    REFRESH TABLE v_SITE_attr_dim
+  ]]></SQLForDB2>
+
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "refresh materialized view v_BUSINESS_LOCATION_attr_dim">
+  <SQLForOracle><![CDATA[
+    {CALL DBMS_MVIEW.REFRESH('V_BUSINESS_LOCATION_ATTR_DIM')}
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer/>
+
+  <SQLForDB2><![CDATA[
+    REFRESH TABLE v_BUSINESS_LOCATION_attr_dim
+  ]]></SQLForDB2>
+
+</SQLExecTaskForDatabase>
+
+<SQLExecTaskForDatabase desc = "refresh materialized view v_READ_POINT_attr_dim">
+  <SQLForOracle><![CDATA[
+    {CALL DBMS_MVIEW.REFRESH('V_READ_POINT_ATTR_DIM')}
+  ]]></SQLForOracle>
+
+  <SQLForSQLServer/>
+
+  <SQLForDB2><![CDATA[
+    REFRESH TABLE v_READ_POINT_attr_dim
+  ]]></SQLForDB2>
+
+</SQLExecTaskForDatabase>
+
+</DataWarehouseETL>

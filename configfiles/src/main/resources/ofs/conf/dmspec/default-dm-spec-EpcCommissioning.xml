@@ -1,0 +1,137 @@
+  <table name="comm_serial_range">
+    <column name="comm_serial_range_id" type="NUMERIC">
+      <primary-key sequence="comm_serial_range_seq"/>
+    </column>
+    <column name="product_pure_identity_id" type="NUMERIC">
+      <foreign-key table="product_pure_identity" column="product_pure_identity_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_serial_number" type="NUMERIC">
+    </column>
+    <column name="end_serial_number" type="NUMERIC">
+    </column>
+    <column name="last_issued_serial_number" type="NUMERIC">
+    </column>
+    <column name="active" type="BOOLEAN">
+    </column>
+    <column name="activation_ts" type="TIMESTAMP">
+    </column>
+    <column name="last_issued_ts" type="TIMESTAMP">
+    </column>
+    <column name="deactivation_ts" type="TIMESTAMP">
+    </column>
+    <column name="download_ts" type="TIMESTAMP">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="commissioning_range">
+    <column name="commissioning_range_id" type="NUMERIC">
+      <primary-key sequence="commissioning_range_seq"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_epc" type="VARCHAR">
+    </column>
+    <column name="end_epc" type="VARCHAR">
+    </column>
+    <column name="last_issued_epc" type="VARCHAR">
+    </column>
+    <column name="active" type="BOOLEAN">
+    </column>
+    <column name="activation_ts" type="TIMESTAMP">
+    </column>
+    <column name="last_issued_ts" type="TIMESTAMP">
+    </column>
+    <column name="deactivation_ts" type="TIMESTAMP">
+    </column>
+    <column name="download_ts" type="TIMESTAMP">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="commissioning_type">
+    <column name="commissioning_type_id" type="NUMERIC">
+      <primary-key sequence="commissioning_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <!-- UPDATE commissioning_type SET guid = type -->
+      <globally-unique-key/>
+    </column>
+    <column name="decommission_tag" type="BOOLEAN">
+    </column>
+    <column name="kill_tag" type="BOOLEAN">
+    </column>
+    <column name="commissioned_data_size" type="NUMERIC">
+    </column>
+    <column name="write_on_tag" type="BOOLEAN">
+    </column>
+    <column name="print_on_label" type="BOOLEAN">
+    </column>
+    <column name="virtual_epc_on_tag" type="BOOLEAN">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="commissioned_tag">
+    <column name="commissioned_tag_id" type="NUMERIC">
+      <primary-key sequence="commissioned_tag_seq"/>
+    </column>
+    <column name="commissioning_range_id" type="NUMERIC">
+      <foreign-key table="commissioning_range" column="commissioning_range_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="commissioning_type_id" type="NUMERIC">
+      <foreign-key table="commissioning_type" column="commissioning_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="tag_id" type="VARCHAR">
+    </column>
+    <column name="epc_or_tag_data" type="VARCHAR">
+    </column>
+    <column name="epc_product_info_id" type="NUMERIC">
+      <foreign-key table="epc_product_info" column="epc_product_info_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="epc_serial_number" type="NUMERIC">
+    </column>
+    <column name="activation_ts" type="TIMESTAMP">
+    </column>
+    <column name="activation_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="deactivation_ts" type="TIMESTAMP">
+    </column>
+    <column name="deactivation_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="commissioning_data_0" type="VARCHAR">
+    </column>
+    <column name="commissioning_data_1" type="VARCHAR">
+    </column>
+    <column name="commissioning_data_2" type="VARCHAR">
+    </column>
+    <column name="commissioning_data_3" type="VARCHAR">
+    </column>
+    <column name="commissioning_data_4" type="VARCHAR">
+    </column>
+    <column name="commissioning_data_5" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+

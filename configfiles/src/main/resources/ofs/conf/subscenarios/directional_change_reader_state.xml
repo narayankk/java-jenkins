@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<scenario>
+    <property key="name">Subscenario Change Reader State</property>
+    <property key="description">Subscenario to change reader state for 1 or 2 readers, for direction-inferring scenarios</property>
+    <property key="sub_scenario">true</property>
+	<property key="parent_access">R</property>
+
+	<property key="inputs">turnOffReader, readpointLocationEpc1, readpointLocationEpc2, readerState</property>
+	<property key="outputs"></property>
+	<property key="exits">DONE</property>
+	
+    <process>
+        <start name="Start">
+            <target exit="Exit Condition" name="DecideOnTurningOffReader"></target>
+        </start>
+		
+        <decision   name="DecideOnTurningOffReader">
+            <case       label="ChangeReaderState"    target="SetReader1State"    condition="(${process.turnOffReader})"></case>
+            <default    label="SkipReaderState"      target="DONE"></default>
+        </decision>
+
+        <activity name="SetReader1State" resource="primitive:SetReaderState">
+            <target exit="done" name="DecideOnReader2Existence"></target>
+            <target exit="error" name="DecideOnReader2Existence"></target>
+            <input  class="java.lang.String" constant="false" name="readerLocationEpc" required="false">${process.readpointLocationEpc1}</input>
+            <input  class="java.lang.String" constant="true" name="readerState" required="false">${process.readerState}</input>
+        </activity>
+
+        <decision   name="DecideOnReader2Existence">
+            <case       label="reader2_exists"           target="SetReader2State"    condition="(${process.readpointLocationEpc2} ne null)"></case>
+            <default    label="reader2_does_not_exist"   target="DONE"></default>
+        </decision>
+
+        <activity name="SetReader2State" resource="primitive:SetReaderState">
+            <target exit="done" name="DONE"></target>
+            <target exit="error" name="DONE"></target>
+            <input  class="java.lang.String" constant="false" name="readerLocationEpc" required="false">${process.readpointLocationEpc2}</input>
+            <input  class="java.lang.String" constant="true" name="readerState" required="false">${process.readerState}</input>
+        </activity>
+
+        <end name="DONE"></end>
+		
+    </process>
+
+    <config>
+    </config>
+
+	<display>
+    </display>
+</scenario>
+
+		

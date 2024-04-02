@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+<meta-data property-table="Physical">
+	<table name="device">
+        <!-- Checkpoint MPOS device node -->
+		<entity type="CkpMPOSDeviceNode" extends="RFDeviceNode">
+			<locator-option value="Checkpoint MPOS reader DeviceNode">Checkpoint MPOS reader DeviceNode</locator-option>
+			<label>Checkpoint MPOS Antenna Configuration</label>
+			<description>Checkpoint MPOS Antenna Configuration</description>
+			<property key="AntennaId" is-mandatory="true">	
+				<label>Antenna ID</label>
+				<description>Antenna number</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+				  <option value="1" is-default="true">1</option>
+				  <option value="2">2</option>
+				  <option value="3">3</option>
+				  <option value="4">4</option>
+				</select>
+			</property>
+		</entity>		
+	</table>
+</meta-data>

@@ -1,0 +1,190 @@
+<!--
+     This xml files is for configuring the actual primitive implementation a workflow
+     activity will invoke.  In rfXML, use 'primtive:XXXXX' prefix to specify the activity
+     name, the implementation is loaded by the Workflow engine as configured below.
+     XML element semantics:
+     name :- Name of primitive, that is XXXXX in the above example.  Required.
+     class :- Fully qualified class name of implementation to be used in OFS.  Required.
+     remote :- true | false.  Optional.  OATedge only, indicates remote execution mode.
+     sync :- true | false. Optional.  OATedge only, when remote=true indicates synchronous execution mode.
+-->
+<properties>
+    <property name="AddItemToContainer" class="com.oatsystems.workflow.primitives.AddItemToContainer" remote="true"/>
+    <property name="AddReadToDirectionalInferenceCache" class="com.oatsystems.workflow.primitives.AddReadToDirectionalInferenceCache" remote="true"/>
+    <property name="AddToEPCOrderSummary" class="com.oatsystems.workflow.primitives.AddToEPCOrderSummary" remote="false"/>
+    <property name="AssociateAttributes" class="com.oatsystems.workflow.primitives.AssociateAttributes" remote="true"/>
+    <property name="AssociateAttributesUDDME" class="com.oatsystems.workflow.primitives.AssociateAttributesUDDME" remote="true"/>
+    <property name="AssociateEpcToLocation" class="com.oatsystems.workflow.primitives.AssociateEpcToLocation" remote="true"/>
+    <property name="CheckEpcProductValidity" class="com.oatsystems.workflow.primitives.CheckEpcProductValidity" remote="true"/>
+    <property name="CheckForContainerAtLocation" class="com.oatsystems.workflow.primitives.CheckForContainerAtLocation" remote="true"/>
+    <property name="CheckForDepartedContainer" class="com.oatsystems.workflow.primitives.CheckForDepartedContainer" remote="false"/>
+    <property name="CheckForEpcInAsn" class="com.oatsystems.workflow.primitives.CheckForEpcInAsn" remote="true"/>
+    <property name="CheckForTargetFulfillment" class="com.oatsystems.workflow.primitives.CheckForTargetFulfillment" remote="false"/>
+    <property name="CheckGroupIdentifier" class="com.oatsystems.workflow.primitives.CheckGroupIdentifier" remote="true"/>
+    <property name="CleanupContainer" class="com.oatsystems.workflow.primitives.CleanupContainer" remote="true"/>
+    <property name="CleanupVerificationSession" class="com.oatsystems.workflow.primitives.CleanupVerificationSession" remote="true"/>
+    <property name="CloseIncompleteContainer" class="com.oatsystems.workflow.primitives.CloseIncompleteContainer" remote="true"/>
+    <property name="CloseProcess" class="com.oatsystems.workflow.primitives.CloseProcess" remote="true"/>
+    <property name="ConvertSsccToEpc" class="com.oatsystems.workflow.primitives.ConvertSsccToEpc" remote="true"/>
+    <property name="IterateOnCount" class="com.oatsystems.workflow.primitives.IterateOnCount" remote="false"/>
+    <property name="IterateOnStringArray" class="com.oatsystems.workflow.primitives.IterateOnStringArray" remote="false"/>
+    <property name="IterateOnObjectArray" class="com.oatsystems.workflow.primitives.IterateOnObjectArray" remote="false"/>
+    <property name="LoadActiveSerialRangeForProduct" class="com.oatsystems.workflow.primitives.LoadActiveSerialRangeForProduct" remote="false"/>
+    <property name="LoadAttributes" class="com.oatsystems.workflow.primitives.LoadAttributes" remote="false"/>
+    <property name="LoadAttributeExtensions" class="com.oatsystems.workflow.primitives.LoadAttributeExtensions" remote="false"/>
+    <property name="LoadContainerFromDB" class="com.oatsystems.workflow.primitives.LoadContainerFromDB" remote="true"/>
+    <property name="LoadContainerManager" class="com.oatsystems.workflow.primitives.LoadContainerManager" remote="false"/>
+    <property name="LoadEscrow" class="com.oatsystems.workflow.primitives.LoadEscrow" remote="true"/>
+    <property name="LoadLabelPrinter" class="com.oatsystems.workflow.primitives.LoadLabelPrinter" remote="true" sync="true"/>
+    <property name="LoadLabelPrinterLocal" class="com.oatsystems.workflow.primitives.LoadLabelPrinterLocal" remote="false"/>
+    <property name="LoadLocationData" class="com.oatsystems.workflow.primitives.LoadLocationData" remote="false"/>
+    <property name="LoadProductFromGtin" class="com.oatsystems.workflow.primitives.LoadProductFromGtin" remote="true"/>
+    <property name="LoadProductFromSku" class="com.oatsystems.workflow.primitives.LoadProductFromSku" remote="true" sync="true"/>
+    <property name="LoadRangeIdentifierFromSsccPrefix" class="com.oatsystems.workflow.primitives.LoadRangeIdentifierFromSsccPrefix" remote="false"/>
+    <property name="LoadTagWriter" class="com.oatsystems.workflow.primitives.LoadTagWriter" remote="true"/>
+    <property name="LogContainerReceipt" class="com.oatsystems.workflow.primitives.LogContainerReceipt" remote="true"/>
+    <property name="LogContainerVerification" class="com.oatsystems.workflow.primitives.LogContainerVerification" remote="true"/>
+    <property name="LogExecutionTime" class="com.oatsystems.workflow.primitives.LogExecutionTime" remote="false"/>
+    <property name="LogTextMessage" class="com.oatsystems.workflow.primitives.LogTextMessage" remote="false"/>
+    <property name="MarkReadToContainer" class="com.oatsystems.workflow.primitives.MarkReadToContainer" remote="true"/>
+    <property name="MarkReadToEscrow" class="com.oatsystems.workflow.primitives.MarkReadToEscrow" remote="true"/>
+    <property name="MarkStartTime" class="com.oatsystems.workflow.primitives.MarkStartTime" remote="false"/>
+    <property name="PostEPCISAggregationEvent" class="com.oatsystems.workflow.primitives.PostEPCISAggregationEvent" remote="true"/>
+    <property name="PostEPCISObjectEvent" class="com.oatsystems.workflow.primitives.PostEPCISObjectEvent" remote="true"/>
+    <property name="PostEPCISQuantityEvent" class="com.oatsystems.workflow.primitives.PostEPCISQuantityEvent" remote="true"/>
+    <property name="PostEPCISTransactionEvent" class="com.oatsystems.workflow.primitives.PostEPCISTransactionEvent" remote="true"/>
+    <property name="PrepareCompositeVariable" class="com.oatsystems.workflow.primitives.PrepareCompositeVariable" remote="false"/>
+    <property name="PrepareMixedContainer" class="com.oatsystems.workflow.primitives.PrepareMixedContainer" remote="true"/>
+    <property name="PreparePureSgtinContainer" class="com.oatsystems.workflow.primitives.PreparePureSgtinContainer" remote="true"/>
+    <property name="PreparePureSsccContainer" class="com.oatsystems.workflow.primitives.PreparePureSsccContainer" remote="true"/>
+    <property name="PrepareContainer" class="com.oatsystems.workflow.primitives.PrepareContainer" remote="true"/>
+    <property name="PrintLabel" class="com.oatsystems.workflow.primitives.PrintLabel" remote="true" sync="true"/>
+    <property name="PublishDigitalOutput" class="com.oatsystems.workflow.primitives.PublishDigitalOutput" remote="false"/>
+    <property name="ReleaseContainer" class="com.oatsystems.workflow.primitives.ReleaseContainer" remote="true"/>
+    <property name="ReplayActiveReads" class="com.oatsystems.workflow.primitives.ReplayActiveReads" remote="true"/>
+    <property name="SetReaderState" class="com.oatsystems.workflow.primitives.SetReaderState" remote="false"/>
+    <property name="StartContainer" class="com.oatsystems.workflow.primitives.StartContainer" remote="true"/>
+    <property name="ValidateGtinForContainer" class="com.oatsystems.workflow.primitives.ValidateGtinForContainer" remote="true"/>
+    <property name="ValidateSkuForContainer" class="com.oatsystems.workflow.primitives.ValidateSkuForContainer" remote="true"/>
+    <property name="WriteTag" class="com.oatsystems.workflow.primitives.WriteTag" remote="true"/>
+    <property name="EvaluateExpression" class="com.oatsystems.workflow.primitives.EvaluateExpression" remote="false"/>
+    <property name="EvaluateVerifiedContainer" class="com.oatsystems.workflow.primitives.EvaluateVerifiedContainer" remote="false"/>
+    <property name="QueuePrintTask" class="com.oatsystems.workflow.primitives.QueuePrintTask" remote="false"/>
+    <property name="DeletePrintTask" class="com.oatsystems.workflow.primitives.DeletePrintTask" remote="false"/>
+    <property name="LoadSsccRangeIdentifierFromProductReference" class="com.oatsystems.workflow.primitives.LoadSsccRangeIdentifierFromProductReference" remote="false"/>
+    <property name="CheckContainerForCase" class="com.oatsystems.workflow.primitives.CheckContainerForCase" remote="false"/>
+    <property name="RemoveItemFromContainer" class="com.oatsystems.workflow.primitives.RemoveItemFromContainer" remote="true"/>
+    <property name="IdentifyContainerForRead" class="com.oatsystems.workflow.primitives.IdentifyContainerForRead" remote="true"/>
+    <property name="ClearReadsFromContainer" class="com.oatsystems.workflow.primitives.ClearReadsFromContainer" remote="false"/>
+    <property name="CheckForMandateVariance" class="com.oatsystems.workflow.primitives.CheckForMandateVariance" remote="true"/>
+    <property name="BranchOnMandate" class="com.oatsystems.workflow.primitives.BranchOnMandate" remote="true"/>
+    <property name="ClearAssociatedContainees" class="com.oatsystems.workflow.primitives.ClearAssociatedContainees" remote="true"/>
+    <property name="LoadMandate" class="com.oatsystems.workflow.primitives.LoadMandate" remote="true"/>
+    <property name="BranchOnContainerInfo" class="com.oatsystems.workflow.primitives.BranchOnContainerInfo" remote="true"/>
+    <property name="LogUserAction" class="com.oatsystems.workflow.primitives.LogUserAction" remote="true"/>
+    <property name="SendMessageRequestResponse" class="com.oatsystems.workflow.messaging.primitives.SendMsgRR" remote="true"/>
+    <property name="SendMessageOut" class="com.oatsystems.workflow.messaging.primitives.SendMsgOut" remote="true"/>
+    <property name="CheckForTargetConfigMatch" class="com.oatsystems.workflow.primitives.CheckForTargetConfigMatch" remote="true"/>
+    <property name="SendMsgOut" class="com.oatsystems.workflow.messaging.primitives.SendMsgOut" remote="true"/>
+    <property name="SendMsgRR" class="com.oatsystems.workflow.messaging.primitives.SendMsgRR" remote="true"/>
+    <property name="SetVariableValue" class="com.oatsystems.workflow.primitives.SetVariableValue" remote="false"/>
+    <property name="SetVariableToNull" class="com.oatsystems.workflow.primitives.SetVariableToNull" remote="false"/>
+    <property name="SetVariablesToNull" class="com.oatsystems.workflow.primitives.SetVariablesToNull" remote="false"/>
+    <property name="StartProcess" class="com.oatsystems.workflow.primitives.StartProcess" remote="true"/>
+    <property name="TranslateToHexEpc" class="com.oatsystems.workflow.primitives.TranslateToHexEpc" remote="true"/>
+    <property name="PrepareBuiltContainerMessage" class="com.oatsystems.workflow.primitives.PrepareBuiltContainerMessage" remote="false"/>
+    <property name="InjectTimedEvent" class="com.oatsystems.workflow.primitives.InjectTimedEvent" remote="false"/>
+    <property name="DeleteTimedEvent" class="com.oatsystems.workflow.primitives.DeleteTimedEvent" remote="false"/>
+    <property name="MarkAggregate" class="com.oatsystems.workflow.primitives.MarkAggregate" remote="false"/>
+    <property name="PersistProcessVariable" class="com.oatsystems.workflow.primitives.PersistProcessVariable" remote="true"/>
+    <property name="LoadProcessVariable" class="com.oatsystems.workflow.primitives.LoadProcessVariable" remote="true"/>
+    <property name="LoadAsnManager" class="com.oatsystems.workflow.primitives.LoadAsnManager" remote="true"/>
+    <property name="MarkReadToAsn" class="com.oatsystems.workflow.primitives.MarkReadToAsn" remote="true"/>
+    <property name="ProcessUnverifiedContainer" class="com.oatsystems.workflow.primitives.ProcessUnverifiedContainer" remote="true"/>
+    <property name="MarkCorrectionsToContainer" class="com.oatsystems.workflow.primitives.MarkCorrectionsToContainer" remote="true"/>
+    <property name="CheckContainerVerificationState" class="com.oatsystems.workflow.primitives.CheckContainerVerificationState" remote="true"/>
+    <property name="LogContainerReceiptQuantities" class="com.oatsystems.workflow.primitives.LogContainerReceiptQuantities" remote="true"/>
+    <property name="CleanupAsnManager" class="com.oatsystems.workflow.primitives.CleanupAsnManager" remote="true"/>
+    <property name="AssignEpcsToAsn" class="com.oatsystems.workflow.primitives.AssignEpcsToAsn" remote="true"/>
+    <property name="LoadExpectedShipments" class="com.oatsystems.workflow.primitives.LoadExpectedShipments" remote="true"/>
+    <property name="RestartPrintQueue" class="com.oatsystems.workflow.primitives.RestartPrintQueue" remote="false"/>
+    <property name="CheckSessionEpcs" class="com.oatsystems.workflow.primitives.CheckSessionEpcs" remote="true"/>
+    <property name="DirectionInferencePrimitive" class="com.oatsystems.workflow.primitives.DirectionInferencePrimitive" remote="false"/>
+    <property name="IterateOnMap" class="com.oatsystems.workflow.primitives.IterateOnMap" remote="false"/>
+
+    <!-- Fine-grained primitives -->
+    <property name="AddObjectToContentSatisfaction" class="com.oatsystems.workflow.primitives.finegrained.AddObjectToContentSatisfaction" remote="true"/>
+    <property name="AddProcessObjectSetElement" class="com.oatsystems.workflow.primitives.finegrained.AddProcessObjectSetElement" remote="true"/>
+    <property name="BindObject" class="com.oatsystems.workflow.primitives.finegrained.BindObject" remote="true"/>
+    <property name="BindObjects" class="com.oatsystems.workflow.primitives.finegrained.BindObjects" remote="true"/>
+    <property name="CancelContentSatisfaction" class="com.oatsystems.workflow.primitives.finegrained.CancelContentSatisfaction" remote="true"/>
+    <property name="CancelProcess" class="com.oatsystems.workflow.primitives.finegrained.CancelProcess" remote="true"/>
+    <property name="CloseContentSatisfaction" class="com.oatsystems.workflow.primitives.finegrained.CloseContentSatisfaction" remote="true"/>
+    <property name="CreateAssociation" class="com.oatsystems.workflow.primitives.finegrained.CreateAssociation" remote="true"/>
+    <property name="CreateListOfStrings" class="com.oatsystems.workflow.primitives.finegrained.CreateListOfStrings" remote="false"/>
+    <property name="CreateStringArrayOfStrings" class="com.oatsystems.workflow.primitives.finegrained.CreateStringArrayOfStrings" remote="false"/>
+    <property name="EnableDisableDevice" class="com.oatsystems.workflow.primitives.finegrained.EnableDisableDevice" remote="false"/>
+    <property name="FailProcess" class="com.oatsystems.workflow.primitives.finegrained.FailProcess" remote="true"/>
+    <property name="FlushRangePrintFromPrinter" class="com.oatsystems.workflow.primitives.finegrained.FlushRangePrintFromPrinter" remote="false"/>
+    <property name="GetFormsRemaining" class="com.oatsystems.workflow.primitives.finegrained.GetFormsRemaining" remote="false"/>
+    <property name="GetLabelsRemaining" class="com.oatsystems.workflow.primitives.finegrained.GetLabelsRemaining" remote="false"/>
+    <property name="GetPrinterStatus" class="com.oatsystems.workflow.primitives.finegrained.GetPrinterStatus" remote="false"/>
+    <property name="IsDeviceOnline" class="com.oatsystems.workflow.primitives.finegrained.IsDeviceOnline" remote="false"/>
+    <property name="IterateOnListOfStrings" class="com.oatsystems.workflow.primitives.finegrained.IterateOnListOfStrings" remote="false"/>
+    <property name="IterateOnGenericCollection" class="com.oatsystems.workflow.primitives.finegrained.IterateOnGenericCollection" remote="false"/>
+    <property name="LogCommissionedEPC" class="com.oatsystems.workflow.primitives.finegrained.LogCommissionedEPC" remote="true"/>
+    <property name="LogProcessError" class="com.oatsystems.workflow.primitives.finegrained.LogProcessError" remote="true"/>
+    <property name="ReadPLCRegister" class="com.oatsystems.workflow.primitives.finegrained.ReadPLCRegister" remote="false"/>
+    <property name="ReadEntireATATag" class="com.oatsystems.workflow.primitives.finegrained.ReadEntireATATag" remote="false"/>
+    <property name="ReadUserData" class="com.oatsystems.workflow.primitives.finegrained.ReadUserData" remote="false"/>
+    <property name="RemoveAllObjectsFromContentSatisfaction" class="com.oatsystems.workflow.primitives.finegrained.RemoveAllObjectsFromContentSatisfaction" remote="true"/>
+    <property name="RemoveObjectFromContentSatisfaction" class="com.oatsystems.workflow.primitives.finegrained.RemoveObjectFromContentSatisfaction" remote="true"/>
+    <property name="SaveObjectToDatabase" class="com.oatsystems.workflow.primitives.finegrained.SaveObjectToDatabase" remote="true"/>
+    <property name="TranslateEPC" class="com.oatsystems.workflow.primitives.finegrained.TranslateEPC" remote="false"/>
+    <property name="UpdateProcess" class="com.oatsystems.workflow.primitives.finegrained.UpdateProcess" remote="true"/>
+    <property name="WritePLCRegister" class="com.oatsystems.workflow.primitives.finegrained.WritePLCRegister" remote="false"/>
+    <property name="WriteATARecord" class="com.oatsystems.workflow.primitives.finegrained.WriteATARecord" remote="false"/>
+    <property name="WriteUserData" class="com.oatsystems.workflow.primitives.finegrained.WriteUserData" remote="false"/>
+
+    <property name="AddToErrorLog" class="com.oatsystems.workflow.primitives.finegrained.AddToErrorLog" remote="false"/>
+    <property name="CacheBatchEpc" class="com.oatsystems.workflow.primitives.finegrained.CacheBatchEpc" remote="false"/>
+    <property name="ClearErrorLog" class="com.oatsystems.workflow.primitives.finegrained.ClearErrorLog" remote="false"/>
+    <property name="CommissionEPC" class="com.oatsystems.workflow.primitives.finegrained.CommissionEPC" remote="false"/>
+    <property name="CommissionEpcLocal" class="com.oatsystems.workflow.primitives.finegrained.CommissionEpcLocal" remote="false"/>
+    <property name="InitializeObject" class="com.oatsystems.workflow.primitives.finegrained.InitializeObject" remote="false"/>
+    <property name="LoadTagWriterLocal" class="com.oatsystems.workflow.primitives.finegrained.LoadTagWriterLocal" remote="false"/>
+    <property name="RawRead" class="com.oatsystems.workflow.primitives.finegrained.RawRead" remote="false"/>
+    <property name="SetProcessVar" class="com.oatsystems.workflow.primitives.finegrained.SetProcessVar" remote="false"/>
+    <property name="WriteTagThin" class="com.oatsystems.workflow.primitives.finegrained.WriteTagThin" remote="false"/>
+    <property name="ConvertMapToStringArray" class="com.oatsystems.workflow.primitives.finegrained.ConvertMapToStringArray" remote="false"/>
+    <property name="ConvertStringArrayToString" class="com.oatsystems.workflow.primitives.finegrained.ConvertStringArrayToString" remote="false"/>        
+
+    <!-- CEP-related primitives -->
+    <property name="RegisterCEPQuery" class="com.oatsystems.workflow.primitives.RegisterCEPQuery" remote="false"/>
+    <property name="InjectLocalCEPEvent" class="com.oatsystems.workflow.primitives.InjectLocalCEPEvent" remote="false"/>
+
+    <!-- Query primitives -->
+    <property name="QueryASNs" class="com.oatsystems.workflow.primitives.query.QueryASNs" remote="true"/>
+    <property name="QueryAssociations" class="com.oatsystems.workflow.primitives.query.QueryAssociations" remote="true"/>
+    <property name="QueryContentSatisfaction" class="com.oatsystems.workflow.primitives.query.QueryContentSatisfaction" remote="true"/>
+    <property name="QueryDevices" class="com.oatsystems.workflow.primitives.query.QueryDevices" remote="true"/>
+    <property name="QueryEPCObjectHierarchy" class="com.oatsystems.workflow.primitives.query.QueryEPCObjectHierarchy" remote="true"/>
+    <property name="QueryEPCObjects" class="com.oatsystems.workflow.primitives.query.QueryEPCObjects" remote="true"/>
+    <property name="QueryLocations" class="com.oatsystems.workflow.primitives.query.QueryLocations" remote="true"/>
+    <property name="QueryProducts" class="com.oatsystems.workflow.primitives.query.QueryProducts" remote="true"/>
+    <property name="QueryPurchaseOrders" class="com.oatsystems.workflow.primitives.query.QueryPurchaseOrders" remote="true"/>
+    <property name="QuerySensewareInstall" class="com.oatsystems.workflow.primitives.query.QuerySensewareInstall" remote="true"/>
+
+    <!-- Below are some test primitives for OATnano remote primitive execution -->
+    <property name="ReverseParamsTest" class="com.oatsystems.workflow.primitives.ReverseParamsTest" remote="false"/>
+    <property name="ReverseParamsTestRemote" class="com.oatsystems.workflow.primitives.ReverseParamsTestRemote" remote="true" sync="true"/>
+    <property name="SwitchOnInputTest" class="com.oatsystems.workflow.primitives.SwitchOnInputTest" remote="false"/>
+    <property name="SwitchOnInputTestRemote" class="com.oatsystems.workflow.primitives.SwitchOnInputTestRemote" remote="true" sync="true"/>
+    <property name="LogTextMessageRemote" class="com.oatsystems.workflow.primitives.LogTextMessageRemote" remote="true" sync="false"/>
+    <property name="PrintAggregate" class="com.oatsystems.workflow.primitives.PrintAggregate" remote="false"/>
+    <property name="CreateAggregate" class="com.oatsystems.workflow.primitives.CreateAggregate" remote="false"/>
+    <property name="ModifyAggregate" class="com.oatsystems.workflow.primitives.ModifyAggregate" remote="false"/>
+    
+    <!--  Zone and Visualization related primitive -->
+    <property name="UpdateZoneDetails" class="com.oatsystems.workflow.primitives.UpdateZoneDetails" remote="false"/>
+</properties>

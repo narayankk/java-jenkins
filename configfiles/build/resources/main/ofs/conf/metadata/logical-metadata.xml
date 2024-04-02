@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd"> 
+
+<meta-data property-table="Logical">
+  <table name="assn_handler">
+    <entity type="Associations">
+	<label>Associations configuration</label>
+	<description>Associations configuration</description>
+	<property key="name" column-name="handler_name" is-mandatory="true">
+	  <label>Name</label>
+          <description>The name of the Association</description>
+	  <type-definition>oat:UnitName</type-definition>
+	</property>
+	<property key="description" column-name="description" is-mandatory="false">
+	  <label>Description of the association</label>
+          <description>Description of the association</description>
+	  <type-definition>oat:Description</type-definition>
+	</property>
+	<property key="args" column-name="args" is-mandatory="false">
+	  <label>Description of the association</label>
+          <description>Description of the association</description>
+	  <type-definition>xsd:string</type-definition>
+	</property>
+	<property key="type" column-name="handler_type" is-mandatory="true">
+	  <label>The type of the association handler</label>
+          <description>type is used to find the appropriate class to instantiate for this association handler.</description>
+	  <type-definition>xsd:string</type-definition>
+	  <select>
+	    <option value="SimpleAssnHandler" is-default="true">SimpleAssnHandler</option>
+	    <option value="CustomAssnHandler">ExceptionAssnHandler</option>
+	  </select>
+	</property>
+    </entity>
+  </table>
+  <table name="assn_handler_location">
+    <entity type="AssociationLocations">
+	  <label>Associations Locations configuration</label>
+	  <description>Associations Locations configuration</description>
+    </entity>
+  </table>
+
+</meta-data>
+

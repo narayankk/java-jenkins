@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:MasterDataList
+    xmlns:tns="http://www.oatsystems.com/OAT-epcis-metadata"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.oatsystems.com/OAT-epcis-metadata OAT-epcis-metadata.xsd ">
+    <tns:SupportedSchema>
+        <tns:Schema>
+            <tns:classname>com.oatsystems.epcis.jaxb</tns:classname>
+            <tns:prefix>epcis</tns:prefix>
+            <tns:namespace>urn:epcglobal:epcis:xsd:1</tns:namespace>
+        </tns:Schema>
+        <tns:Schema>
+            <tns:classname>
+                com.oatsystems.epcis.fmcg.jaxb
+            </tns:classname>
+            <tns:prefix>fmcg</tns:prefix>
+            <tns:handlerClassname>
+                com.oatsystems.service.dquery.notification.FMCGExtensionHandler
+            </tns:handlerClassname>
+            <tns:namespace>urn:epcglobal:fmcg:xsd:1</tns:namespace>
+        </tns:Schema>
+        <tns:Schema>
+            <tns:classname>
+                com.oatsystems.epcis.oat.jaxb
+            </tns:classname>
+            <tns:prefix>oat</tns:prefix>
+            <tns:handlerClassname>
+                com.oatsystems.service.dquery.notification.OATExtensionHandler
+            </tns:handlerClassname>
+            <tns:namespace>http://www.oatsystems.com/EPCglobal-epcis-OAT-Extn1_0</tns:namespace>
+        </tns:Schema>
+    </tns:SupportedSchema>
+        
+    <tns:MasterData name="Location">
+    
+        <tns:VocabularyTypeList>
+            <tns:VocabularyType>
+                urn:epcglobal:epcis:vtype:BusinessLocation
+            </tns:VocabularyType>
+            <tns:VocabularyType>
+                urn:epcglobal:epcis:vtype:ReadPoint
+            </tns:VocabularyType>
+        </tns:VocabularyTypeList>
+        
+        <tns:VocabularyAttribute>
+            <tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:desc</tns:Id>
+                <tns:PropertyKey>description</tns:PropertyKey>
+            </tns:AttributeMetadata>
+            <tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:displayname</tns:Id>
+                <tns:PropertyKey>displayname</tns:PropertyKey>
+            </tns:AttributeMetadata>
+            <tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:category</tns:Id>
+                <tns:PropertyKey>category</tns:PropertyKey>
+            </tns:AttributeMetadata>
+            <tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:location_type</tns:Id>
+                <tns:PropertyKey>location_type</tns:PropertyKey>
+            </tns:AttributeMetadata>
+            <tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:gln</tns:Id>
+                <tns:PropertyKey>gln</tns:PropertyKey>
+            </tns:AttributeMetadata>
+            <tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:sslt</tns:Id>
+                <tns:PropertyKey>sslt_code</tns:PropertyKey>
+            </tns:AttributeMetadata>
+            <tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:sle</tns:Id>
+                <tns:PropertyKey>sle</tns:PropertyKey>
+            </tns:AttributeMetadata>
+            <tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:sslta</tns:Id>
+            </tns:AttributeMetadata>
+            <tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:allow_children</tns:Id>
+                <tns:PropertyKey>allow_children</tns:PropertyKey>
+            </tns:AttributeMetadata>
+            <tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:timezone</tns:Id>
+                <tns:PropertyKey>timezone</tns:PropertyKey>
+            </tns:AttributeMetadata>
+			<tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:site_number</tns:Id>
+                <tns:PropertyKey>site_number</tns:PropertyKey>
+            </tns:AttributeMetadata>
+			<tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:address</tns:Id>
+                <tns:PropertyKey>address</tns:PropertyKey>
+            </tns:AttributeMetadata>
+			<tns:AttributeMetadata>
+                <tns:Id>urn:oat:loc:currency</tns:Id>
+                <tns:PropertyKey>currency</tns:PropertyKey>
+            </tns:AttributeMetadata>
+            <tns:AttributeMetadata customProperty="true">
+                <tns:Id>urn:oat:loc:a_custom_property</tns:Id>
+                <tns:PropertyKey>a_custom_property</tns:PropertyKey>
+            </tns:AttributeMetadata>
+        </tns:VocabularyAttribute>
+
+    </tns:MasterData>
+</tns:MasterDataList>

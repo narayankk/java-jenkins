@@ -1,0 +1,4 @@
+<locations>
+	<!-- TO BE REMOVED: sample configuration-->
+	<location name="pos station1" readpointlocation="xpress readpoint location name"/>
+</locations>

@@ -1,0 +1,132 @@
+[
+    //Topic for scenario messages
+    {"topic" : "halo-scenario-messages",
+        "service"        : "com.oatsystems.messaging.eventhub.EHMessagingService",
+        "compressor"     : "com.oatsystems.messaging.compression.GZIPCompressor",
+        "producerconfig" : 
+        { 
+            "producer"       : [ "all" ], 
+            "threads"        : 1 
+        },
+        "consumerconfig" : 
+        {   
+            "handler"        : "com.oatsystems.service.handheld.messaging.HHMessageHandler",
+            "consumergroups" :
+            [
+                //Consumer for hh messages intended to scenarios
+                { 
+                    "group"       : "scenario-messages", 
+                    "consumer"    : [ "processserver", "standalone" ] 
+                }
+            ]
+        }
+    },
+    
+    //Topic for mv messages
+    {"topic" : "halo-mv-messages",
+        "service"        : "com.oatsystems.messaging.eventhub.EHMessagingService",
+        "compressor"     : "com.oatsystems.messaging.compression.GZIPCompressor",
+        "producerconfig" : 
+        { 
+            "producer"       : [ "all" ], 
+            "threads"        : 1 
+        },
+        "consumerconfig" : 
+        {   
+            "handler"        : "com.oatsystems.messaging.async.AsyncMessageHandler",
+            "consumergroups" :
+            [
+                //Consumer for async messages of ERP module
+                { 
+                    "group"       : "messages-to-erp", 
+                    "consumer"    : [ "processserver", "standalone" ],
+                    "processor"  : "messages-to-erp.processors"
+                 },
+            
+                //Consumer for async messages of inventory module
+                { 
+                    "group"       : "messages-to-inventory", 
+                    "consumer"    : [ "apiserver", "standalone" ],
+                    "processor"  : "messages-to-inventory.processors"
+                }, 
+
+                   //Consumer for async messages of inventory module
+                { 
+                    "group"       : "messages-to-cyclecount", 
+                    "consumer"    : [ "processserver", "standalone" ],
+                    "processor"  : "messages-to-cyclecount.processors"
+                } ,
+
+                //Consumer for async messages of inventory module
+                { 
+                    "group"       : "messages-to-workflow", 
+                    "consumer"    : [ "apiserver", "standalone" ],
+                    "processor"  : "messages-to-workflow.processors"
+                }              
+            ]
+        }
+    },
+    //separating cc-acceptance messages as per perf test
+    {"topic" : "halo-ccacceptance-messages",
+        "service"        : "com.oatsystems.messaging.eventhub.EHMessagingService",
+        "compressor"     : "com.oatsystems.messaging.compression.GZIPCompressor",
+        "producerconfig" : 
+        { 
+            "producer"       : [ "all" ], 
+            "threads"        : 1 
+        },
+        "consumerconfig" : 
+        {   
+            "handler"        : "com.oatsystems.messaging.async.AsyncMessageHandler",
+            "consumergroups" :
+            [
+                
+                //Consumer for async messages of inventory module
+                { 
+                    "group"       : "messages-to-ccacceptance", 
+                    "consumer"    : [ "processserver", "standalone" ],
+                    "processor"  : "messages-to-ccacceptance.processors"
+                }    
+            ]
+        }
+    },
+    
+    //Topic for core messages
+    {"topic" : "halo-core-messages",
+        "service"        : "com.oatsystems.messaging.eventhub.EHMessagingService",
+        "compressor"     : "com.oatsystems.messaging.compression.GZIPCompressor",
+        "producerconfig" : 
+        { 
+            "producer"       : [ "all" ], 
+            "threads"        : 1 
+        },
+        "consumerconfig" : 
+        {   
+            "handler"        : "com.oatsystems.messaging.async.AsyncMessageHandler",
+            "consumergroups" :
+            [
+                //Consumer for async messages intended to config server - product & location sync
+                { 
+                    "group"       : "messages-to-configserver", 
+                    "consumer"    : [ "configserver", "standalone" ],
+                    "processor"  : "messages-to-configserver.processors"
+                },
+                
+                //Consumer for async messages intended to process server
+                { 
+                    "group"       : "messages-to-processserver", 
+                    "consumer"    : [ "processserver", "standalone" ],
+                    "processor"  : "messages-to-processserver.processors"
+                },
+                
+                //Consumer for async messages broadcasted to all servers - scenario config changes
+                { 
+                    "group"       : "messages-many-to-many", 
+                    "consumer"    : [ "all" ], 
+                    "isbroadcast" : true,
+                    "processor"  : "messages-many-to-many.processors"
+                }              
+            ]
+        }
+    }
+]

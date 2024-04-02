@@ -1,0 +1,420 @@
+## This file contains all configuration for an installation.
+## MODIFY THIS FILE FOR EACH INSTALLATION
+
+################################################################################
+## MANDATORY PARAMETERS
+################################################################################
+
+## Server mode this installation is running as.  It can either
+## be ENTERPRISE or SITE or CCS
+SERVER_MODE=SITE
+SERVER_MODE_NAME=OATxpress
+
+## A unique 4 digit hex string assigned to the senseware.
+## This value should be a valid hexadecimal number which is unique
+## across all Senseware that interact with each other
+OATEDGE_SERIAL_NUMBER=0001
+
+## The position of this Senseware installation in the hierarchy of
+## Sensewares.  Central systems should set this to HIGH, and local
+## systems should set this to LOW
+SW_HIERARCHY_POSITION=LOW
+
+## Is this Senseware directly by an administrator (TRUE), or is it
+## managed by a central system (FALSE). It should be NA if
+## NODE_POSITION is high, and should be one of TRUE/FALSE otherwise
+IS_MANAGED_BY_SELF=TRUE
+
+## If the Senseware is managed by a central system, this property
+## should be set to the SOAP address of central server
+#CMS_MGMT_STATION_SOAP_URL=http://192.168.1.183:8080/soap/servlet/rpcrouter
+
+## The human-readable name for the installation unique among a
+## hierarchy of Senseware installations
+OATEDGE_NAME=oatedge1
+
+## The time between configuration synchronizations in seconds
+TIME_BETWEEN_CONFIG_SYNC=3600
+
+################################################################################
+## Optional variables that can be specified as environment variables
+################################################################################
+
+## Uncomment to set the install directory
+INSTALL_DIR=/usr/local
+INSTALL_DIR2=/usr/local
+OFS_ROOT=/usr/local
+OFS_ROOT2=/usr/local
+WAS_BIN_DIR=
+WAS_APPSERVER=
+
+## Uncomment to set the java home directory
+#JAVA_HOME=/usr/java
+JAVA_HOME=/opt/java/openjdk/bin/java
+
+#Xmx for JVM
+JAVA_XMX=1024m
+JAVA_XMS=1024m
+
+#Tomcat Folders
+CATALINA_HOME=/usr/local/tomcat
+CATALINA_BASE=/usr/local/tomcat
+
+OATEDGE_PORT=
+WEBAPP_PORT=8443
+## Server Port used by Tomcat server if SITE / CCS / ENTERPRISE are installed on same machine
+TOMCAT_SERVER_PORT=8005
+TOMCAT_INSTALL_DIR=tomcat
+
+## Datamigration server details
+OATAXIOM_SERVER=
+OATAXIOM_PORT=
+OATAXIOM_JMS_PORT=
+
+
+################################################################################
+## Optional enterprise server properties if EA is being installed with ENMS
+################################################################################
+CCS_ENMS_SERVER_ENABLED=
+
+################################################################################
+## Optional enterprise server properties if configured for SITE
+################################################################################
+CCS_SERVER_ENABLED=false
+CCS_SERVER_SYNC_ON_STARTUP=FALSE
+CCS_SERVER_NAME=oatCCS
+CCS_SERVER_HOST=
+CCS_SERVER_PORT=
+
+################################################################################
+## EDM Details for Site/EA
+################################################################################
+EDM_SERVER_HOST=
+EDM_SERVER_PORT=
+DM_DATA_COMPRESSION_ENABLED=false
+DM_PUSH_MODE=no
+DM_TRANSPORT_SIZE=
+DM_WAIT_TIME=
+DM_SCHDULE_TIME=
+
+
+################################################################################
+## OAuth2.0
+################################################################################
+USE_OAUTH2=false
+
+################################################################################
+## Email configuration
+################################################################################
+
+## (Optional)The SMTP host through which emails can be sent
+SMTP_HOST=localhost
+
+## (Optional)The email address used while sending mails for account creation/modification
+SENDER_ADDR_FOR_ACCOUNT_CHANGES=postmaster@localhost.localdomain
+
+## (Optional)The email address used while sending mails for alerts
+SENDER_ADDR_FOR_ALERTS=postmaster@localhost.localdomain
+
+
+################################################################################
+## Data migration configuration. Can be configured through UI also.
+################################################################################
+
+## The IP address or DNS name of the machine to which data should be migrated. Empty if not defined
+#DATA_MIGRATION_HOST=192.168.1.183
+
+## The time between data migration in seconds
+TIME_BETWEEN_DATA_MIGRATION=3600
+
+
+################################################################################
+## Database configuration
+################################################################################
+
+## Valid DB_TYPE values:
+DB_VALID_TYPES="postgres, sqlserver,oracle,db2"
+## TO BE ADDED: db2, oracle, sybase, mysql
+
+## The type of database.  Valid values are defined in DB_VALID_TYPES
+DB_TYPE=sqlserver
+
+## The user name used to login to the database
+POSTGRES_DB_USER=sa
+ORACLE_DB_USER=sa
+#SQLSERVER_DB_USER=sa
+DB2_DB_USER=sa
+ENTERPRISE_DB_USER=
+
+## The password used to login to the database
+POSTGRES_DB_PASSWORD=4/LLDbrozoN+pFGImLp5QQ==
+
+DB2_DB_PASSWORD=4/LLDbrozoN+pFGImLp5QQ==
+
+ORACLE_DB_PASSWORD=4/LLDbrozoN+pFGImLp5QQ==
+
+#SQLSERVER_DB_PASSWORD=4/LLDbrozoN+pFGImLp5QQ==
+
+ENTERPRISE_DB_PASSWORD=
+## The name of the database
+#DB_NAME=newcicd
+ENTERPRISE_DB_NAME=
+## The password of the database encypted
+#DB_PASSWORD_ENCRYPTED=true
+ENTERPRISE_DB_PASSWORD_ENCRYPTED=true
+ENTERPRISE_SERVICE_NAME=;
+## I18N for DBURL
+ENABLE_I18N=true
+## JIRA MV-4745 - Database URL
+#DB_URL=jdbc:sqlserver://172.26.65.109:1433;DatabaseName=newcicd;SelectMethod=cursor;sendStringParametersAsUnicode=true;
+MASTER_DB_URL=jdbc:sqlserver://172.26.65.109:1433;DatabaseName=master;SelectMethod=cursor;sendStringParametersAsUnicode=true;
+## The IP address or DNS name of the machine hosting the database
+#DB_HOST=172.26.65.109
+ENTERPRISE_DB_HOST=
+## JDBC Driver:
+POSTGRES_JDBC_DRIVER=org.postgresql.Driver
+SQLSERVER_JDBC_DRIVER=com.microsoft.sqlserver.jdbc.SQLServerDriver
+DB2_JDBC_DRIVER=com.ibm.db2.jcc.DB2Driver
+#JIRA TWO-8728- Changing driver for Oracle 11g upgrade
+ORACLE_JDBC_DRIVER=oracle.jdbc.OracleDriver
+## JDBC Prefix:
+POSTGRES_JDBC_PREFIX=jdbc:postgresql
+SQLSERVER_JDBC_PREFIX=jdbc:sqlserver
+DB2_JDBC_PREFIX=jdbc:db2
+ORACLE_JDBC_PREFIX=jdbc:oracle:thin
+
+## PORT ORACLE DATABASE IS RUNNING ON
+DB_PORT=1433
+ENTERPRISE_DB_PORT=
+DB_SERVICE=
+ENTERPRISE_DB_SERVICE=
+
+#DB2 table space which has more than 8K page size
+DB2_TABLESPACE=
+
+# Oracle Index table space name to store indexes
+INDEX_TABLE_SPACE_NAME=
+
+STAR_DB_HOST=
+STAR_DB_NAME=
+STAR_DB_USER=
+STAR_DB_PASSWORD_ENCRYPTED=true
+STAR_DB_PASSWORD=
+STAR_DB_SERVICE=
+STAR_DB_TYPE=sqlserver
+STAR_DB_PORT=
+STAR_DB_DOMAIN_NAME=link_to_ods
+MSTR_SERVER_NAME=
+
+## Kettle DB Details
+KETTLE_DB_PASSWORD=
+KETTLE_STAR_DB_PASSWORD=
+
+STAR_DB2_TABLESPACE=
+
+## Database connection check level:
+POSTGRES_DB_CONN_CHECK_LEVEL=2
+SQLSERVER_DB_CONN_CHECK_LEVEL=2
+DB2_DB_CONN_CHECK_LEVEL=2
+ORACLE_DB_CONN_CHECK_LEVEL=2
+
+## Database connection test statement:
+POSTGRES_DB_CONN_TEST_STMT="SELECT 1"
+SQLSERVER_DB_CONN_TEST_STMT="SELECT 1"
+DB2_DB_CONN_TEST_STMT="SELECT 1 FROM SYSIBM.SYSDUMMY1"
+ORACLE_DB_CONN_TEST_STMT="SELECT 1 FROM DUAL"
+
+
+################################################################################
+## Web Server configuration
+################################################################################
+
+## The type of Web Server
+WS_TYPE=Tomcat
+
+
+################################################################################
+## JMS Provider configuration
+################################################################################
+JMS_TYPE=Websphere
+JMS_CONNECTION_FACTORY=
+JMS_PROVIDER_URL=
+JMS_FACTORY_CLASS=
+JMS_QUEUE_NAME=
+JMS_USER_NAME=
+JMS_PASSWORD=
+
+######## JMS for OATedge communication #####
+JMS_AGENT_PROVIDER_SERVICE=ActiveMQJMSAgent
+
+#########  JMS for SOA  #######
+JMS_CONNECTION_FACTORY_SOA=
+JMS_PROVIDER_URL_SOA=
+JMS_FACTORY_CLASS_SOA=
+JMS_QUEUE_NAME_SOA=
+JMS_USER_NAME_SOA=
+JMS_PASSWORD_SOA=
+JMS_NOTIFICATION_QUEUE_NAME_SOA=
+JMS_IMPORT_QUEUE_NAME_SOA=
+
+## Should JMS SOAP Listener be started
+ENABLE_JMS=false
+
+################################################################################
+####  Product management service, DefaultProductService or EnmsProductService
+################################################################################
+PRODUCT_SERVICE=
+ENMS_COMPANY_PREFIX=
+
+################################################################################
+####  Sercure http
+################################################################################
+SSL_PORT=8443
+SOAP_SSL_PORT=
+#SSL_HOST_NAME=172.26.64.123
+SSL_ENABLE=true
+
+################################################################################
+####    Run on oatedege on startup of linux
+################################################################################
+
+START_UP=yes
+
+################################################################################
+####    Run on Cluster
+################################################################################
+
+HA_CONFIG=
+
+################################################################################
+####    WAS service name
+################################################################################
+
+WASSVC_NAME=
+
+################################################################################
+####    SQL service name
+################################################################################
+
+SQLSVC_NAME=
+
+###############################################################################
+###     WAS COnnection type and port string for non-default APPSERVER
+###############################################################################
+
+WAS_CONNTYPE_STRING=
+
+# TNS name
+ENTERPRISE_DB_TNS_NAME=
+DB_TNS_NAME=
+STAR_DB_TNS_NAME=
+
+
+###############################################################################
+###     User Management spefic config variables
+###############################################################################
+
+## Default Values
+USER_MANAGEMENT_LOCAL_SERVICE=UserManagementDefaultServices
+USER_MANAGEMENT_EXTERNAL_SERVICE=UserManagementExternalServices
+USER_MANAGEMENT_EXT_SITE_SERVICE=UserManagementSiteServices
+USER_AUTH_MODE_SITE_DEFAULT=true
+USER_AUTH_MODE_CCS_DEFAULT=false
+
+## Possible values: true/false
+USER_IS_EXTERNAL_AUTH_MODE=false
+
+#possible values: true/false
+USER_MICROSOFT_ACTIVE_DIRECTORY=
+
+#possbile values: ant ldap url like ldap://adserver.company.com:port
+USER_LDAP_URL=
+
+#possible values: any DN values like CN=users,DC=company,DC=com
+USER_LDAP_BASE_DN=
+
+#possible values: CN/LoginID
+USER_LOGIN_FORMAT=
+
+#possible Values: any admin DN like CN=Administrator,cn=users,dc=company,dc=com
+USER_OAT_ADMIN_DN=
+
+#possbile values: encrypted passwd
+USER_OAT_ADMIN_PASSWD=
+
+#possible values: true/false
+USER_OAT_ADMIN_GROUP=
+
+#possible values: NULL or Admin group name (only one group)
+USER_OAT_ADMIN_GROUP_NAME=
+
+#possible values: true/false
+USER_OAT_ADMIN_MULTI_GROUP=
+
+#possible values: NULL or Admin group names comma(,) separated names
+USER_OAT_ADMIN_MULTI_GROUP_NAMES=
+
+#possible values: NULL or user group names comma(,) separated names
+USER_OAT_USER_GROUP_NAMES=
+
+#possible values: true/false
+USER_AUTH_PASSWD_CACHE=true
+
+SYSTEM_ROOT=
+
+##########################
+#Server Port Definitions
+##########################
+
+### SITE  #####
+SITE_SMX_TELNET_PORT=18899
+SITE_RMI_REG_PORT=6099
+SITE_RMI_REG_PORT_MA=7099
+SITE_RMI_REG_PORT_WINSVC=5099
+SITE_TYCO_NOTIF_PORT=2981
+
+### CCS  #####
+CCS_SMX_TELNET_PORT=0
+CCS_RMI_REG_PORT=6098
+CCS_RMI_REG_PORT_MA=7098
+CCS_RMI_REG_PORT_WINSVC=5098
+CCS_TYCO_NOTIF_PORT=2988
+
+### EDM  #####
+EDM_SMX_TELNET_PORT=0
+EDM_RMI_REG_PORT=6090
+EDM_RMI_REG_PORT_MA=7090
+EDM_RMI_REG_PORT_WINSVC=5090
+EDM_TYCO_NOTIF_PORT=2980
+
+ACTIVEMQ_PORT=61616
+
+############################
+#Security flags
+############################
+RMI_SECURITY=false
+JMS_BROKER_SECURITY=false
+WS_SECURITY=false
+
+############################
+# WAS autologin flags
+############################
+LOGIN_EVENT=GOTO_LOGIN_EVENT
+WAS_LOGIN_ENABLED=false
+WAS_ADMIN_GROUPS=
+WAS_ADMIN_USER_NAME=
+WAS_ADMIN_USER_PASSWD=
+
+###########################
+# HTTP communication with SAP AII
+###########################
+SAP_AII_USER=
+SAP_AII_PASSWORD=
+
+###########################
+# WS context
+###########################
+WS_CONTEXT=axis
+CCS_WS_CONTEXT=axis
+EDM_WS_CONTEXT=axis
+

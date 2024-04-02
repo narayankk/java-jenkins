@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://support.oatsystems.com/xsd/scenarios4_0.xsd">
+  <property key="version">5.1</property>
+  <property key="scenario.type">Apparel_Receiving</property>
+  <property key="name">Poolable MV Handheld Receiving Untagged and Returns Scenario</property>
+  <property key="description">This scenario receives EPC-GTIN data from handheld reader and makes association of EPC with the receiving location. It creates a product corresponding to the given GTIN if necessary.</property>
+  <property key="poolable">true</property>
+  <process>
+    <start name="Start">
+      <target name="SetVariablesToNull" />
+    </start>
+        
+    <activity name="SetVariablesToNull" resource="primitive:SetVariablesToNull">
+      <target name="ResetProcessId" exit="done" />
+      <target name="ResetProcessId" exit="skip" />
+      <target name="RETRY_NEEDED" exit="error" />
+      <output name="variable0" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currTag}</output>
+      <output name="variable1" class="java.util.Set">${process.failedEpcs}</output>
+      <output name="variable2" class="java.lang.Object">${process.parentLocationEpc}</output>
+      <output name="variable3" class="java.lang.String">${process.user}</output>
+      <output name="variable4" class="java.lang.Object">${process.processStartTime}</output>
+      <output name="variable5" class="java.lang.Object">${process.processEndTime}</output>      
+      <output name="variable6" class="java.lang.Object">${process.elapsedTimeInSeconds}</output>
+      <output name="variable7" class="java.lang.Object">${process.currentIndex}</output>
+    </activity>
+
+        <activity name="ResetProcessId" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+          <target name="ResetCurrentIndex" exit="done"/>
+          <target name="ResetCurrentIndex" exit="error"/>
+          <input  name="value" class="java.lang.String">''</input>
+          <output name="variable" class="java.lang.String">${process.processID}</output>
+        </activity>
+    	
+    	<activity name="ResetCurrentIndex" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+          <target name="ProcessMessageIn" exit="done"/>
+          <target name="ProcessMessageIn" exit="error"/>
+          <input  name="value" class="java.lang.String">''</input>
+          <output name="variable" class="java.lang.String">${process.currentIndex}</output>  
+    </activity>
+    
+
+
+    <activity name="ProcessMessageIn" resource="class:com.oatsystems.workflow.apparel.primitives.ProcessMessageIn">
+      <target name="StartMongoProcess" exit="done" />
+      <target name="FAILURE" exit="error" />
+      <input name="payload" class="java.lang.Object">${process.payload}</input>
+      <output name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</output>
+      <output name="processType" class="java.lang.String">${process.processType}</output>
+      <output name="processSubType" class="java.lang.String">${process.processSubType}</output>
+      <output name="handheldID" class="java.lang.String">${process.handheldID}</output>
+      <output name="scenarioID" class="java.lang.String">${process.scenarioID}</output>
+      <output name="user" class="java.lang.String">${process.user}</output>
+      <output name="processStartTime" class="java.lang.String">${process.processStartTime}</output>
+      <output name="processEndTime" class="java.lang.String">${process.processEndTime}</output>
+      <output name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</output>
+      <output name="location" class="java.lang.String">${process.parentLocationEpc}</output>
+    </activity>
+    
+   <activity name="StartMongoProcess" resource="class:com.oatsystems.workflow.primitives.StartMongoProcess">
+	  <target name="DecideOnInferringReceivingLocation" exit="done" />
+	   <target name="SUCCESS" exit="alreadyProcessed" />
+      <target name="RETRY_NEEDED" exit="error" />
+      <input  name="user" class="java.lang.String">${process.user}</input>
+      <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+      <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input  name="hhEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input  name="processType" class="java.lang.String">${process.processType}</input>
+      <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+      <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+   </activity>
+	
+	<decision name="DecideOnInferringReceivingLocation">
+      <case target="GetReceivingLocation" condition="${process.processType}.equalsIgnoreCase('ITEM_RECV')" />
+      <default target="GetSiteIdForLocation" />
+    </decision>
+	
+	<activity name="GetReceivingLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetInferredDefaultLocation">
+      <target name="GetSiteIdForLocation" exit="processed"/>
+	  <target name="GetSiteIdForLocation" exit="done" />
+	  <target name="RetryStopMongoProcess" exit="error" />
+	  <input name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+	  <input name="locSubTypePrefix" class="java.lang.String">'receiving'</input>
+	  <output name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</output>
+	  <output name="readPointLocation" class="java.lang.String">${process.rpLocEpc}</output>
+	  <output name="siteId" class="java.lang.String">${process.parentLocSiteId}</output>
+	</activity>
+	
+    <activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+      <target name="CheckIfReceived" exit="done" />
+      <target name="RetryStopMongoProcess" exit="error" />
+      <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+      <output name="siteId" class="java.lang.String">${process.parentLocSiteId}</output>
+      <output name="siteName" class="java.lang.String">${process.parentSiteName}</output>
+	   <output name="siteEpc" class="java.lang.String">${process.siteEpc}</output>
+    </activity>
+    
+     <activity name="CheckIfReceived" resource="class:com.oatsystems.solutions.apparel.primitives.CheckProcessExists">
+          <target name="StartAssociationProcess" exit="notexists" />
+          <target name="IterateOnTagArrayBatch" exit="exists" />
+          <target name="RetryStopMongoProcess" exit="error" />
+          <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+          <input name="processType" class="java.lang.String">${process.processType}</input>
+          <input name="user" class="java.lang.String">${process.user}</input>
+          <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+          <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+          <input name="processSubType" class="java.lang.String">${process.processSubType}</input>  
+          <input name="handheldID" class="java.lang.String">${process.handheldID}</input> 
+          <output name="processID" class="java.lang.String">${process.processID}</output>
+        </activity>
+
+        <activity name="IterateOnTagArrayBatch" resource="class:com.oatsystems.workflow.primitives.IterateOnObjectArrayInBatch">
+       <target name="CheckIfReceiveUntagged" exit="continue" />
+       <target name="CloseAssociationProcess" exit="break" />
+       <target name="CloseAssociationProcessForFailure" exit="error" />
+       <input name="iterationRange" class="[Ljava.lang.Object;">${process.tags}</input>
+       <input name="currentStartIndex" class="java.lang.String">${process.currentIndex}</input>
+       <input name="batchSize" class="java.lang.String">1000</input>
+       <output name="currentEndIndex" class="java.lang.String">${process.currentIndex}</output>
+       <output name="currentValues" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+     </activity>
+    <activity name="StartAssociationProcess" resource="primitive:StartProcess">
+      <target name="InitialiseFailedEpcsList" exit="done" />
+      <target name="RetryStopMongoProcess" exit="error" />
+      <input name="processMasterCode" class="java.lang.String">${process.processType}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+      <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="processData5" class="java.lang.String">${process.parentLocationEpc}</input>      
+      <input name="processData6" class="java.lang.String">${process.siteEpc}</input>      
+      <input name="processData7" class="java.lang.String">${process.handheldID}</input>      
+      <input name="processData8" class="java.lang.String">${process.scenarioID}</input>      
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>      
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+    <activity name="InitialiseFailedEpcsList" resource="primitive:SetVariablesToNull" >
+      <target name="IterateOnTagArrayBatch" exit="done" />
+      <target name="IterateOnTagArrayBatch" exit="skip" />
+      <target name="IterateOnTagArrayBatch" exit="error" />
+      <output name="variable0" class="java.util.Set">${process.failedEpcs}</output>
+    </activity>
+    
+    
+    <activity name="IterateOnTagArray" resource="primitive:IterateOnObjectArray">
+      <target name="CheckIfReceiveUntagged" exit="continue" />
+      <target name="CheckIfReceiveUntagged" exit="break"/>
+      <target name="RetryStopMongoProcess" exit="error"/>
+      <input name="iterationRange" class="[Ljava.lang.Object;">${process.tags}</input>
+      <input name="currentIndex" class="java.lang.String">${process.currentIndex}</input>
+      <output name="currentIndex" class="java.lang.String">${process.currentIndex}</output>
+      <output name="currentValue" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currTag}</output>
+    </activity>
+
+<!--
+    <activity name="UpdateEpcProductMapping" resource="class:com.oatsystems.workflow.primitives.UpdateEpcProductMapping">
+      <target exit="done" name="AssociateTagToLocation"/>
+      <target exit="error" name="AddToFailedEpcsOnError"/>
+      <input class="java.lang.String" name="epc">${process.currTag}.getEpc()</input>
+      <input name="timestamp" class="java.lang.String">${process.currTag}.getReadTimeStamp()</input>
+      <input name="tag" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currTag}</input>
+    </activity>
+-->
+
+    <decision name="CheckIfReceiveUntagged">
+      <case target="DecideIfCurrentLocIdIsNull" condition="${process.processType}.equalsIgnoreCase('ITEM_RECV')" />
+      <default target="AssociateTagToLocation" />
+    </decision>
+    
+    <activity name="AssociateTagToLocation" resource="class:com.oatsystems.workflow.primitives.AssociateEpcToLocationMDBatch">
+      <target name="IterateOnTagArrayBatch" exit="associated" />
+      <target name="CloseAssociationProcessForFailure" exit="error" />
+	  <input name="epcList" class="java.util.List">${process.epcList}</input>    
+     <!-- <input name="epc" class="java.lang.String">${process.currTag}.getEpc()</input>
+      <input name="containeeObj" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currTag}</input>
+      <input name="timestamp" class="java.lang.String">${process.currTag}.getReadTimeStamp()</input>-->
+      <input name="checkEpcValidity" class="java.lang.String">FALSE</input>
+      <!--<input name="associationLocationEpc" class="java.lang.String">${process.currTag}.getCurrentLocationID()</input>-->
+      <input name="associationSiteId" class="java.lang.String">${process.parentLocSiteId}</input>
+      <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input  name="logVerification" class="java.lang.String">true</input>
+      <input  name="processId" class="java.lang.String">${process.processID}</input>
+     <!-- <input  name="status" class="java.lang.String">${process.currTag}.getDescription()</input>-->
+      <input name="processType" class="java.lang.String">${process.processType}</input>
+      <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+    </activity>
+
+	<decision name="DecideIfCurrentLocIdIsNull">
+	 <!-- <case target="SetInferredReadPointLocation" condition="${process.currTag}.getCurrentLocationID() eq NULL" />-->
+	  <default target="SetRPLocationBatch" />
+	</decision>
+	<activity name="SetRPLocationBatch" resource="class:com.oatsystems.solutions.apparel.primitives.SetRPLocationBatch">
+    <target name="AssociateTagToLocationReceiveUntagged" exit="done"/> 
+      <target name="AssociateTagToLocationReceiveUntagged" exit="error" />
+	  <input name="readPointEpc" class="java.lang.String">${process.rpLocEpc}</input>     
+	  <input name="parentLocationEpc" class="java.lang.String"> ${process.parentLocationEpc}</input> 
+      <input name="epcListArray" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</input>
+      <input name="failedEpcs" class="java.util.Set">${process.failedEpcs}</input>
+      <output name="failedEpcs" class="java.util.Set">${process.failedEpcs}</output>
+      <output name="epcList" class="java.util.List">${process.epcList}</output>
+    </activity>
+
+	
+    <activity name="AssociateTagToLocationReceiveUntagged" resource="class:com.oatsystems.workflow.primitives.AssociateEpcToLocationMDBatch">
+      <target name="IterateOnTagArrayBatch" exit="associated" />
+      <target name="CloseAssociationProcessForFailure" exit="error" />
+	  <input name="epcList" class="java.util.List">${process.epcList}</input>
+  
+      <input name="checkEpcValidity" class="java.lang.String">FALSE</input>
+      <!--<input name="associationLocationEpc" class="java.lang.String">${process.readPointLoc}</input>-->
+      <input name="associationSiteId" class="java.lang.String">${process.parentLocSiteId}</input>
+      <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input  name="logVerification" class="java.lang.String">true</input>
+      <input  name="processId" class="java.lang.String">${process.processID}</input>
+      <!--<input  name="status" class="java.lang.String">${process.currTag}.getDescription()</input>-->
+      <input name="processType" class="java.lang.String">${process.processType}</input>
+      <input name="processSubType" class="java.lang.String">${process.processSubType}</input>  
+      <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>    
+    </activity>
+
+
+
+
+    <activity name="CloseAssociationProcess" resource="primitive:CloseProcess">
+      <target name="StopMongoProcess" exit="done" />
+      <target name="RetryStopMongoProcess" exit="error" />
+      <input name="processID" class="java.lang.String">${process.processID}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+      <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="processData5" class="java.lang.String">${process.parentLocationEpc}</input>      
+      <input name="processData6" class="java.lang.String">${process.siteEpc}</input>      
+      <input name="processData7" class="java.lang.String">${process.handheldID}</input>      
+      <input name="processData8" class="java.lang.String">${process.scenarioID}</input>      
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>      
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+
+    <activity name="CloseAssociationProcessForFailure" resource="primitive:CloseProcess">
+      <target name="RetryStopMongoProcess" exit="done" />
+      <target name="RetryStopMongoProcess" exit="error" />
+      <input name="processID" class="java.lang.String">${process.processID}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData2" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.processEndTime}</input>
+      <input name="processData4" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="processData5" class="java.lang.String">${process.parentLocationEpc}</input>      
+      <input name="processData6" class="java.lang.String">${process.siteEpc}</input>      
+      <input name="processData7" class="java.lang.String">${process.handheldID}</input>      
+      <input name="processData8" class="java.lang.String">${process.scenarioID}</input>      
+      <input name="processData9" class="java.lang.String">${process.processSubType}</input>      
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+   
+     <activity name="RetryStopMongoProcess" resource="class:com.oatsystems.workflow.primitives.StopMongoProcess">
+	  <target name="RETRY_NEEDED" exit="done" />
+      <target name="RETRY_NEEDED" exit="error" />
+      <input  name="user" class="java.lang.String">${process.user}</input>
+      <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+      <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input  name="hhEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input  name="processType" class="java.lang.String">${process.processType}</input>
+      <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+      <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+   </activity>
+   
+   <activity name="StopMongoProcess" resource="class:com.oatsystems.workflow.primitives.StopMongoProcess">
+	  <target name="SUCCESS" exit="done" />
+      <target name="SUCCESS" exit="error" />
+      <input  name="user" class="java.lang.String">${process.user}</input>
+      <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+      <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input  name="hhEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input  name="processType" class="java.lang.String">${process.processType}</input>
+      <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+      <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+   </activity>
+   
+    <end name="SUCCESS"></end>
+    <end name="RETRY_NEEDED"></end>
+    <end name="FAILURE"></end>
+  </process>
+  <config>
+  	
+    
+    <var name="${process.payload}" class="java.lang.Object">
+        <property key="ui.required">false</property>
+        <!-- <property key="ui.configurable">false</property>  -->
+    </var>
+  </config>
+  <display/>
+</scenario>

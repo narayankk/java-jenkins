@@ -1,0 +1,81 @@
+{
+  "TaskType": [
+    {
+      "processType": "CYCLECOUNT",
+      "name": "Counting",
+      "imageRelativePath": "/xyx.jpg",
+      "subtypes": [
+        {
+          "name": "Individual Count",
+          "inputs": [
+            {
+              "name": "",
+              "required": "false",
+              "multi-valued": "false",
+              "value": "",
+              "providerClass": ""
+            }
+          ]
+        },
+        {
+          "name": "Team Count",
+          "inputs": [
+            {
+              "name": "",
+              "required": "false",
+              "multi-valued": "false",
+              "value": "",
+              "providerClass": ""
+            }
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "name": "Filter Name",
+          "required": "false",
+          "multi-valued": "false",
+          "value": "filterName",
+          "providerClass": "com.oatsystems.tmsext.service.impl.TMSFiltersListImpl"
+        },
+        {
+          "name": "Location Type",
+          "required": "true",
+          "multi-valued": "false",
+          "value": "location",
+          "providerClass": "com.oatsystems.tmsext.service.impl.TMSLocationSubtypeListImpl"
+        }
+      ]
+    },
+    {
+      "processType": "RESTOCK",
+      "name": "Replenishment",
+      "imageRelativePath": "/rep.jpg",
+      "subtypes": [],
+      "inputs": [
+        {
+          "name": "Filter Name",
+          "required": "false",
+          "multi-valued": "false",
+          "value": "filterName",
+          "providerClass": "com.oatsystems.tmsext.service.impl.TMSFiltersListImpl"
+        }
+      ]
+    },
+    {
+      "processType": "FREEFORM",
+      "name": "Free Form",
+      "imageRelativePath": "/freeform.jpg",
+      "subtypes": [],
+      "inputs": [
+        {
+          "name": "",
+          "required": "false",
+          "multi-valued": "false",
+          "value": "",
+          "providerClass": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+<?xml version="1.0" ?>
+<!--
+ * $Source: /usr/local/cvs/ofs/install/src/dist/conf/site-des-config.xml.template.in,v $
+ * $Revision: 1.10 $
+ * $State: Exp $
+ * @version $Id: site-des-config.xml.template.in,v 1.10 2013/10/31 09:00:52 agupta Exp $
+-->
+
+<!DOCTYPE errors SYSTEM "file:///usr/local/ofs/conf/des-config.dtd">
+
+<!-- OATedge DES Services -->
+
+<des-config>
+    <transport-clients>
+		<client class-name="com.oatsystems.des.client.DMJMSProducer" desc="JMS client" />
+        <client class-name="com.oatsystems.des.client.TCPClient" desc="TCP client" />
+        <client class-name="com.oatsystems.des.client.SOAPClient" desc="SOAP client" />
+		<client class-name="com.oatsystems.des.file.FileClient" desc="File client" />
+        <client class-name="com.oatsystems.ams.EmailClient" desc="Email client" />
+        <client class-name="com.oatsystems.ams.SNMPClient" desc="Snmp trap client" />
+    </transport-clients>
+
+    <local-services>
+        <!-- BEGIN : services for Edge to Axiom Data Migration -->
+        <service topic="dm-export" class-name="com.oatsystems.dm.sender.des.DMExportService" desc="Data migration export">
+            <args/>
+        </service>
+
+		 <!-- BEGIN : services for Edge to Offline Axiom Data Migration -->
+        <service topic="dm-export-offline" class-name="com.oatsystems.dm.sender.des.DMExportService" desc="Data migration export">
+            <args/>
+        </service>
+
+        <service topic="axiom-soap-transfer" class-name="com.oatsystems.dm.sender.des.AxiomTransferService" desc="Axiom soap data transfer">
+          <args/>
+        </service>
+
+        <service topic="edge-version" class-name="com.oatsystems.dm.sender.des.EdgeVersionService" desc="Service to return Edge version">
+          <args/>
+        </service>
+        <!-- END   : services for Edge to Axiom Data Migration -->
+
+
+        <!-- BEGIN : services for CCS to Edge Master Data Migration -->
+
+        <!-- call when DES SOAP listener received CSS Master Data Migration data -->
+        <service topic="ccs-export" class-name="com.oatsystems.ccs.des.ImportCCSDataService" desc="Data migration export">
+            <args/>
+        </service>
+
+        <!-- call from InitiateCCSDataMigrationSoapBindingImpl -->
+        <service topic="initiate-ccs-soap" class-name="com.oatsystems.dm.receiver.des.CCSInitiateTransferService" desc="Data migration import">
+            <args/>
+        </service>
+
+        <!-- END   : services for CCS to Edge Master Data Migration -->
+
+
+
+        <service topic="association" class-name="com.oatsystems.service.logical.AssociationService" desc="Association service" static="true">
+            <args/>
+        </service>
+
+        <service topic="reader-proxy" class-name="com.oatsystems.service.reader.ReaderProxyService" desc="Reader proxy service">
+            <args/>
+        </service>
+
+        <service topic="print-label" class-name="com.oatsystems.service.printlabel.PrintLabelService" desc="Print label service">
+            <args/>
+        </service>
+
+        <service topic="reader-config" class-name="com.oatsystems.service.readerconfig.ReaderConfigService" desc="Reader config service">
+            <args/>
+        </service>
+
+        <service topic="digitalio" class-name="com.oatsystems.service.digitalio.DigitalIOService" desc="Digital IO service">
+            <args/>
+        </service>
+
+        <service topic="dquery-service" class-name="com.oatsystems.service.dquery.DQueryService" desc="Dquery service">
+            <args/>
+        </service>
+
+        <service topic="epccomm" class-name="com.oatsystems.service.epccomm.EPCCommService" desc="EPC commissioning service">
+            <args/>
+        </service>
+
+        <service topic="scenario-recorder" class-name="com.oatsystems.wfe.tools.ScenarioRecordingService" desc="Scenario Recording Service">
+            <args/>
+        </service>
+    </local-services>
+
+    <remote-listeners>
+        <listener remote-peer-id="dm-tcp-listener" desc="The TCP server writes to this listener">
+            <transformer class-name="com.oatsystems.des.SimpleServerTransformer">
+                <args>topic=dm-import remote_peer_id=dm-tcp-listener</args>
+            </transformer>
+        </listener>
+
+        <listener remote-peer-id="dm-status-tcp-listener" desc="The TCP server writes to this listener for dm status queries">
+            <transformer class-name="com.oatsystems.des.SimpleServerTransformer">
+                <args>topic=dm-status-query remote_peer_id=dm-tcp-listener</args>
+            </transformer>
+        </listener>
+
+        <listener remote-peer-id="generic-soap" desc="The SOAP service GenericService writes to this listener">
+            <transformer class-name="com.oatsystems.des.GenericServerTransformer">
+                <args>remote_peer_id=generic-soap</args>
+            </transformer>
+        </listener>
+
+    </remote-listeners>
+
+    <remote-services>
+        <remote-service topic="post-alert" remote-peer-id="mail" desc="Transformer for AMS">
+            <transformer class-name="com.oatsystems.ams.AMSTransformer">
+                <args>transport_type=email</args>
+            </transformer>
+        </remote-service>
+        <remote-service topic="post-alert" remote-peer-id="snmp" desc="Transformer for SNMP TRAP">
+            <transformer class-name="com.oatsystems.ams.SNMPTransformer">
+                <args>transport_type=snmp</args>
+            </transformer>
+        </remote-service>
+
+        <!-- BEGIN : CCS to Edge Master Data Synchronization remote services, RECVR_WS_CONTEXT, RECVR_HOST & RECVR_PORT will subsitute with CCS host & port at runtime -->
+        <remote-service topic="initiate-ccs-soap" remote-peer-id="ccs" desc="Data migration import transformers for hl-savant over SOAP">
+            <transformer class-name="com.oatsystems.des.SoapClientTransformer">
+                <args>transport_type=soap envelope_data=<![CDATA["<soap-call service-url=\"http://@RECVR_HOST:@RECVR_PORT/@RECVR_WS_CONTEXT/services\" target-object-uri=\"GenericService\" method=\"queryDES\"><param name=\"topic\" class=\"String\"/><param name=\"message\" class=\"String\"/></soap-call>"]]>
+                </args>
+            </transformer>
+        </remote-service>
+        <!-- END   : CCS to Edge Master Data Migration remote services -->
+
+        <!-- Edge to Axiom Data Migration remote services -->
+		<!-- comment out following part to stop using SOAP for Data Migration -->
+        <remote-service topic="dm-export" remote-peer-id="hl-savant" desc="Data migration export transformers for hl-savant over SOAP">
+            <transformer class-name="com.oatsystems.des.SoapClientTransformer">
+                <args>transport_type=soap envelope_data=<![CDATA["<soap-call service-url=\"http://:/axis/services\" target-object-uri=\"GenericService\" method=\"queryDES\"><param name=\"topic\" class=\"String\"/><param name=\"message\" class=\"String\"/></soap-call>"]]>
+                </args>
+            </transformer>
+        </remote-service>
+        <remote-service topic="dm-export-offline" remote-peer-id="hl-savant" desc="Data migration export transformers for hl-savant in File">
+            <transformer class-name="com.oatsystems.des.FileClientTransformer">
+                <args>transport_type=file envelope_data=<![CDATA[""]]>
+                </args>
+            </transformer>
+        </remote-service>
+        <!-- UnCommnet out following part to use JMS for Data Migration
+        <remote-service topic="dm-export" remote-peer-id="hl-savant" desc="Data migration export transformers for hl-savant over JMS">
+            <transformer class-name="com.oatsystems.des.SimpleClientTransformer">
+                <args>transport_type=jms envelope_data=<![CDATA["<jms-connection queue=\"ofs.trans.queue\" persistent=\"true\" transact=\"false\" client-ack=\"false\" host-name=\"\" port=\"61616\" priority=\"5\"></jms-connection>"]]>
+                </args>
+            </transformer>
+        </remote-service>
+		-->
+    </remote-services>
+</des-config>

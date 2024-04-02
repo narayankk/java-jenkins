@@ -1,0 +1,59 @@
+  <table name="aggregate_property_group">
+    <column name="property_group_id" type="NUMERIC">
+      <primary-key sequence="aggregate_property_group_seq"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="aggregate_property">
+    <column name="property_id" type="NUMERIC">
+      <primary-key sequence="aggregate_property_seq"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="aggregate_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_key" type="VARCHAR">
+    </column>
+    <column name="property_value" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="inventory_fact">
+    <column name="inventory_fact_id" type="NUMERIC">
+      <primary-key sequence="inventory_fact_seq"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="product_id" type="NUMERIC">
+      <foreign-key table="product" column="product_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="time_interval_num" type="NUMERIC">
+    </column>
+    <column name="end_period_ts" type="TIMESTAMP">
+    </column>
+    <column name="added_in_period" type="NUMERIC">
+    </column>
+    <column name="removed_in_period" type="NUMERIC">
+    </column>
+    <column name="count_at_end" type="NUMERIC">
+    </column>
+    <column name="min_in_period" type="NUMERIC">
+    </column>
+    <column name="max_in_period" type="NUMERIC">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>

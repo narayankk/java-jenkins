@@ -1,0 +1,281 @@
+  <table name="entity_type" migratable="false">
+    <column name="entity_type_id" type="NUMERIC">
+      <primary-key sequence="entity_type_seq"></primary-key>
+    </column>
+    <column name="type" type="VARCHAR"></column>
+    <column name="description" type="VARCHAR"></column>
+    <column name="ref_table_name" type="VARCHAR"></column>
+    <column name="property_table" type="VARCHAR"></column>
+    <column name="is_analytic" type="VARCHAR"></column>
+    <column name="custom_property_group_md_id" type="NUMERIC">
+      <foreign-key table="custom_property_group_md" column="custom_property_group_md_id" update-later="true" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="custom_property_group_md" migratable="false">
+    <column name="custom_property_group_md_id" type="NUMERIC">
+      <primary-key sequence="custom_property_group_md_seq"></primary-key>
+    </column>
+    <column name="label" type="VARCHAR"></column>
+    <column name="description" type="VARCHAR"></column>
+    <column name="is_abstract" type="VARCHAR"></column>
+    <column name="entity_type_id" type="NUMERIC">
+      <foreign-key table="entity_type" column="entity_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="custom_property_md" migratable="false">
+    <column name="custom_property_md_id" type="NUMERIC">
+      <primary-key sequence="custom_property_md_seq"></primary-key>
+    </column>
+    <column name="column_name" type="VARCHAR"></column>
+    <column name="property_key" type="VARCHAR"></column>
+    <column name="label" type="VARCHAR"></column>
+    <column name="description" type="VARCHAR"></column>
+    <column name="is_mandatory" type="VARCHAR"></column>
+    <column name="is_visible" type="VARCHAR"></column>
+    <column name="is_bound" type="VARCHAR"></column>
+    <column name="is_cycle_control" type="VARCHAR"></column>
+    <column name="is_analytic" type="VARCHAR"></column>
+    <column name="type_definition" type="VARCHAR"></column>
+    <column name="custom_property_group_md_id" type="NUMERIC">
+      <foreign-key table="custom_property_group_md" column="custom_property_group_md_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="custom_property_lookup" migratable="false">
+    <column name="custom_property_lookup_id" type="NUMERIC">
+      <primary-key sequence="custom_property_lookup_seq"></primary-key>
+    </column>
+    <column name="property_key" type="VARCHAR"></column>
+    <column name="property_value" type="VARCHAR"></column>
+    <column name="ui_value" type="VARCHAR"></column>
+    <column name="is_default" type="VARCHAR"></column>
+    <column name="custom_property_md_id" type="NUMERIC">
+      <foreign-key table="custom_property_md" column="custom_property_md_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+  
+  <table name="physical_property_group" migratable="false">
+    <column name="property_group_id" type="NUMERIC">
+      <primary-key sequence="physical_property_group_seq"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="physical_property" migratable="false">
+    <column name="property_id" type="NUMERIC">
+      <primary-key sequence="physical_property_seq"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="physical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_key" type="VARCHAR">
+    </column>
+    <column name="property_value" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="location" migratable="false">
+    <column name="location_id" type="NUMERIC">
+      <primary-key sequence="location_seq"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="physical_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="epc" type="VARCHAR">
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="gln" type="VARCHAR">
+    </column>
+    <column name="sslt_code" type="NUMERIC">
+    </column>
+    <column name="sle" type="VARCHAR">
+    </column>
+    <column name="location_type" type="VARCHAR">
+    </column>
+    <column name="loc_subtype" type="VARCHAR">
+    </column>
+    <column name="parent_location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="true" is-primary-key="false"/>
+    </column>
+    <column name="category" type="VARCHAR">
+    </column>
+    <column name="type" type="VARCHAR">
+    </column>
+    <column name="epcis_id" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid">
+    </guid-column>
+  </table>
+
+<!--
+  <table name="device">
+    <column name="device_id" type="NUMERIC">
+      <primary-key sequence="device_seq"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="epc" type="VARCHAR">
+    </column>
+    <column name="location_id" type="NUMERIC">
+      <foreign-key table="location" column="location_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="dms_device_node_name" type="VARCHAR">
+    </column>
+    <column name="dms_device_id" type="NUMERIC">
+      <foreign-key table="dms_device" column="dms_device_id" update-later="true" is-primary-key="false"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="device_error_code">
+    <column name="device_error_code_id" type="NUMERIC">
+      <primary-key sequence="device_error_code_seq"/>
+    </column>
+    <column name="error_code" type="VARCHAR">
+      <globally-unique-key/>
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="dms_device">
+    <column name="dms_device_id" type="NUMERIC">
+      <primary-key sequence="dms_device_seq"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="name" type="VARCHAR">
+    </column>
+    <column name="category" type="VARCHAR">
+    </column>
+    <column name="type" type="VARCHAR">
+    </column>
+    <column name="epc" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+-->
+
+  <table name="epc_identity_type" migratable="false">
+    <column name="epc_identity_type_id" type="NUMERIC">
+      <primary-key sequence="epc_identity_type_seq"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <!-- UPDATE epc_identity_type SET guid = type -->
+      <globally-unique-key/>
+    </column>
+    <column name="num_identity_digits" type="NUMERIC">
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="epc_encoding_type" migratable="false">
+    <column name="epc_encoding_type_id" type="NUMERIC">
+      <primary-key sequence="epc_encoding_type_seq"/>
+    </column>
+    <column name="epc_identity_type_id" type="NUMERIC">
+      <foreign-key table="epc_identity_type" column="epc_identity_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="type" type="VARCHAR">
+      <!-- UPDATE epc_identity_type SET guid = type -->
+      <globally-unique-key/>
+    </column>
+    <column name="header" type="VARCHAR">
+    </column>
+    <column name="tag_length" type="NUMERIC">
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="type"/>
+  </table>
+
+  <table name="epc_product_info" migratable="false">
+    <column name="epc_product_info_id" type="NUMERIC">
+      <primary-key sequence="epc_product_info_seq"/>
+    </column>
+    <column name="epc_identity_type_id" type="NUMERIC">
+      <foreign-key table="epc_identity_type" column="epc_identity_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="pure_identity_type" type="VARCHAR">
+    </column>
+    <column name="epc_encoding_type_id" type="NUMERIC">
+      <foreign-key table="epc_encoding_type" column="epc_encoding_type_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="epc_encoding_type" type="VARCHAR">
+    </column>
+    <column name="filter_value" type="NUMERIC">
+    </column>
+    <column name="company_prefix" type="VARCHAR">
+    </column>
+    <column name="object_class" type="VARCHAR">
+    </column>
+    <column name="identity_code" type="VARCHAR">
+    </column>
+    <column name="pure_identity_uri_prefix" type="VARCHAR">
+    </column>
+    <column name="tag_uri_prefix" type="VARCHAR">
+      <!-- UPDATE epc_product_info SET guid = tag_uri_prefix -->
+      <globally-unique-key/>
+    </column>
+    <column name="num_identity_digits" type="NUMERIC">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+

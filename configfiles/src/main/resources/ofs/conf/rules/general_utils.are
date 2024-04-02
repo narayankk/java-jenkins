@@ -1,0 +1,50 @@
+%% This rule-set defines common predicates
+
+%%%%%%%%%%%%%%%%%%%% Utilities
+:- import('com.oatsystems.are.util.TimerService').
+:- import('com.oatsystems.are.util.GeneralUtilities').
+
+%% Null and non-null
+is_null(null).
+
+is_not_null(null) :- !, fail.
+is_not_null(_).
+
+%% Limited knowledge NOT implementation
+not(X) :- X,!, fail.
+not(X).
+
+%% Length of a list
+length(0, []).
+length(Len, [A | B]) :- length(C, B), Len is C + 1.
+
+
+%% Methods to do bagof
+:- dynamic('data999/1').
+
+bagof(X,Goal,Bag) :-   post_it(X,Goal),
+                        gather([],Bag).
+
+post_it(X,Goal) :- Goal,               /* try Goal */
+                   asserta data999(X), /* assert above others */
+                   fail.               /* force backtracking   */
+post_it(_,_).                          /* gratuitous success    */
+
+gather(B,Bag) :-  data999(X),          /* find next recorded solution  */
+                  retract data999(X),  /* erase posting       */
+                  gather([X|B],Bag),   /* continue  ...        */
+                  !.                   /* cut off rule below */
+
+gather(S,S).                           /* when done          */
+
+
+%% Timer stuff
+not(X) :- X, !, fail.
+not(X).
+
+wait_till(T) :- wait timer_event(T), !.
+wait_till(T) :- _  is schedule_timer_event(T), fail.
+
+timeout(T) :-   CurTime is get_current_millis(),
+                ToWait is CurTime + T,
+                wait_till(ToWait).

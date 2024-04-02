@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+ $Source: /usr/local/cvs/ofs/install/src/dist/conf/labeltemplate/Z_64PalletLabelTemplate.xml,v $
+ $Revision: 1.1 $
+ $State: Exp $
+-->
+
+<!--
+  This template is for a Zebra printer (203dpi) using 4" X 2" label printing EPC 64-bit code Pallet label
+  Tested on Zebra R110Xi and R4MPlus printers.
+-->
+<template name="Z_64PalletLabelTemplate">
+    <variables>
+        <variable name="EPCCODE_URI" defaultValue=""/>
+        <variable name="EPCCODE" defaultValue=""/>
+        <variable name="MANUFACTURER" defaultValue=""/>
+    </variables>
+    <printcode>
+    <![CDATA[^XA^RS3,,,2,N^FS^WT0,3,1,0,1,n^FD{TAG_EPC_ZPL}^FS^RT0,0,1,1,3,1,0^FS^HV0^FS
+^CF0,32,32
+^FO0,125
+^FB725,4,,C^FDPallet EPC {EPCCODE_URI}\&Pallet EPC (Hex format) {EPCCODE}^FS
+^FO150,250
+^BY2^BCN,50,Y,N,N^FD{EPCCODE}^FS
+^FO0,350
+^FB725,4,,C^FD{MANUFACTURER}^FS
+^XZ]]>
+    </printcode>
+</template>
+

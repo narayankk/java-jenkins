@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dbcleanup-spec SYSTEM "file:////usr/local/ofs/conf/db-cleanup-spec.dtd">
+
+<dbcleanup-spec>
+  <table pk="log_id" name="user_event_logger" cleanup-type="applogs">
+    <delete-conditions>
+      <aged-timestamp column="timestamp" />
+    </delete-conditions>
+  </table>
+  <table name="dc_epc_box_detail" pk="dc_epc_box_detail_id" cleanup-type="applogs">
+    <delete-conditions>
+      <aged-timestamp column="insert_date" />
+    </delete-conditions>
+  </table>
+  <table pk="device_status_id" name="device_status" cleanup-type="monitoring">
+    <delete-conditions>
+      <aged-timestamp column="end_time" />
+      <isMigratable>true</isMigratable>
+    </delete-conditions>
+  </table>
+  <table pk="observation_id" name="observation" cleanup-type="tagreads">
+    <delete-conditions>
+      <aged-timestamp column="end_ts" />
+      <isMigratable>true</isMigratable>
+    </delete-conditions>
+  </table>
+  <!-- The query to generate from below will be
+ delete from observation o where (exists (select o.observation_type_id, ot.observation_type_id from observation_type ot where o.observation_type_id = ot.observation_type_id and ot.is_point_in_time=true) and o.start_ts < current_date - threshold)
+-->
+  <table pk="observation_id" name="observation" cleanup-type="tagreads">
+    <delete-conditions>
+      <aged-timestamp column="start_ts" />
+      <isMigratable>true</isMigratable>
+      <exists>
+        <join table="observation_type" join_column="observation_type_id">
+          <condition-to-satisfy col-name="is_point_in_time" col-type="boolean" col-value="true" />
+        </join>
+      </exists>
+    </delete-conditions>
+  </table>
+  <table pk="epc_detection_id" name="epc_detection" cleanup-type="tagreads">
+    <delete-conditions>
+      <aged-timestamp column="end_ts" />
+      <isMigratable>true</isMigratable>
+    </delete-conditions>
+  </table>
+  <table pk="commissioned_tag_id" name="commissioned_tag" cleanup-type="commissionedtags">
+    <delete-conditions>
+      <aged-timestamp column="deactivation_ts" />
+    </delete-conditions>
+  </table>
+  <table pk="commissioned_tag_id" name="commissioned_tag" cleanup-type="commissionedtags">
+    <delete-conditions>
+      <aged-timestamp column="activation_ts" />
+    </delete-conditions>
+  </table>
+  <!--
+   Data above deleted based on application, either activation_ts or deactivation_ts will be used for commissioned_tag table above
+-->
+  <table pk="assn_exception_id" name="assn_exception" cleanup-type="contextualtagdata">
+    <delete-conditions>
+      <aged-timestamp column="event_ts" />
+      <isMigratable>true</isMigratable>
+    </delete-conditions>
+  </table>
+  <table pk="object_disassn_id" name="object_disassn" cleanup-type="contextualtagdata">
+    <delete-conditions>
+      <aged-timestamp column="disassn_ts" />
+      <isMigratable>true</isMigratable>
+    </delete-conditions>
+  </table>
+  <table pk="object_assn_verification_id" name="object_assn_verification" cleanup-type="contextualtagdata">
+    <delete-conditions>
+      <aged-timestamp column="read_ts" />
+      <isMigratable>true</isMigratable>
+    </delete-conditions>
+  </table>
+  <table pk="object_assn_id" name="object_assn" cleanup-type="contextualtagdata">
+    <delete-conditions>
+      <aged-timestamp column="end_ts" />
+      <no-fk join-column="object_assn_id">
+        <!-- Table latest_object_assn is now a view based on table object, without a FK to object_assn. 
+			<FKTable pk="latest_object_assn_id" join-column="object_assn_id">latest_object_assn</FKTable>
+-->
+        <FKTable pk="object_assn_verification_id" join-column="object_assn_id">object_assn_verification</FKTable>
+      </no-fk>
+    </delete-conditions>
+  </table>
+  <!-- Table latest_object_assn is now a view. Not reqd any more.
+<table pk="latest_object_assn_id" name = "latest_object_assn" cleanup-type = "contextualtagdata">
+	<delete-conditions>
+		<aged-object />
+			
+	</delete-conditions>
+</table>
+-->
+  <!--
+NOTE: For the above table, should we delete the record if aged_object condition is satisfied but there are live parent or child objects? (Corollary, is it true that if child object is aged, parent object will be aged as well?)
+-->
+  <table pk="content_sat_id" name="content_sat" cleanup-type="contextualtagdata">
+    <delete-conditions>
+      <aged-timestamp column="end_ts" />
+    </delete-conditions>
+    <cascade-delete>
+      <casc-table name="content_li_sat" pk="content_li_sat_id" parent="content_sat" fk-column="content_sat_id">
+        <casc-table name="object_cls" pk="object_cls_id" parent="content_li_sat" fk-column="content_li_sat_id" />
+      </casc-table>
+    </cascade-delete>
+  </table>
+  <table pk="order_sat_id" name="order_sat" cleanup-type="contextualtagdata">
+    <delete-conditions>
+      <aged-timestamp column="end_ts" />
+    </delete-conditions>
+    <cascade-delete>
+      <casc-table name="order_li_sat" pk="order_li_sat_id" parent="order_sat" fk-column="order_sat_id">
+        <casc-table name="object_ols" pk="object_ols_id" parent="order_li_sat" fk-column="order_li_sat_id" />
+      </casc-table>
+    </cascade-delete>
+  </table>
+  <!-- 
+<table pk="object_product_history_id" name = "object_product_history" cleanup-type = "contextualtagdata">
+	<delete-conditions>
+		<aged-timestamp column = "end_ts" />
+		<no-fk join-column="object_product_history_id">
+			<FKTable pk="object_product_id" join-column="object_product_history_id"> object_product</FKTable>
+		</no-fk>
+		
+	</delete-conditions>
+</table>
+-->
+  <!-- Table object_product is now a view based on table object. Not reqd any more
+<table pk="object_product_id" name = "object_product " cleanup-type = "contextualtagdata">
+	<delete-conditions>
+		<aged-object />	
+	</delete-conditions>
+</table>
+-->
+  <table pk="object_state_history_id" name="object_state_history" cleanup-type="contextualtagdata">
+    <delete-conditions>
+      <aged-timestamp column="end_ts" />
+      <no-fk join-column="object_state_history_id">
+        <FKTable pk="object_state_id" join-column="object_state_history_id">object_state</FKTable>
+      </no-fk>
+    </delete-conditions>
+  </table>
+  <!-- Not sure how rows in object_state can be deleted. Also not sure how aged-object is supposed to 
+     tell this. Commenting out for now.
+<table pk="object_state_id" name = "object_state " cleanup-type = "contextualtagdata">
+	<delete-conditions>
+		<aged-object />	
+	</delete-conditions>
+</table>
+-->
+  <table pk="inventory_fact_id" name="inventory_fact " cleanup-type="applogs">
+    <delete-conditions>
+      <aged-timestamp column="end_period_ts" />
+    </delete-conditions>
+  </table>
+</dbcleanup-spec>
+

@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+<meta-data property-table="Physical">
+  <table name="device">
+
+    <entity type="TagsysReaderL200DeviceNode" extends="RFDeviceNode">
+      <locator-option value="Tagsys Reader L200 DeviceNode">Tagsys Reader L200 DeviceNode</locator-option>
+
+      <label>Tagsys Reader L200 DeviceNode Configuration</label>
+      <description>Tagsys Reader L200 DeviceNode Configuration</description>
+      <property key="ReadDuration" is-mandatory="false">
+	<label>Read Duration</label>
+	<description>Time-out value used during read operations. </description>
+	<type-definition>oat:ReadDuration</type-definition>
+	<select is-bound="false">
+	  <option value="-1" is-default="true">-1</option>
+	</select>
+      </property>
+      <property key="RestoreIOPortsOnReset" is-mandatory="false">
+	<label>Restore I/O ports after device reset</label>
+	<description>Restore I/O ports after device reset</description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="true" is-default="true">true</option>
+	  <option value="false">false</option>
+	</select>
+      </property>
+      <property key="ReadPullIntervalDivider" is-mandatory="false">
+	<label>Read Pull Interval Divider</label>
+	<description>This value used to calculate pull time, while waiting for new tags in continues read mode. Pause is ReadTimeDuration divided by this value</description>
+	<type-definition>oat:ReadPullIntervalDivider</type-definition>
+	<select is-bound="false">
+	  <option value="3" is-default="true">3</option>
+	</select>
+      </property>
+      <property key="AntennaId" is-mandatory="true">
+	<label>Antenna ID</label>
+	<description>Antenna number</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="1" is-default="true">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>
+	  <option value="4">4</option>
+	</select>
+      </property>
+      <property key="TimeThreshold" is-mandatory="false">
+	<label>Time Threshold</label>
+	<description>The time threshold should exceed 100 milliseconds</description>
+	<type-definition>oat:TimeThreshold</type-definition>
+      </property>
+      <property key="LoopThreshold" is-mandatory="false">
+	<label>Loop Threshold</label>
+	<description>The loop threshold should exceed -1</description>
+	<type-definition>oat:LoopThreshold</type-definition>
+      </property>
+    </entity>
+
+  </table>
+</meta-data>

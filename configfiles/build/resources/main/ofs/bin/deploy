@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# $Source: /usr/local/cvs/scripts/deploy/installanywhere/oat-plugin/jython/Bin/deploy,v $
+# $Revision: 1.7 $
+# $State: Exp $
+# @version $Id: deploy,v 1.7 2013/02/14 14:32:35 kmanickam Exp $
+#
+# This file starts the deploy plugin tool. Note that variables inclosed in 2 dollar signs
+# are substituted during installation by IA installer.
+#
+
+CUR_DIR=`pwd`
+DIR_NAME=`dirname $0`
+cd $DIR_NAME/../..
+
+OAT_HOME=/usr/local
+cd $CUR_DIR
+
+OFS_HOME=$OAT_HOME/ofs
+#"$OFS_HOME/bin/updateproperties" -sourceFile $OAT_HOME/ofs/configure.properties -destinationResource rdbms_config.properties -propertyMapFile $OAT_HOME/ofs/conf/rdbms_config.properties.in
+"$OFS_HOME/bin/prepareConfigureProperties.sh"
+"$OFS_HOME/bin/jython" "$OFS_HOME/bin/deploy.py" "$@"
+if [ $? != 0 ]; then
+ echo *********** Deploy Failed *************
+else
+"$OFS_HOME/bin/jython" "$OFS_HOME/bin/deploy.py" "-m"
+fi

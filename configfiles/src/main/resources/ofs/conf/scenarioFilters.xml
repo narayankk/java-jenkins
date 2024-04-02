@@ -1,0 +1,13 @@
+<properties>
+
+  <property name="BarcodeEventFilter" class="com.oatsystems.wfe.filter.BarcodeEventFilter"/>
+  <property name="EpcAddEventFilter" class="com.oatsystems.wfe.filter.EpcAddEventFilter"/>
+  <property name="EpcRawEventFilter" class="com.oatsystems.wfe.filter.EpcRawEventFilter"/>
+  <property name="EpcRemoveEventFilter" class="com.oatsystems.wfe.filter.EpcRemoveEventFilter"/>
+  <property name="PhotocellEventFilter" class="com.oatsystems.wfe.filter.PhotocellEventFilter"/>
+  <property name="LocationEMSEventFilter" class="com.oatsystems.wfe.filter.LocationEMSEventFilter"/>
+  <property name="ReceiveMsgInToAnyFilter" class="com.oatsystems.workflow.messaging.ReceiveMsgInToAnyFilter"/>
+  <property name="ReceiveMsgInFilter" class="com.oatsystems.workflow.messaging.ReceiveMsgInFilter"/>
+  <property name="DeviceStatusEventFilter" class="com.oatsystems.wfe.filter.DeviceStatusEventFilter"/>
+</properties>
+

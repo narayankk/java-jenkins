@@ -1,0 +1,43 @@
+import com.oatsystems.solutions.apparel.objects.MergeCCEval;
+import com.oatsystems.solutions.apparel.objects.CurrentCCData;
+import com.oatsystems.util.ModLog;
+
+rule "diffThresh is 0"
+no-loop
+when
+$obj : MergeCCEval(diffThresh == 0, $ccid : getCcDetailId(), processed == false)
+$cur : CurrentCCData(getIsBothThresholdmet() == 1, getPrevIsBothThresholdmet() == 0)
+then
+$obj.setMaxCCId($ccid);
+$obj.setProcessed(true);
+ModLog.info("SmartMergeCCDroolsService: Updated max CC ID: " + $ccid);
+update($obj);
+end
+
+rule "currentWFD is greater"
+no-loop
+when
+$obj : MergeCCEval((diffThresh == 10 || diffThresh == 9 || diffThresh == 11), processed == false, $ccid : getCcDetailId())
+$cur : CurrentCCData(getIsNew() == 1, getPrevIsNew() == 1, getWeightedFunctionDefault() > getPrevWeightedFunctionDefault())
+then
+$obj.setMaxCCId($ccid);
+$obj.setProcessed(true);
+ModLog.info("SmartMergeCCDroolsService: Updated max CC ID: " + $ccid);
+update($obj);
+end
+
+rule "currentWFD is not greater"
+no-loop
+when
+$obj : MergeCCEval((diffThresh == 10 || diffThresh == 9 || diffThresh == 11), processed == false, $ccid : getPrevMaxCC())
+$cur : CurrentCCData(getIsNew() == 1, getPrevIsNew() == 1, getWeightedFunctionDefault() <= getPrevWeightedFunctionDefault())
+then
+$obj.setMaxCCId($ccid);
+$obj.setProcessed(true);
+ModLog.info("SmartMergeCCDroolsService: Updated max CC ID: " + $ccid);
+update($obj);
+end
+
+query "getMergeCCEval"
+    $result: MergeCCEval()
+end

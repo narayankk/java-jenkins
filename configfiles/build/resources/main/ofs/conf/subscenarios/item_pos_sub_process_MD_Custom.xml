@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<scenario>
+    <property key="name">OATMV POS Process EPCs - MD Custom</property>
+    <property key="description"></property>
+    <property key="scenario.type">SUB_SCENARIO</property>
+    <property key="sub_scenario">true</property>
+    <property key="fragment.scenario.exits">DONE</property>
+    <property key="fragment.scenario.expected_inputs">
+    epcArray,
+    action,
+    posRpEpc,
+    soldReasonCodeId,
+    siteId
+    </property>
+    <property key="fragment.scenario.expected_outputs">
+    </property>
+
+    <process>
+        <start name="Start">
+				<target exit="Exit Condition" name="SetProcessTypeSold"></target>
+        </start>
+
+        <activity name="SetProcessTypeSold" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="IterateOnTagArrayBatch" exit="done"/>
+            <target name="IterateOnTagArrayBatch" exit="error"/>
+            <input name="value" class="java.lang.String">ITEM_POS</input>
+            <output name="variable" class="java.lang.String">${process.processType}</output>
+        </activity>
+		
+        <!--<activity name="StartAssociationProcess" resource="primitive:StartProcess">
+          <target name="IterateOnTagArrayBatch" exit="done" />
+          <target name="IterateOnTagArrayBatch" exit="error" />
+          <input name="processMasterCode" class="java.lang.String">${process.processType}</input>
+          <input name="processData0" class="java.lang.String">ITEM_POS</input>
+          <input name="processData9" class="java.lang.String">FR</input>      
+          <output name="processID" class="java.lang.String">${process.processID}</output>
+        </activity>-->
+		
+		<activity name="IterateOnTagArrayBatch" resource="class:com.oatsystems.workflow.primitives.IterateOnObjectArrayInBatch">
+       <target name="AssignContaneeListObj" exit="continue" />
+       <target name="SetBatchVariablesToNull" exit="break" />
+       <target name="SetBatchVariablesToNull" exit="error" />
+       <input name="iterationRange" class="[Ljava.lang.Object;">${process.epcArray}</input>
+       <input name="currentStartIndex" class="java.lang.String">${process.currentIndex}</input>
+       <input name="batchSize" class="java.lang.String">5</input>
+       <output name="currentEndIndex" class="java.lang.String">${process.currentIndex}</output>
+       <output name="currentValues" class="[Ljava.lang.String;">${process.currBatch}</output>
+     </activity>
+	 
+   <!-- <activity name="IterateOnTagArrayBatch" resource="class:com.oatsystems.workflow.primitives.IterateOnObjectArrayInBatch">
+       <target name="AssignContaneeListObj" exit="continue" />
+       <target name="SetBatchVariablesToNull" exit="break" />
+       <target name="SetBatchVariablesToNull" exit="error" />	   
+       <input name="iterationRange" class="[Ljava.lang.Object;">${process.epcArray}</input>
+       <input name="currentStartIndex" class="java.lang.String">${process.currentIndex}</input>
+       <input name="batchSize" class="java.lang.String">5</input>
+       <output name="currentEndIndex" class="java.lang.String">${process.currentIndex}</output>
+      
+	   <output name="currentValues" class="[Ljava.lang.String;">${process.currBatch}</output>
+     </activity>-->
+	 <activity name="AssignContaneeListObj" resource="class:com.oatsystems.workflow.primitives.AssignContaneeListObj">
+			<target name="GetSiteIdForRPLocation" exit="done"/>
+			<target name="GetSiteIdForRPLocation" exit="error"/>     
+			<!--<input name="epcObject" class="[Ljava.lang.Object;">${process.currBatch}</input>			-->
+			<input name="epcObject" class="[Ljava.lang.String;">${process.currBatch}</input>
+			<output name="epcList" class="java.util.List">${process.epcList}</output>
+		</activity>	
+		
+		<activity name="GetSiteIdForRPLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation"> 
+           <target name="GetInferredRetirementBusinessLocation" exit="done" /> 
+           <target name="SetBatchVariablesToNull" exit="error" /> 
+           <input  name="locationEpc" class="java.lang.String">${process.posRpEpc}</input> 
+           <output name="siteId" class="java.lang.String">${process.siteId}</output> 
+           <output name="siteEpc" class="java.lang.String">${process.siteEpc}</output> 
+           <output name="siteName" class="java.lang.String">${process.siteName}</output>
+		   <output name="locSubtype" class="java.lang.String">${process.locSubtype}</output>
+        </activity>
+		
+		<activity name="GetInferredRetirementBusinessLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetInferredLocation">
+               <target name="SetParentLocationEPC" exit="done" />
+               <target name="SetBatchVariablesToNull" exit="error" />
+               <input  name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+               <input  name="siteEpc" class="java.lang.String">${process.siteEpc}</input>
+               <output name="inferredParentLocationEpc" class="java.lang.String">${process.inferredParentLocationEpc}</output>
+               <output name="readPointEpc" class="java.lang.String">${process.posRpEpcDiscard}</output>
+        </activity>
+		
+		<activity name="SetParentLocationEPC" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+			<target name="ConvertPOSToHandheldEvent" exit="done"/>
+			<target name="SetBatchVariablesToNull" exit="error"/>
+			<input  name="value" class="java.lang.String">${process.inferredParentLocationEpc}</input>
+			<output name="variable" class="java.lang.String">${process.parentLocationEpc}</output>
+		</activity>
+		
+	    <!--<activity name="AssociateTagWithNullParentLocationSold" resource="class:com.oatsystems.workflow.primitives.AssociateEpcToLocationMDBatch">
+	      <target name="IterateOnTagArrayBatch" exit="associated" />	      
+	      <target name="SetBatchVariablesToNull" exit="error" />
+	      <input name="epcList" class="java.util.List">${process.epcList}</input>
+		  <input name="associationLocationEpc" class="java.lang.String">${process.posRpEpc}</input>	 
+	      <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>	      
+	      <input  name="processId" class="java.lang.String">${process.processID}</input>
+	      <input  name="status" class="java.lang.String">${process.soldReasonCodeId}</input>-->
+	      <!--<input  name="processMasterCode" class="java.lang.String">${process.processType}</input>-->
+	      <!--<input class="java.lang.String" constant="false" name="processType" required="false">ITEM_POS</input>
+	      <input class="java.lang.String" constant="false" name="processSubType" required="false">FR</input>            
+          <output name="invalidepcs" class="java.util.List">${process.invalidepcs}</output>
+	    </activity>-->
+		
+		<activity name="ConvertPOSToHandheldEvent" resource="class:com.oatsystems.project.workflow.primitives.ConvertPOSToHandheldEvent">
+	      <target name="IterateOnTagArrayBatch" exit="done" />
+	      <target name="SetBatchVariablesToNull" exit="error" />
+	      <input name="epcList" class="java.util.List">${process.epcList}</input>
+		  <input name="associationLocationEpc" class="java.lang.String">${process.posRpEpc}</input>
+	      <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+		  <input class="java.lang.String" constant="false" name="processType" required="false">ITEM_POS</input>
+	      <input class="java.lang.String" constant="false" name="processSubType" required="false">FR</input>
+	    </activity>
+		
+		<!--<activity name="PopulatePOSHistory" resource="class:com.oatsystems.solutions.apparel.primitives.PopulatePOSHistory">
+		<target  exit="done" name="IterateOnTagArrayBatch"/>
+		<target  exit="error" name="SetBatchVariablesToNull" />
+		<input name="epcList" class="java.util.List">${process.epcList}</input>		
+		<input name="readerLocationEpc" class="java.lang.String">${process.posRpEpc}</input>
+		</activity>-->
+	
+		<activity name="SetBatchVariablesToNull" resource="primitive:SetVariablesToNull">
+          <target name="DONE" exit="done" />
+          <target name="DONE" exit="skip" />
+          <target name="ERROR" exit="error" />
+          <output name="variable0" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currBatch}</output>
+          <output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+          <output name="variable3" class="java.lang.Object">${process.epcList}</output>          
+        </activity>
+        <!--<activity name="CloseAssociationProcess" resource="primitive:CloseProcess">
+          <target name="SetBatchVariablesToNull" exit="done" />
+          <target name="SetBatchVariablesToNull" exit="error" />
+          <input name="processID" class="java.lang.String">${process.processID}</input>
+          <input name="processData0" class="java.lang.String">ITEM_POS</input>
+          <input name="processData9" class="java.lang.String">FR</input>      
+          <output name="processID" class="java.lang.String">${process.processID}</output>
+        </activity>-->
+
+        <end name="ERROR"></end> 
+        <end name="DONE"></end> 
+    </process>
+
+    <config>
+    </config>
+
+    <display>
+
+    </display>
+</scenario>        

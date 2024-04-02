@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+ $Source: /usr/local/cvs/ofs/install/src/dist/conf/labeltemplate/Z_96CaseLabelTemplate.xml,v $
+ $Revision: 1.1 $
+ $State: Exp $
+-->
+
+<!--
+  This template is for a Zebra printer (203dpi) using 4" X 2" label printing EPC 96-bit code Case label
+  Tested on Zebra R110Xi and R4MPlus printers.
+-->
+<template name="Z_96CaseLabelTemplate">
+    <variables>
+        <variable name="EPCCODE_URI" defaultValue=""/>
+        <variable name="EPCCODE" defaultValue=""/>
+        <variable name="GTIN" defaultValue=""/>
+        <variable name="PRODUCT" defaultValue=""/>
+        <variable name="MANUFACTURER" defaultValue=""/>
+    </variables>
+    <printcode>
+    <![CDATA[^XA^RS4,,,2,N^FS^WT0,3,1,0,1,n^FD{TAG_EPC_ZPL}^FS^RT0,0,1,1,3,1,0^FS^HV0^FS
+^CF0,32,32
+^FO0,75
+^FB725,4,,C^FDCase EPC {EPCCODE_URI}\&Case EPC (Hex format) {EPCCODE}\&GTIN: {GTIN}\&Product Description: {PRODUCT}^FS
+^FO70,250
+^BY2^BCN,50,Y,N,N^FD{EPCCODE}^FS
+^FO0,350
+^FB725,4,,C^FD{MANUFACTURER}^FS
+^XZ]]>
+    </printcode>
+</template>
+

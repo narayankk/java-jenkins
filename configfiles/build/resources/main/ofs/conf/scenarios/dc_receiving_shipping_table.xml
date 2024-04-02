@@ -1,0 +1,2051 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://support.oatsystems.com/xsd/scenarios4_0.xsd">
+  <property key="name">DC Receiving and Shipping Scenario - Table</property>
+  <property key="description">This scenario performs DC Shipping and Receiving activity for fixed Table</property>
+  <property key="version">10.0</property>
+  <property key="scenario.type">DC_RECV_SHIP</property>
+  <property key="ui.custom">flooruiWS.jsp</property>
+  <process>
+  
+  <!-- Anurag -->
+    <start name="Start">
+ <!--    <target exit="Exit Condition" name="initalizeVariables"></target>  --> 
+ 	 <target exit="Exit Condition" name="StartSetReaderStateOff"></target> 
+    </start>
+    <end name="END"></end>
+	
+	 <activity name="StartSetReaderStateOff" resource="primitive:SetReaderState">
+      <target exit="done" name="CloseHangingProcess"></target>
+      <target exit="error" name="CloseHangingProcess"></target>
+      <input class="java.lang.String" name="readerLocationEpc">${process.transitLocationRP}</input>
+      <input class="java.lang.String" name="readerState">DISABLED</input>
+    </activity>
+
+	<!-- Anurag ,JIRA 5471 added to close any unsubmitted or uncancelled process -->
+	<activity name="CloseHangingProcess" resource="class:com.oatsystems.solutions.apparel.primitives.CloseHangingProcess">
+      <target exit="done" name="PreBarcodeToNULL"></target>
+      <target exit="error" name="PreBarcodeToNULL"></target>
+      <input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+	  <input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>
+	  <input class="java.lang.String" name="asnMode">${process.asnMode}</input>
+	  <input class="java.lang.String" name="scenarioDeviceType">TABLE_FR</input>
+     </activity>
+	
+	 <activity name="PreBarcodeToNULL" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+          	<target exit="done" name="initalizeVariables"></target>
+          	<target exit="error" name="initalizeVariables"></target>
+          	<target exit="skip" name="initalizeVariables"></target>
+          	<output class="java.lang.String" constant="false" name="variable0">${process.preBarcode}</output> 
+			<output class="java.lang.String" constant="false" name="variable1">${process.stopTimeoutInd}</output>
+    </activity>
+	
+	<activity name="initalizeVariables" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+         <target exit="done" name="InputHandler"></target>
+         <target exit="error" name="InputHandler"></target>
+         <input class="java.lang.String" constant="false" name="inArg0">${process.defaultShipToDescBarcodeMode}</input>
+         <output class="java.lang.String" constant="false" name="outArg0">${process.ShipToDescBarcodeMode}</output>
+		 <!-- Anurag Added scenarioDeviceType variable as process var. The config scenarioDeviceType is removed since this is specifically for Table only -->
+		  <input class="java.lang.String" constant="false" name="inArg1">TABLE_FR</input>
+  	    <output class="java.lang.String" constant="false" name="outArg1">${process.scenarioDeviceType}</output>
+		<input class="java.lang.String" constant="false" name="inArg2">2147483647</input>
+		<output class="java.lang.String" constant="false" name="outArg2">${process.numTriesBeforeFailure}</output>
+     </activity> 
+	
+    <call name="InputHandler" resource="dc_input_handler_table.xml">
+        <target name="ProcessInitiliazer" exit="DONE"/>
+        <target name="END" exit="ERROR"/>
+        <input class="java.lang.String" name="bypassReader">${process.bypassReader}</input>
+<!-- Anurag	<input class="java.lang.String" name="configDevicePoint6EpcForDeviceStatus">${process.configDevicePoint6EpcForDeviceStatus}</input> -->
+	<input class="java.lang.String" name="readerEpc">${process.readerEpc}</input>
+	<input class="java.lang.String" name="configRfidOpOutput">${process.configRfidOpOutput}</input>
+	<input class="java.lang.String" name="configNonrfidOpOutput">${process.configNonrfidOpOutput}</input>	
+	<input class="java.lang.String" name="configReadOnOutput">${process.configReadOnOutput}</input>
+	<input class="java.lang.String" name="configReadOffOutput">${process.configReadOffOutput}</input>
+	<input class="java.lang.String" name="configNonrfidStartOutput">${process.configNonrfidStartOutput}</input>
+	<input class="java.lang.String" name="configCriticalErrorOutput">${process.configCriticalErrorOutput}</input>
+	<input class="java.lang.String" name="confgNonCriticalErrorOutput">${process.confgNonCriticalErrorOutput}</input>
+	<input class="java.lang.String" name="configMaintenanceDoneOutput">${process.configMaintenanceDoneOutput}</input>
+	<input class="java.lang.String" name="configDevicePointEpcForEnd">${process.configDevicePointEpcForEnd}</input>
+	<!-- Anurag <input class="java.lang.String" name="configDevicePoint7EpcForEnd">${process.configDevicePoint7EpcForEnd}</input> 
+	<input class="java.lang.String" name="configDevicePoint5EpcForAntennaStatus">${process.configDevicePoint5EpcForAntennaStatus}</input> -->
+	<input class="java.lang.String" name="stationId">${process.stationId}</input>
+	<input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>
+	<input class="java.lang.String" name="configSessionStopOutput">${process.configSessionStopOutput}</input>
+	<input class="java.lang.String" name="configSessionStartOutput">${process.configSessionStartOutput}</input>
+	<input class="java.lang.String" name="configAccuracyMetOutput">${process.configAccuracyMetOutput}</input>
+	<input class="java.lang.String" name="configAccuracyNotMetOutput">${process.configAccuracyNotMetOutput}</input>
+	<input class="java.lang.String" name="configWrongItemOutput">${process.configWrongItemOutput}</input>
+	<output class="java.lang.String" name="rfidOpOutput">${process.rfidOpOutput}</output>
+	<output class="java.lang.String" name="nonrfidOpOutput">${process.nonrfidOpOutput}</output>
+	<output class="java.lang.String" name="readOffOutput">${process.readOffOutput}</output>
+	<output class="java.lang.String" name="nonrfidStartOutput">${process.nonrfidStartOutput}</output>
+	<output class="java.lang.String" name="nonrfidStopOutput">${process.nonrfidStopOutput}</output>
+	<output class="java.lang.String" name="criticalErrorOutput">${process.criticalErrorOutput}</output>
+	<output class="java.lang.String" name="nonCriticalErrorOutput">${process.nonCriticalErrorOutput}</output>
+	<output class="java.lang.String" name="maintenanceDoneOutput">${process.maintenanceDoneOutput}</output>
+	<output class="java.lang.String" name="devicePointForStart">${process.devicePointForStart}</output>
+	<output class="java.lang.String" name="devicePointEpcForEnd">${process.devicePointEpcForEnd}</output>
+<!-- Anurag	<output class="java.lang.String" name="devicePoint7EpcForEnd">${process.devicePoint7EpcForEnd}</output> 
+	<output class="java.lang.String" name="devicePoint5EpcForAntennaStatus">${process.devicePoint5EpcForAntennaStatus}</output>
+	<output class="java.lang.String" name="devicePoint6EpcForDeviceStatus">${process.devicePoint6EpcForDeviceStatus}</output> -->
+        <output class="java.lang.String" name="endError">${process.endError}</output>
+	<output class="java.lang.String" name="logicalState">${process.logicalState}</output>  
+	<output class="java.lang.String" name="eventErrCode">${process.eventErrCode}</output>
+	<output class="java.lang.String" name="errorDesc">${process.errorDesc}</output>
+	<output class="java.lang.String" name="origNode">${process.origNode}</output>
+	<output class="java.lang.String" name="readOnOutput">${process.readOnOutput}</output>
+	<output class="java.lang.String" name="sessionStartedOutput">${process.sessionStartedOutput}</output>
+        <output class="java.lang.String" name="sessionStopOutput">${process.sessionStopOutput}</output>
+        <output class="java.lang.String" name="accuracyMetOutput">${process.accuracyMetOutput}</output>
+        <output class="java.lang.String" name="accuracyNotMetOutput">${process.accuracyNotMetOutput}</output>
+        <output class="java.lang.String" name="wrongItemOutput">${process.wrongItemOutput}</output>
+    </call>
+    <!--
+    <call name="ErrorHandler" resource="dc_maintenance_mode_handler.xml">
+         <target name="ProcessInitiliazer" exit="DONE"/>
+         <target name="END" exit="ERROR"/>
+	<input class="java.lang.String" name="stationId">${process.stationId}</input>
+	<input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>         
+    </call>-->
+    <call name="ProcessInitiliazer" resource="dc_process_initializer.xml">
+             <target name="MaintenanceModeHandler" exit="DONE"/>
+             <target name="END" exit="ERROR"/>
+             <target name="WaitForEvents" exit="WaitForEvents"/>
+             <input class="java.lang.String" name="stationId">${process.stationId}</input>
+             <input class="java.lang.String" name="criticalErrorOutput">${process.criticalErrorOutput}</input>
+	     <input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>  
+	     <input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+	     <input class="java.lang.String" name="transitLocationRP">${process.transitLocationRP}</input>
+	     <input class="java.lang.String" name="scenarioDeviceType">${process.scenarioDeviceType}</input>
+		 	 <input class="java.lang.String" name="transitLocation">${process.transitLocation}</input>
+			 <input class="java.lang.String" name="asnMode">${process.asnMode}</input>
+             <output class="java.util.List" name="codeList">${process.codeList}</output>
+             <output class="java.lang.String" name="desOnlineFlag">${process.desOnlineFlag}</output>
+             <output class="java.lang.String" name="logicalState">${process.logicalState}</output>
+             <output class="java.lang.String" name="historyStr">${process.historyStr}</output>
+             <output class="com.oatsystems.solutions.apparel.objects.ReadSessionHistory" name="historyMap">${process.historyMap}</output>
+             <output class="java.lang.String" name="siteName">${process.siteName}</output>
+             <output class="java.lang.String" name="siteEpc">${process.siteEpc}</output>
+             <output class="java.lang.String" name="siteId">${process.siteId}</output>
+             <output class="java.lang.String" name="boxID">${process.boxID}</output>
+             <output class="java.lang.String" name="sessionID">${process.sessionID}</output>
+             <output class="java.lang.String" name="processID">${process.processID}</output>
+             <output class="java.lang.String" name="isRejoinSession">${process.isRejoinSession}</output>
+             <output class="com.oatsystems.asn.objects.Shipment" name="shipment">${process.shipment}</output>
+             <output class="java.lang.String" name="epcBatchSize">${process.epcBatchSize}</output>
+			<output class="java.lang.String" name="allowDatabaseTransaction">${process.allowDatabaseTransaction}</output>
+			<output class="java.lang.String" name="publishDataToSubscribers">${process.publishDataToSubscribers}</output>
+			<output class="java.lang.String" name="dummyProcessID">${process.dummyProcessID}</output>
+    </call>
+
+    <call name="MaintenanceModeHandler" resource="dc_maintenance_mode_handler_table.xml">
+          <target name="CreateVirtualBoxID" exit="CreateVirtualBoxID"/>
+	 <target name="RFIDReadHandler" exit="CheckMissedCartonInfo"/>
+	 <target name="WaitForEvents" exit="ERROR"/>
+	 <target name="WaitForEvents" exit="DONE"/>
+	 <target name="CreateVirtualBoxID" exit="CheckASN"/>
+	 <target name="StopSessionExit" exit="StopSessionExit"/>
+	 <target name="CheckOutOfSequenceASN" exit="CheckOutOfSequenceASN"/>
+	 <input class="java.lang.String" name="inComingBoxID">${process.inComingBoxID}</input>
+	 <input class="java.lang.String" name="logicalState">${process.logicalState}</input>
+	 <input class="java.lang.String" name="bypassReader">${process.bypassReader}</input>
+	 <input class="java.lang.String" name="maintenanceDoneOutput">${process.maintenanceDoneOutput}</input>
+	 <input class="java.lang.String" name="readerEpc">${process.readerEpc}</input>	 
+	 <input class="java.lang.String" name="maintenanceMode">${process.maintenanceMode}</input>
+	 <input class="java.lang.String" name="origNode">${process.origNode}</input>
+	 <input class="java.lang.String" name="eventErrCode">${process.eventErrCode}</input>
+	 <input class="java.lang.String" name="errorDesc">${process.errorDesc}</input>
+	 <input class="java.lang.String" name="readOnOutput">${process.readOnOutput}</input>
+	 <input class="java.lang.String" name="readOffOutput">${process.readOffOutput}</input>
+	 <input class="java.lang.String" name="criticalErrorOutput">${process.criticalErrorOutput}</input>
+	 <input class="java.lang.String" name="nonCriticalErrorOutput">${process.nonCriticalErrorOutput}</input>
+	 <input class="java.lang.String" name="nonrfidStopOutput">${process.nonrfidStopOutput}</input>
+	 <input class="java.lang.String" name="rfidOpOutput">${process.rfidOpOutput}</input>
+	 <input class="java.lang.String" name="nonrfidOpOutput">${process.nonrfidOpOutput}</input>
+	 <input class="java.lang.String" name="nonrfidStartOutput">${process.nonrfidStartOutput}</input>
+	 <input class="java.lang.String" name="sessionStartedOutput">${process.sessionStartedOutput}</input>
+	 <input class="java.lang.String" name="sessionStopOutput">${process.sessionStopOutput}</input>
+	 <input class="java.lang.String" name="rfidSessionVar">${process.rfidSessionVar}</input> 
+	 <input class="java.util.Map" name="inProcessPayload">${process.inProcessPayload}</input>
+	 <input class="java.lang.String" name="boxID">${process.boxID}</input> 
+	 <input class="java.lang.String" name="sessionState">${process.sessionState}</input>
+	 <input class="java.lang.String" name="digitalOutputPattern">${process.digitalOutputPattern}</input>
+	 <input class="java.util.Map" name="rcvPayload">${process.rcvPayload}</input>
+	 <input class="java.lang.String" name="stationId">${process.stationId}</input>
+	 <input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+	 <input class="java.lang.String" name="isRejoinSession">${process.isRejoinSession}</input>
+	 <input class="java.lang.String" name="sessionID">${process.sessionID}</input>
+	 <input class="java.lang.String" name="isStopTriggerRcvd">${process.isStopTriggerRcvd}</input>
+			<input class="java.lang.String" name="allowDatabaseTransaction">${process.allowDatabaseTransaction}</input>
+			<input class="java.lang.String" name="dummyProcessID">${process.dummyProcessID}</input>
+	 <output class="java.lang.String" name="rfidOperation">${process.rfidOperation}</output>
+	 <output class="java.lang.String" name="logicalState">${process.logicalState}</output>
+	 <output class="java.lang.String" name="maintenanceMode">${process.maintenanceMode}</output>
+	 <output class="java.lang.String" name="eventErrCode">${process.eventErrCode}</output>
+	 <output class="java.lang.String" name="errorDesc">${process.errorDesc}</output>
+	 <output class="java.lang.String" name="numFailureStartTrigger">${process.numFailureStartTrigger}</output>
+	 <output class="java.lang.String" name="numFailureEndTrigger">${process.numFailureEndTrigger}</output>
+	 <output class="java.util.Map" name="newPayload">${process.newPayload}</output>
+	 <output class="java.util.Map" name="inProcessPayload">${process.inProcessPayload}</output>
+	 <output class="java.lang.String" name="sessionID">${process.sessionID}</output>
+	 <output class="java.lang.String" name="rfidSessionVar">${process.rfidSessionVar}</output>
+	 <output class="java.lang.String" name="checkForASN">${process.checkForASN}</output>
+	 <output class="java.lang.String" name="isRejoinSession">${process.isRejoinSession}</output>
+	 <output class="java.lang.String" name="isDelayedASN">${process.isDelayedASN}</output>
+			<output class="java.lang.Long" name="processEndTime">${process.processEndTime}</output>
+    </call>
+		
+
+    <call name="ASNHandler" resource="dc_asn_handler_table.xml">
+		<target name="DecideStopOption" exit="BARCODEDONE"/> 
+        <target name="DisableRework" exit="DONE"/>
+        <target name="SetErrorCode" exit="ERROR"/>
+        <target name="InProgress.Reading" exit="InProgress.Reading"/>		 
+        <target name="InProgress.StartTriggerReceived" exit="InProgress.StartTriggerReceived"/>
+        <target name="ASNCreated" exit="ASNCreated"/>
+        <target name="PublishReadStopOutput" exit="PublishReadStopOutput"/>
+        <target name="StopSessionExit" exit="StopSessionExit"/>
+        <input class="java.lang.String" name="siteName">${process.siteName}</input>
+        <input class="java.lang.String" name="checkForASN">${process.checkForASN}</input>
+        <input class="java.lang.String" name="logicalState">${process.logicalState}</input>
+        <input class="java.lang.String" name="inComingBoxID">${process.inComingBoxID}</input>
+		<input class="java.lang.String" name="defaultShipToDesc">${process.defaultShipToDescBarcodeMode}</input>
+		<input class="com.oatsystems.solutions.apparel.objects.ReadSessionHistory" constant="false" name="historyMap" required="true">${process.historyMap}</input>
+		<input class="java.lang.String" name="boxID">${process.boxID}</input>   
+		<input class="java.lang.String" name="stationId">${process.stationId}</input>  
+		<input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>  
+		<input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+		<input class="java.lang.String" name="asnExpected">${process.asnExpected}</input>
+		<input class="java.util.Map" name="rcvPayload">${process.newPayload}</input>
+		<input class="java.lang.String" name="processID">${process.processID}</input> 
+	    <input class="com.oatsystems.asn.objects.Shipment" name="shipment">${process.shipment}</input>
+		<input class="java.lang.String" name="transitLocation">${process.transitLocation}</input>
+		<input class="java.lang.String" name="shipToDesc">${process.shipToDesc}</input>
+		<input class="java.lang.String" name="asnMode">${process.asnMode}</input>
+	    <input class="java.lang.String" name="isStopTriggerRcvd">${process.isStopTriggerRcvd}</input>
+		<input class="java.lang.String" name="isDelayedASN">${process.isDelayedASN}</input>
+		<input class="java.lang.String" name="shipToDescBarcodeMode">${process.shipToDescBarcodeMode}</input>
+		<input class="java.lang.String" name="uiAction">${process.uiAction}</input>
+		<input class="java.lang.String" name="poNumberVal">${process.poNumberVal}</input>
+		<input class="java.lang.String" name="allowDatabaseTransaction">${process.allowDatabaseTransaction}</input>
+		<input class="java.lang.String" name="publishDataToSubscribers">${process.publishDataToSubscribers}</input>
+		<input class="java.lang.Long" name="processEndTime">${process.processEndTime}</input>
+		<input class="java.lang.Long" name="processStartTime">${process.processStartTime}</input>
+		<input class="java.lang.String" name="dummyProcessID">${process.dummyProcessID}</input>
+		<input class="java.lang.String" name="multiBoxSupport">${process.multiBoxSupport}</input>
+		<input class="java.lang.String" constant="false" name="sessionID" required="false">${process.sessionID}</input>
+		<input class="java.lang.String" constant="false" name="rework" required="false">${process.rework}</input>
+		<!--output class="java.lang.String" name="poNumberVal" required="false">${process.poNumberVal}</output-->
+		<output class="java.lang.String" name="logicalState">${process.logicalState}</output>
+		<output class="java.lang.String" name="rework">${process.rework}</output>
+		<output class="java.lang.String" name="boxID">${process.boxID}</output>
+		<output class="com.oatsystems.asn.objects.Shipment" name="shipment">${process.shipment}</output>
+		<output class="java.lang.String" name="eventErrCode">${process.eventErrCode}</output>
+		<output class="java.lang.String" name="errorDesc">${process.errorDesc}</output>
+		<output class="java.lang.String" name="origNode">${process.origNode}</output>
+		 <!--<output class="java.lang.String" name="siteEpc">${process.siteEpc}</output>-->
+		<output class="java.util.Map" name="systemCreatedPayload">${process.newPayload}</output>
+		<output class="java.lang.Boolean" name="isOriginalASN">${process.isOriginalASN}</output>
+		<output class="java.lang.String" name="timeoutEventID">${process.timeoutEventID}</output>
+	    <output class="com.oatsystems.solutions.apparel.objects.ReadSessionHistory" name="historyMap">${process.historyMap}</output>	
+    </call>
+	
+	<!-- Anurag - Added to decide for Submit or Timeout Event -->
+	<decision name="DecideStopOption">
+	 <!-- <case condition="${process.stopIndicator} eq 'TIMEOUT'" label="TIMEOUT" target="InjectTimeoutEvent"/> -->
+	 <case condition="${process.stopIndicator} eq 'TIMEOUT' and ${process.stopTimeoutInd} == null" label="TIMEOUT" target="SetTimeOutInd"/>
+	  <case condition="${process.stopIndicator} eq 'SUBBUTTON'" label="InitializePayLoad" target="InitializePayLoad"/>
+	  <default label="DoNothing" target="InitializePayLoad"/>
+	</decision>
+	
+	<activity name="SetTimeOutInd" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+         <target exit="done" name="InjectTimeoutEvent"></target>
+         <target exit="error" name="InjectTimeoutEvent"></target>
+         <input class="java.lang.String" constant="false" name="inArg0">TRUE</input>
+         <output class="java.lang.String" constant="false" name="outArg0">${process.stopTimeoutInd}</output>		
+     </activity>
+	
+	<!-- Anurag - Added for Timeout Event -->
+	<activity name="InjectTimeoutEvent" resource="class:com.oatsystems.workflow.primitives.InjectTimedEvent">
+            <target exit="done" name="InitializePayLoad"></target>
+            <target exit="error" name="InitializePayLoad"></target>
+            <input class="java.lang.String" constant="true" name="eventName" required="false">STOP_READER</input>
+            <input class="java.lang.String" constant="false" name="timeoutInMillis" required="false">${process.stopTime}</input>
+            <output class="java.lang.String" constant="false" name="eventID">${process.timeoutEventID}</output>
+        </activity>
+		
+	
+	
+    <call name="RFIDReadHandler" resource="dc_rfid_read_handler_table.xml">
+	 <target name="WaitForEvents" exit="DONE"/>
+	 <target name="MaintenanceModeHandler" exit="HANDLEERROR"/>
+	 <target name="PublishReadStartOutput" exit="PublishReadStartOutput"/>
+	 <target name="PublishNonRFIDStartOutput" exit="PublishNonRFIDStartOutput"/> 
+	 <target name="MaintenanceModeHandler" exit="ShouldNotReachHere"/>
+	 <target name="UpdateASNWithProcessID" exit="PublishReadStopOutput"/>
+		 <target name="PublishNonRFIDStopOutput" exit="PublishNonRFIDStopOutput"/> 
+	 <target name="PublishRcvRfidOpOutput" exit="PublishRcvRfidOpOutput"/>
+	 <target name="PublishRcvNonRfidOpOutput" exit="PublishRcvNonRfidOpOutput"/>
+	 <target name="CreateVirtualBoxID" exit="CreateVirtualBoxID"/>
+<target name="PublishReadStopOutput" exit="PublishStopReadOutputWithoutProcess"/> 
+	 <target name="MaintenanceModeHandler" exit="PublishAccuracyMetOutput"/>
+	 <!-- Anurag Barcode related -->
+	 <target name="AssignPreBarcodeAndStart" exit="ReadAfterCancel"/>
+	 <input class="java.lang.String" name="logicalState">${process.logicalState}</input>
+	 <input class="java.lang.String" name="bypassReader">${process.bypassReader}</input>
+	 <input class="java.lang.String" name="maintenanceDoneOutput">${process.maintenanceDoneOutput}</input>
+	 <input class="java.lang.String" name="readerEpc">${process.readerEpc}</input>	 
+ 	 <input class="java.lang.String" name="maintenanceMode">${process.maintenanceMode}</input>
+ 	 <input class="java.lang.String" name="epc">${process.epc}</input>
+ 	 <input class="java.util.Map" name="epcPayload">${process.epcPayload}</input>
+ 	 <input class="java.util.Map" name="inProcessPayload">${process.inProcessPayload}</input>
+ 	 <input class="java.util.Map" name="newPayload">${process.newPayload}</input>
+ 	 <input class="java.lang.String" name="uiMessage">${process.uiMessage}</input>
+ 	 <input class="java.lang.String" name="rfidOperation">${process.rfidOperation}</input>
+ 	 <input class="java.lang.String" name="transitLocation">${process.transitLocation}</input>
+ 	 <input class="java.lang.String" name="transitLocationRP">${process.transitLocationRP}</input>
+ 	 <input class="java.lang.String" name="boxID">${process.boxID}</input> 
+	 <input class="java.lang.String" name="inComingBoxID">${process.inComingBoxID}</input>
+ 	 <input class="java.lang.String" name="processID">${process.processID}</input> 
+ 	 <input class="com.oatsystems.asn.objects.Shipment" name="shipment">${process.shipment}</input>
+	 <input class="java.lang.String" name="stationId">${process.stationId}</input>  
+	 <input class="java.lang.String" name="scenarioType">${process.scenarioType}</input>  
+	 <input class="java.lang.String" name="scenarioDeviceType">${process.scenarioDeviceType}</input>
+	 <input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+	 <input class="java.lang.String" name="rfidSessionVar">${process.rfidSessionVar}</input>
+	 <input class="java.lang.String" name="sessionID">${process.sessionID}</input>
+	 <input class="java.lang.String" name="siteEpc">${process.siteEpc}</input>
+	 <input class="java.lang.String" name="asnExpected">${process.asnExpected}</input>
+	 <input class="java.lang.String" name="asnMode">${process.asnMode}</input>
+	 <input class="java.lang.String" name="epcBatchSize">${process.epcBatchSize}</input>
+	<input class="java.lang.String" name="shipToDescBarcodeMode">${process.shipToDescBarcodeMode}</input>
+	<input class="java.lang.String" name="allowDatabaseTransaction">${process.allowDatabaseTransaction}</input>
+	<!-- Anurag added for barcode related operations -->
+	<input class="java.lang.String" name="readAfterCancel">${process.readAfterCancel}</input>
+	<input class="java.lang.String" name="user">${process.user}</input>		
+	 <!-- <input class="java.lang.String" name="eventErrCode">${process.eventErrCode}</input> -->
+	 <output class="java.lang.String" name="epc">${process.epc}</output>
+	 <output class="java.lang.String" name="rfidOperation">${process.rfidOperation}</output>
+	 <output class="java.lang.String" name="logicalState">${process.logicalState}</output>
+	 <output class="java.lang.String" name="rfidSessionVar">${process.rfidSessionVar}</output>
+	 <output class="java.util.Map" name="inProcessPayload">${process.inProcessPayload}</output>
+	 <output class="java.util.Map" name="newPayload">${process.newPayload}</output>
+	 <output class="java.lang.String"  name="batchId">${process.batchId}</output>
+	 <output class="java.util.Map"  name="singulatedEpcs">${process.singulatedEpcs}</output>
+	 <output class="java.util.Map"  name="preEncodedEpcs">${process.preEncodedEpcs}</output>
+         <output class="java.util.Map"  name="badEpcs">${process.badEpcs}</output>
+         <output class="java.util.Map" name="epcPayload">${process.epcPayload}</output>
+         <output class="java.util.Map" name="rcvPayload">${process.rcvPayload}</output>
+         <output class="java.lang.String" name="eventErrCode">${process.eventErrCode}</output>
+         <output class="java.lang.String" name="errorDesc">${process.errorDesc}</output>
+         <output class="java.lang.String" name="origNode">${process.origNode}</output>
+         <output class="java.lang.String" name="processID">${process.processID}</output>
+	 <output class="java.util.Map" name="customPayload">${process.customPayload}</output>
+	 <output class="java.lang.String" constant="false" name="hasPendingEpcInBatch" required="false">${process.hasPendingEpcInBatch}</output>
+	 <output class="java.lang.String" name="isAccuracyMet">${process.isAccuracyMet}</output>
+			<output class="java.lang.Long" name="processEndTime">${process.processEndTime}</output>
+			<output class="java.lang.Long" name="processStartTime">${process.processStartTime}</output>
+			<output class="java.lang.String" name="checkForASN">${process.checkForASN}</output>
+     <output class="java.lang.String" name="boxID">${process.boxID}</output>
+	 <output class="java.lang.String" name="inComingBoxID">${process.inComingBoxID}</output>
+	 <output class="com.oatsystems.asn.objects.Shipment" name="shipment">${process.shipment}</output>
+    </call>
+    <wait name="WaitForEvents">
+	<!--<event name="msg_in" target="ASNDone.ASNFound">
+	     <param class="java.util.Map" name="payload">${process.rcvPayload}</param>
+	     <filter resource="filter:ReceiveMsgInFilter">
+		    <argument name="messageChannel" class="java.lang.String">SIMULATOR_CHANNEL</argument>
+		    <argument name="messageName" class="java.lang.String">SIMULATOR_MSG_IN</argument>
+		    <argument name="externalScenarioId" class="java.lang.String">${process.stationId}</argument>
+	      </filter>
+	</event>-->
+	
+	<event deferred="false" name="TIME_OUT" target="StartSetReaderStateOffProcessClose"></event>
+	
+	   <event name="submit_ui" target="DecideIfSubmitOrCancel">
+	  	 <param class="java.lang.String" name="submittedValue">${process.uiAction}</param>
+		  <param class="java.lang.String" name="shipToDesc">${process.shipToDesc}</param>
+		  <param class="java.lang.String" name="readBarcode">${process.readBarcode}</param> 		  
+		  <property key="ui.invisibleWhenInactive">false</property>
+		  <property key="ui.invisibleWhenWaitConditionFalse">true</property>
+		  <property key="ui.jsp"></property>
+	          <property key="waitCondition">true</property>
+	    </event>
+	    <event name="carton_msg_ui" target="InProgress.CartonMsgUIReceived">
+		<param class="java.lang.String" name="soapmessage">${process.uiMessage}</param>
+		<property key="ui.invisibleWhenInactive">false</property>
+		<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+		<property key="ui.jsp">/workflow/floor_ui/event_tiles/soap_message_simulator.jsp</property>
+		<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+	    </event>
+		<!--
+	    <event name="photocell_trigger" target="InProgress.StartTriggerReceived">
+	        <filter resource="filter:PhotocellEventFilter">
+		    <argument class="java.lang.String"  name="deviceEpcAndPoint">${process.devicePointForStart}</argument>
+		    <argument class="java.lang.String"  name="state">${process.devicePointStateForStart}</argument>
+		</filter>
+	    </event>
+		-->
+	    <event name="start_trigger_ui" target="InProgress.StartTriggerReceived">
+	    	<property key="ui.invisibleWhenInactive">false</property>
+		<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+		<property key="ui.jsp">/workflow/floor_ui/event_tiles/Start_Trigger.jsp</property>
+		<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+	    </event>
+	    <event name="epc_add_read" target="CheckIfProcessIsRunning">
+	    	<param class="java.lang.String"  name="epc">${process.epc}</param>
+		<param class="java.lang.String"  name="timestamp">${process.timestamp}</param>
+		<param class="java.util.Map" name="payload">${process.epcPayload}</param>
+		<filter resource="filter:EpcAddEventFilter">
+		    <argument class="java.lang.String"  name="locationEpc">${process.transitLocationRP}</argument>
+		</filter>
+	    </event>
+	    <event name="epc_add_read_ui" target="CheckIfProcessIsRunningUI">
+		<param class="java.lang.String"  name="epc">${process.epc}</param>
+		<param class="java.lang.String"  name="timestamp">${process.timestamp}</param>
+		<param class="java.lang.String" name="soapmessage">${process.uiMessage}</param>
+		<property key="ui.invisibleWhenInactive">false</property>
+		<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+		<property key="ui.jsp">/workflow/floor_ui/event_tiles/read_message_simulator.jsp</property>
+		<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+	    </event>
+		<!--
+	    <event name="photocell_trigger" target="InProgress.StopTriggerReceived">
+		<filter resource="filter:PhotocellEventFilter">
+		    <argument class="java.lang.String"  name="deviceEpcAndPoint">${process.devicePointEpcForEnd}</argument>
+		    <argument class="java.lang.String"  name="state">${process.devicePointStateForEnd}</argument>
+		</filter>
+	    </event>
+		-->
+	    <event name="end_trigger_ui" target="InProgress.StopTriggerReceived">
+		<property key="ui.invisibleWhenInactive">false</property>
+		<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+		<property key="ui.jsp">/workflow/floor_ui/event_tiles/End_Trigger.jsp</property>
+		<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+	    </event>
+		<!--
+	    <event name="photocell_trigger" target="MaintenanceModeHandler">
+		<filter resource="filter:PhotocellEventFilter">
+		    <argument class="java.lang.String" constant="false" name="deviceEpc">${process.readerEpc}</argument>
+		    <argument class="java.lang.String" constant="false"  name="state">${process.devicePointStateForEnd}</argument>
+		    <argument class="java.lang.String" constant="true"  name="point">5</argument>
+		</filter>
+	    </event>
+		-->
+		
+		<!--
+	    <event name="photocell_trigger" target="SetDeviceReaderOff">
+		<filter resource="filter:PhotocellEventFilter">
+		    <argument class="java.lang.String" constant="false" name="deviceEpc">${process.readerEpc}</argument>
+		    <argument class="java.lang.String" constant="false"  name="state">${process.devicePointStateForEnd}</argument>
+		    <argument class="java.lang.String" constant="true"  name="point">6</argument>
+		</filter>
+	    </event>
+		
+	    <event name="photocell_trigger" target="SetDeviceReaderOn">
+		<filter resource="filter:PhotocellEventFilter">
+		    <argument class="java.lang.String"  constant="false"  name="deviceEpc">${process.readerEpc}</argument>
+		    <argument class="java.lang.String"  constant="false" name="state">${process.devicePointStateForStart}</argument>
+		    <argument class="java.lang.String" constant="true"  name="point">6</argument>
+		</filter>
+	    </event>
+		-->
+		
+		<!-- Anurag will be removed 
+	    <event name="point6_device_error_ui_on" target="MaintenanceModeHandler">
+		<property key="ui.invisibleWhenInactive">false</property>
+		<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+		<property key="ui.jsp">/workflow/floor_ui/event_tiles/Point6_Trigger.jsp</property>
+		<property key="waitCondition">${process.testWithUI} eq 'true' and ${process.maintenanceMode} ne null</property>
+	    </event>
+	    <event name="point6_device_error_ui_off" target="MaintenanceModeHandler">
+		<property key="ui.invisibleWhenInactive">false</property>
+		<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+		<property key="ui.jsp">/workflow/floor_ui/event_tiles/Point6_Trigger.jsp</property>
+		<property key="waitCondition">${process.testWithUI} eq 'true' and ${process.maintenanceMode} eq null</property>
+	    </event>
+		-->
+		<!--
+	    <event name="photocell_trigger" target="ProcessClosing.StopTriggerReceived">
+	       <param class="java.lang.String" name="logicalState">ProcessClosing.StopTriggerReceived</param> 
+		<filter resource="filter:PhotocellEventFilter">
+		    <argument class="java.lang.String"  name="deviceEpcAndPoint">${process.devicePoint7EpcForEnd}</argument>
+		    <argument class="java.lang.String"  name="state">${process.devicePoint7StateForEnd}</argument>
+		</filter>
+	    </event>
+		-->
+		
+		<!-- Anurag will be removed 
+	    <event name="point7_end_trigger_ui" target="ProcessClosing.StopTriggerReceived">
+		<param class="java.lang.String" name="logicalState">ProcessClosing.StopTriggerReceived</param>
+		<property key="ui.invisibleWhenInactive">false</property>
+		<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+		<property key="ui.jsp">/workflow/floor_ui/event_tiles/Point7_Trigger.jsp</property>
+		<property key="waitCondition">${process.testWithUI} eq 'true'</property>
+	    </event>
+		-->
+		<!-- -->
+		<!-- Anurag can be removed 
+	    <event name="des_topic_online" target="des_topic_online">
+	       <property key="ui.invisibleWhenInactive">false</property>
+	       <property key="ui.invisibleWhenWaitConditionFalse">true</property>
+	        <property key="ui.jsp">/workflow/floor_ui/event_tiles/des_on.jsp</property>
+	        <property key="waitCondition">${process.testWithUI} eq 'true'</property>
+	   </event>
+	   <event name="DesTopicOnline" target="DesTopicOnline">
+		<filter resource="class:com.oatsystems.wfe.filter.DefaultWorkflowFilter">
+		<argument class="java.lang.String"  name="DesTopic">${process.desTopic}</argument>
+		</filter>
+           </event>
+	   <event name="des_topic_offline" target="des_topic_offline">
+		 <property key="ui.invisibleWhenInactive">false</property>
+		 <property key="ui.invisibleWhenWaitConditionFalse">true</property>
+		 <property key="ui.jsp">/workflow/floor_ui/event_tiles/des_off.jsp</property>
+		 <property key="waitCondition">${process.testWithUI} eq 'true'</property>
+	 </event>
+	 <event name="DesTopicOffline" target="DesTopicOffline">
+	    <filter resource="class:com.oatsystems.wfe.filter.DefaultWorkflowFilter">
+		<argument class="java.lang.String"  name="DesTopic">${process.desTopic}</argument>
+	    </filter>
+	</event>
+	-->
+	<!-- -->
+	<!-- Anurag can be removed -->
+	<event name="sessionStarted" target="SessionStarted">
+	   <property key="ui.invisibleWhenInactive">false</property>
+	   <property key="ui.invisibleWhenWaitConditionFalse">true</property>
+	   <property key="ui.jsp">/workflow/floor_ui/event_tiles/session_started.jsp</property>
+	   <property key="waitCondition">${process.testWithUI} eq 'true'</property>
+	 </event>
+	<event name="sessionStopped" target="SessionStopped">
+	   <property key="ui.invisibleWhenInactive">false</property>
+	   <property key="ui.invisibleWhenWaitConditionFalse">true</property>
+	   <property key="ui.jsp">/workflow/floor_ui/event_tiles/session_stopped.jsp</property>
+	   <property key="waitCondition">${process.testWithUI} eq 'true'</property>
+	 </event>	 
+	 <!-- -->
+	 <event name="barcode_read" target="FilterBarcodeReads">
+	     <param class="java.lang.String" name="gtin">${process.readBarcode}</param>
+	    <filter resource="filter:BarcodeEventFilter">
+		<argument class="java.lang.String"  name="deviceEpc">${process.barcodeScannerEPC}</argument>
+	    </filter>
+	</event>
+
+	<event name="barcode_read_ui" target="FilterBarcodeReads">
+	   <param class="java.lang.String"  name="soapmessage">${process.readBarcode}</param>
+	   <property key="ui.invisibleWhenInactive">false</property>
+	   <property key="ui.invisibleWhenWaitConditionFalse">true</property>
+	   <property key="ui.jsp">/workflow/floor_ui/event_tiles/barcode_read.jsp</property>
+	   <property key="waitCondition">${process.testWithUI} eq 'true'</property>
+      </event> 
+	  
+	 <!-- <event deferred="false" name="STOP_READER" target="StartSetReaderStateOffProcessClose"></event> -->
+		<event deferred="false" name="STOP_READER" target="DecideToStopReader"></event>
+		
+		
+	  <!-- Anurag , commented out as this might be costly
+	  <event name="__timeout_event" target="IsDeviceOnline">
+        <property key="timeout">${process.readerCheck}</property>
+      </event>
+	  -->
+	  
+	  <!--
+	<event  name="photocell_trigger"   target="SessionStarted">
+	      <filter resource="filter:PhotocellEventFilter">
+	           <argument name="deviceEpcAndPoint" class="java.lang.String">${process.sessionStartDeviceEpcAndPoint}</argument>
+	           <argument name="state" class="java.lang.String">${process.sessionPointStateForStart}</argument>
+	      </filter>
+	 </event>
+	<event  name="photocell_trigger"   target="SessionStopped">
+	      <filter resource="filter:PhotocellEventFilter">
+	           <argument name="deviceEpcAndPoint" class="java.lang.String">${process.sessionStopDeviceEpcAndPoint}</argument>
+	           <argument name="state" class="java.lang.String">${process.sessionPointStateForStop}</argument>
+	      </filter>
+	 </event>	 
+	 -->
+    </wait>
+ <!--  <decision name="DecideIfSubmitOrCancel">
+	 <case condition="${process.uiAction} eq 'SUBMIT'" label="submitdata" target="ProcessClosing.StopTriggerReceived"/> 
+	 <case condition="${process.uiAction} eq 'SUBMIT'" label="submitdata" target="InProgress.StopTriggerReceived"/>
+	  <case condition="${process.uiAction} eq 'STARTSCAN'" label="submitdata" target="InProgress.StartTriggerReceived"/>
+	   <case condition="${process.uiAction} eq 'CANCEL'" label="canceldata" target="UserCancelled.ClearData"/> 
+	  <default label="DoNothing" target="WaitForEvents"/> 
+  </decision>
+  -->
+   <decision name="DecideToStopReader">
+			<case condition="${process.stopTimeoutInd}!= null" label="StopReader" target="SetStopIndToNULL"></case> 	
+			<default label="DoNothing" target="WaitForEvents"/>
+		</decision>
+	  
+	   <activity name="SetStopIndToNULL" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+          	<target exit="done" name="StartSetReaderStateOffProcessClose"></target>
+          	<target exit="error" name="StartSetReaderStateOffProcessClose"></target>
+          	<target exit="skip" name="StartSetReaderStateOffProcessClose"></target>
+          	<output class="java.lang.String" constant="false" name="variable0">${process.stopTimeoutInd}</output>
+			<output class="java.lang.String" constant="false" name="variable1">${process.preBarcode}</output>  
+    </activity>
+  
+   <activity name="IsDeviceOnline" resource="primitive:IsDeviceOnline">
+      <target exit="done" name="SendReaderStatus"></target>
+      <target exit="error" name="SendReaderStatus"></target>
+      <input class="java.lang.String" constant="false" name="deviceEpc" required="false">${process.readerEpc}</input>
+      <output class="java.lang.Boolean" constant="false" name="isOnline">${process.readerIsOnline}</output>
+    </activity>
+	
+	<activity name="SendReaderStatus" resource="class:com.oatsystems.solutions.apparel.primitives.SendReaderStatus">
+      <target exit="done" name="WaitForEvents"></target>
+      <target exit="error" name="WaitForEvents"></target>
+      <input class="java.lang.Boolean" constant="false" name="readerStatus" required="false">${process.readerIsOnline}</input>
+	  <input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+	   <input class="java.lang.String" name="bypassReader">${process.bypassReader}</input>
+    </activity>
+  
+  <!-- Change to first disable the reader then close the process Anurag -->
+   <decision name="DecideIfSubmitOrCancel">
+
+	  <case condition="${process.uiAction} eq 'SUBMIT'" label="submitdata" target="ResetPreBarcodeAndSubmit"/> 
+	  
+	  <!-- Rework will discard the previous reads. flag will be enable and it will be used in updateasn-->
+	  <case condition="${process.uiAction} eq 'REWORK'" label="reworkData" target="EnableRework"/> 
+	  
+	  <!-- It will consider the previous reads -->
+	  <case condition="${process.uiAction} eq 'CONTINUE'" label="addOnTheExisting" target="DisableRework"/> 
+	  
+	  <!-- It will set the poNumber for receiving  -->
+	  <case condition="${process.uiAction} eq 'PONUMBERVALUE'" label="PONumberSet" target="SetPONumber"/>
+	  
+	  <!-- It will set the poNumber for receiving  -->
+	  <case condition="${process.uiAction} eq 'USER'" label="UserDetail" target="SetUserDetail"/>
+	  
+	  
+	  <!-- Below submitted data values(next & cancelcarton) are added for Multibox support in pickpack and shipping. When user needs to start read next carton, they are supposed to click on next carton button. The control resets the payload and then goes to updateASNForTable where data gets persisted & creates new info. Similarly, cancel carton follows the same path of next button but ignores the currentdata in info and creates new info. -->
+	  <case condition="${process.uiAction} eq 'NEXT' or ${process.uiAction} eq 'CANCELCARTON'" label="submitdata" target="CreateVirtualBoxID"/> 
+	  
+<!--	  <case condition="${process.uiAction} eq 'STARTSCAN'" label="submitdata" target="InProgress.StartTriggerReceived"/> -->
+	<case condition="${process.uiAction} eq 'STARTSCAN'" label="submitdata" target="InitializePayLoad"/> 
+<!--	  <case condition="${process.uiAction} eq 'CANCEL'" label="canceldata" target="UserCancelled.ClearData"/> -->
+		<case condition="${process.uiAction} eq 'CANCEL'" label="canceldata" target="OnlyCancel"/>
+<!--	  <case condition="${process.uiAction} eq 'BARCODEREAD'" label="submitdata" target="FilterBarcodeReads"/>  -->
+	  <case condition="${process.uiAction} eq 'BARCODEREAD'" label="submitdata" target="AnalyzeBarcode"/>
+	  <default label="DoNothing" target="WaitForEvents"/>
+  </decision>
+  
+  <!-- Anurag Barcode related -->
+  <decision name="AnalyzeBarcode">
+	<case condition="${process.preBarcode} == null" label="normalRead" target="AssignPreBarcodeAndStart"/>
+	<case condition="${process.preBarcode}!= null and ${process.preBarcode} == ${process.readBarcode}" label="submitData" target="ResetPreBarcodeAndSubmit"/> 
+	<case condition="${process.preBarcode}!= null and ${process.preBarcode} != ${process.readBarcode}" label="cancelAndNormalRead" target="CancelAndRead"/>
+	<default label="DoNothing" target="WaitForEvents"/>
+  </decision>
+  
+    <activity name="AssignPreBarcodeAndStart" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+         <target exit="done" name="FilterBarcodeReads"></target>
+         <target exit="error" name="FilterBarcodeReads"></target>
+         <input class="java.lang.String" constant="false" name="inArg0">${process.readBarcode}</input>
+         <output class="java.lang.String" constant="false" name="outArg0">${process.preBarcode}</output>		
+     </activity> 
+	 
+	 <activity name="ResetPreBarcodeAndSubmit" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+          	<target exit="done" name="StartSetReaderStateOffProcessClose"></target>
+          	<target exit="error" name="StartSetReaderStateOffProcessClose"></target>
+          	<target exit="skip" name="StartSetReaderStateOffProcessClose"></target>
+          	<output class="java.lang.String" constant="false" name="variable0">${process.preBarcode}</output> 	
+			<output class="java.lang.String" constant="false" name="variable1">${process.stopTimeoutInd}</output> 			
+    </activity>
+		
+	<!-- Added for rework -->
+	<activity name="EnableRework" resource="class:com.oatsystems.solutions.apparel.primitives.EnableReworkOnASN">
+		<target exit="done" name="WaitForEvents"></target>
+		<target exit="error" name="WaitForEvents"></target>
+		<input class="java.lang.String" name="scenarioName">${process.scenarioName}</input>
+		<input class="java.lang.String" name="boxID">${process.boxID}</input>		
+        <output class="java.lang.String" constant="false" name="rework">${process.rework}</output>		
+     </activity>
+	 
+	 <activity name="SetPONumber" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+		<target exit="done" name="WaitForEvents"></target>
+        <target exit="error" name="WaitForEvents"></target>
+		<input class="java.lang.String" constant="false" name="inArg0">${process.readBarcode}</input>
+        <output class="java.lang.String" constant="false" name="outArg0">${process.poNumberVal}</output>		
+     </activity>
+	 
+	 <activity name="SetUserDetail" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+		<target exit="done" name="WaitForEvents"></target>
+        <target exit="error" name="WaitForEvents"></target>
+		<input class="java.lang.String" constant="false" name="inArg0">${process.readBarcode}</input>
+        <output class="java.lang.String" constant="false" name="outArg0">${process.user}</output>		
+     </activity>
+	 
+	 <activity name="DisableRework" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+		<target exit="done" name="WaitForEvents"></target>
+        <target exit="error" name="WaitForEvents"></target>
+		<input class="java.lang.String" constant="false" name="inArg0">FALSE</input>
+        <output class="java.lang.String" constant="false" name="outArg0">${process.rework}</output>		
+     </activity>
+	
+	<activity name="CancelAndRead" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+         <target exit="done" name="RemoveCartonFromHistory"></target>
+         <target exit="error" name="RemoveCartonFromHistory"></target>
+         <input class="java.lang.String" constant="false" name="inArg0">TRUE</input>
+         <output class="java.lang.String" constant="false" name="outArg0">${process.readAfterCancel}</output>		
+     </activity> 
+	 
+	 <activity name="OnlyCancel" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+          	<target exit="done" name="RemoveCartonFromSessionHistory"></target>
+          	<target exit="error" name="RemoveCartonFromSessionHistory"></target>
+          	<target exit="skip" name="RemoveCartonFromSessionHistory"></target>
+          	<output class="java.lang.String" constant="false" name="variable0">${process.preBarcode}</output>
+			<output class="java.lang.String" constant="false" name="variable1">${process.readAfterCancel}</output>
+			<!--output class="java.lang.String" constant="false" name="variable2">${process.poNumberVal}</output-->
+    </activity>
+	
+	<!--Fix for MV-5668 (for only cancel) -->
+	<activity name="RemoveCartonFromSessionHistory" resource="class:com.oatsystems.solutions.apparel.primitives.RemoveCartonFromSessionHistory">
+		<target exit="done" name="DecideBoxShipmentNull"></target>
+		<target exit="error" name="DecideBoxShipmentNull"></target>
+		<input class="java.lang.String" constant="false" name="boxID" required="false">${process.boxID}</input>
+		<input class="java.lang.String" constant="false" name="sessionID" required="false">${process.sessionID}</input>
+		<input class="com.oatsystems.solutions.apparel.objects.ReadSessionHistory" constant="false" name="historyMap" required="true">${process.historyMap}</input>
+        <output class="com.oatsystems.solutions.apparel.objects.ReadSessionHistory" name="historyMap">${process.historyMap}</output>	
+	</activity>
+	
+	<!--Fix for Jira 5412 and 5564 added Decision point, if its Local mode and cancel out the operation, then, make the boxid, shipment null so that next scan, 
+	it will generate new shipment -->
+	
+	<decision name="DecideBoxShipmentNull">
+	<case condition="${process.asnMode} eq 'LOCAL' and ${process.readBarcode} == null" label="LocalSetNull" target="SetBoxShipmentNull"/>
+	<default label="NotLocal" target="StartSetReaderStateOffProcessCancel"/>
+	</decision>
+	
+	 <activity name="SetBoxShipmentNull" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+          	<target exit="done" name="StartSetReaderStateOffProcessCancel"></target>
+          	<target exit="error" name="StartSetReaderStateOffProcessCancel"></target>
+          	<target exit="skip" name="StartSetReaderStateOffProcessCancel"></target>
+          	<output class="java.lang.String" constant="false" name="variable2">${process.boxID}</output>
+			<output class="java.lang.String" constant="false" name="variable3">${process.shipment}</output>	
+			<output class="java.lang.String" constant="false" name="variable4">${process.maintenanceMode}</output>			
+    </activity>
+	
+	
+	<!--Fix for MV-5668 (for cancel and read) -->
+	<activity name="RemoveCartonFromHistory" resource="class:com.oatsystems.solutions.apparel.primitives.RemoveCartonFromSessionHistory">
+		<target exit="done" name="StartSetReaderStateOffProcessCancel"></target>
+		<target exit="error" name="StartSetReaderStateOffProcessCancel"></target>
+		<input class="java.lang.String" constant="false" name="boxID" required="true">${process.boxID}</input>
+		<input class="java.lang.String" constant="false" name="sessionID" required="false">${process.sessionID}</input>
+		<input class="com.oatsystems.solutions.apparel.objects.ReadSessionHistory" constant="false" name="historyMap" required="true">${process.historyMap}</input>
+        <output class="com.oatsystems.solutions.apparel.objects.ReadSessionHistory" name="historyMap">${process.historyMap}</output>	
+	</activity>
+  
+  <activity name="StartSetReaderStateOffProcessCancel" resource="primitive:SetReaderState">
+      <target exit="done" name="UserCancelled.ClearData"></target>
+      <target exit="error" name="UserCancelled.ClearData"></target>
+      <input class="java.lang.String" name="readerLocationEpc">${process.transitLocationRP}</input>
+      <input class="java.lang.String" name="readerState">DISABLED</input>
+    </activity>
+  
+    
+  <activity name="StartSetReaderStateOffProcessClose" resource="primitive:SetReaderState">
+      <target exit="done" name="InProgress.StopTriggerReceived"></target>
+      <target exit="error" name="InProgress.StopTriggerReceived"></target>
+      <input class="java.lang.String" name="readerLocationEpc">${process.transitLocationRP}</input>
+      <input class="java.lang.String" name="readerState">DISABLED</input>
+    </activity>
+	
+	<!-- Anurag  -->
+	<activity name="InitializePayLoad" resource="class:com.oatsystems.solutions.apparel.primitives.CreateInitialBatchVar">
+      <target exit="done" name="InProgress.StartTriggerReceived"></target>
+      <target exit="error" name="InProgress.StartTriggerReceived"></target>
+	  <input class="java.lang.String" name="uiAction">${process.uiAction}</input>
+      <output class="java.lang.String" name="badReadCount">${process.badReadCount}</output>
+      <output class="java.lang.String" name="epcBatchId">${process.epcBatchId}</output>
+	  <output class="java.lang.String" name="boxID">${process.boxID}</output>
+	  <output class="java.lang.String" name="inComingBoxID">${process.inComingBoxID}</output>
+	  <output class="com.oatsystems.asn.objects.Shipment" name="shipment">${process.shipment}</output>
+    </activity>  
+  
+  
+  <activity name="UserCancelled.ClearData" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+  	    <target exit="done" name="RFIDReadHandler"></target>
+  	    <target exit="error" name="RFIDReadHandler"></target>
+  	    <input class="java.lang.String" constant="false" name="inArg0">UserCancelled.ClearData</input>
+  	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+  	    <input class="java.lang.String" constant="false" name="inArg1">true</input>
+  	    <output class="java.lang.String" constant="false" name="outArg1">${process.isStopTriggerRcvd}</output>
+    </activity> 
+   <decision name="CheckIfProcessIsRunningUI">
+         <!-- <case condition="${process.processID}==null" label="normal" target="InProgress.EpcAddReadUI"/> -->
+          	  <case condition="${process.processID}!=null" label="CallProcessSessionRead" target="CheckLogicalStateUI"/>
+          	  <default label="DoNothing" target="WaitForEvents"/>
+   </decision>
+   <decision name="CheckLogicalStateUI">
+            	  <case condition="${process.logicalState}==null" label="setLogicalState" target="InProgress.EpcAddReadUI"/>
+            	  <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.EpcAddReadUI'" label="CallProcessSessionRead" target="CreateEpcPayloadFromUIString"/>
+            	  <default label="DoNothing" target="InProgress.EpcAddReadUI"/>
+   </decision>
+   <activity name="CreateEpcPayloadFromUIString" resource="class:com.oatsystems.solutions.apparel.primitives.ConvertDelimitedStringToPayload">
+      	  <target exit="done" name="ProcessSessionRead"></target>
+      	  <target exit="error" name="ProcessSessionRead"></target>
+      	  <target exit="end" name="WaitForEvents"></target>
+      	  <input class="java.lang.String" constant="false" name="message" required="true">${process.uiMessage}</input>
+      	  <output class="java.lang.String" constant="false" name="epc">${process.epc}</output>
+      	  <output class="java.util.Map" constant="false" name="payload">${process.epcPayload}</output>
+   </activity>
+   
+  
+   
+   <decision name="CheckIfProcessIsRunning">
+    	<!--  <case condition="${process.processID}==null" label="normal" target="InProgress.Reading"/> No Need to start reading unless process is started -->
+    	 <!-- 	  <case condition="${process.processID}!=null" label="CallProcessSessionRead" target="ProcessSessionRead"/>  -->
+		<case condition="${process.processID}!=null" label="CreateEPCPayLoadTable" target="CreateEPCPayLoadTable"/> 
+    	  <default label="DoNothing" target="WaitForEvents"/>
+  </decision>
+  
+   <!-- Anurag -->
+    <activity name="CreateEPCPayLoadTable" resource="class:com.oatsystems.solutions.apparel.primitives.CreateEPCPayLoadTable">
+      	  <target exit="done" name="ProcessSessionRead"></target>
+      	  <target exit="error" name="ProcessSessionRead"></target>
+		  <input class="java.lang.String" constant="false" name="epcBatchId">${process.epcBatchId}</input>
+      	  <input class="java.lang.String" constant="false" name="badReadCount">${process.badReadCount}</input>
+		  <input class="java.lang.String" constant="false" name="epc">${process.epc}</input>		  
+      	  <output class="java.lang.String" constant="false" name="badReadCount">${process.badReadCount}</output>
+      	  <output class="java.lang.String" constant="false" name="epc">${process.epc}</output>
+      	  <output class="java.util.Map" constant="false" name="payload">${process.epcPayload}</output>
+   </activity>
+  
+      <activity name="ProcessSessionRead" resource="class:com.oatsystems.solutions.apparel.primitives.ProcessSessionRead">
+  	<target exit="done" name="DecideToShowUI"></target>
+  	<target exit="error" name="SetInternalError"></target>
+  	<input class="java.util.Map" constant="false" name="cartonInfo" required="false">${process.inProcessPayload}</input>
+  	<input class="java.lang.String" constant="false" name="epc" required="true">${process.epc}</input>
+  	<input class="java.util.Map" constant="false" name="epcPayload" required="false">${process.epcPayload}</input>
+  	<input class="java.lang.String" constant="false" name="batchId" required="false">${process.batchId}</input>
+  	<input class="java.util.Map" constant="false" name="singulatedEpcs" required="false">${process.singulatedEpcs}</input>
+  	<input class="java.util.Map" constant="false" name="preEncodedEpcs" required="false">${process.preEncodedEpcs}</input>
+  	<input class="java.util.Map" constant="false" name="badEpcs" required="false">${process.badEpcs}</input>
+  	<input class="com.oatsystems.solutions.apparel.objects.ReadSessionHistory" constant="false" name="historyMap" required="false">${process.historyMap}</input>
+  	<input class="java.lang.String" constant="false" name="transitLocation" required="false">${process.transitLocation}</input>
+  	<input class="java.lang.String" constant="false" name="transitLocationRP" required="false">${process.transitLocationRP}</input>
+  	<input class="java.lang.String" constant="false" name="processID">${process.processID}</input>
+  	<input class="java.lang.String" constant="false" name="boxID">${process.boxID}</input>
+  	<input class="java.lang.String" constant="false" name="scenarioName">${process.scenarioName}</input>
+  	<input class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</input>
+  	<input class="java.lang.String" name="asnExpected">${process.asnExpected}</input>
+  	<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+  	<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+  	<input class="java.lang.String" constant="false" name="sessionID" required="false">${process.sessionID}</input>
+  	<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+  	<input class="java.lang.String" constant="false" name="numTriesBeforeFailure" equired="false">${process.numTriesBeforeFailure}</input>
+  	<input class="java.lang.String" constant="false" name="numFailureStartTrigger" equired="false">${process.numFailureStartTrigger}</input>
+  	<input class="java.lang.String" constant="false" name="eventErrCode" equired="false">${process.eventErrCode}</input>
+  	<input class="java.util.Map" constant="false" name="customPayload" required="false">${process.customPayload}</input>
+  	<input class="java.lang.String" constant="false" name="logicalState" required="false">${process.logicalState}</input>
+  	<input class="java.lang.String" constant="false" name="epcBatchSize" required="false">${process.epcBatchSize}</input>
+	<input class="java.lang.String" constant="false" name="scenarioDeviceType" required="false">${process.scenarioDeviceType}</input>
+	<input class="java.lang.String" constant="false" name="allowDatabaseTransaction" required="false">${process.allowDatabaseTransaction}</input>
+	<input class="java.lang.String" constant="false" name="multiBoxSupport" required="false">${process.multiBoxSupport}</input>
+  	<output class="java.lang.String" constant="false" name="batchId">${process.batchId}</output>
+  	<output class="java.util.Map" constant="false" name="singulatedEpcs">${process.singulatedEpcs}</output>
+  	<output class="java.util.Map" constant="false" name="preEncodedEpcs">${process.preEncodedEpcs}</output>
+  	<output class="java.util.Map" constant="false" name="badEpcs">${process.badEpcs}</output>
+  	<output class="java.util.Map" constant="false" name="productCountMap">${process.productCountMap}</output>
+  	<output class="java.util.Map" constant="false" name="customPayload" required="false">${process.customPayload}</output>
+  	<output class="java.lang.String" constant="false" name="hasPendingEpcInBatch" required="false">${process.hasPendingEpcInBatch}</output>
+  	<output class="java.lang.String" constant="false" name="boxID">${process.boxID}</output>
+	<output class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</output>
+    </activity>
+    
+    <decision name="DecideToShowUI">
+        <case condition="${process.scenarioType} eq 'ITEM_PACK' and ${process.processID}!=null" label="ShowUI" target="ShowScenarioUI"></case> 
+        <default label="DoNothing" target="WaitForEvents"/>
+    </decision>
+    
+       <activity name="ShowScenarioUI" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateScenarioUI">
+        	<target exit="done" name="WaitForEvents"></target>
+        	<target exit="error" name="SetInternalError"></target>
+		   	<target exit="accuracyNotMet" name="AccuracyNotMet"></target>
+		<target exit="wrongItem" name="WrongItem"></target>
+    	        <target exit="accuracyMet" name="AccuracyMet"></target>
+        	<input class="java.lang.String" constant="false" name="transitLocation" required="false">${process.transitLocation}</input>
+        	<input class="java.lang.String" constant="false" name="transitLocationRP" required="false">${process.transitLocationRP}</input>
+        	<input class="java.lang.String" constant="false" name="processID">${process.processID}</input>
+        	<input class="java.lang.String" constant="false" name="boxID">${process.boxID}</input>
+        	<input class="java.lang.String" constant="false" name="scenarioName">${process.scenarioName}</input>
+        	<input class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</input>
+        	<input class="java.lang.String" name="asnExpected">${process.asnExpected}</input>
+        	<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+        	<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+        	<input class="java.lang.String" constant="false" name="sessionID" required="false">${process.sessionID}</input>
+        	<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+        	<input class="java.lang.String" constant="false" name="logicalState" required="false">${process.logicalState}</input>
+   </activity>
+      <activity name="AccuracyNotMet" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+          	<target exit="done" name="MaintenanceModeHandler"></target>
+          	<target exit="error" name="MaintenanceModeHandler"></target>
+          	<target exit="skip" name="MaintenanceModeHandler"></target>
+          	<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+          	<output class="java.lang.String" constant="false" name="variable1">${process.origNode}</output>
+          	<input class="java.lang.String" constant="true" name="inArg2" required="false">NO</input>
+          	<output class="java.lang.String" constant="false" name="variable2">${process.isAccuracyMet}</output>
+          	<!--<output class="java.util.Map" constant="false" name="variable1">${process.singulatedEpcs}</output>-->
+       </activity> 
+   
+      <activity name="AccuracyMet" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+          	<target exit="done" name="MaintenanceModeHandler"></target>
+          	<target exit="error" name="MaintenanceModeHandler"></target>
+          	<target exit="skip" name="MaintenanceModeHandler"></target>
+          	<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+          	<output class="java.lang.String" constant="false" name="variable1">${process.origNode}</output>
+          	<input class="java.lang.String" constant="true" name="inArg2" required="false">YES</input>
+          	<output class="java.lang.String" constant="false" name="variable2">${process.isAccuracyMet}</output>
+          	<!--<output class="java.util.Map" constant="false" name="variable1">${process.singulatedEpcs}</output>-->
+       </activity>   
+   
+      <activity name="WrongItem" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+          	<target exit="done" name="MaintenanceModeHandler"></target>
+          	<target exit="error" name="MaintenanceModeHandler"></target>
+          	<target exit="skip" name="MaintenanceModeHandler"></target>
+          	<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+          	<output class="java.lang.String" constant="false" name="variable1">${process.origNode}</output>
+          	<input class="java.lang.String" constant="true" name="inArg2" required="false">WRONG</input>
+          	<output class="java.lang.String" constant="false" name="variable2">${process.isAccuracyMet}</output>
+          	<!--<output class="java.util.Map" constant="false" name="variable1">${process.singulatedEpcs}</output>-->
+    </activity>
+        <activity name="SetInternalError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+        	<target exit="done" name="MaintenanceModeHandler"></target>
+        	<target exit="error" name="MaintenanceModeHandler"></target>
+        	<input class="java.lang.String" constant="true" name="inArg0" required="false">INTERNAL_ERROR</input>
+        	<output class="java.lang.String" constant="false" name="outArg0">${process.eventErrCode}</output>
+        	<input class="java.lang.String" constant="true" name="inArg1" required="false">"Exception occured while processing RFID read."</input>
+        	<output class="java.lang.String" constant="false" name="outArg1">${process.errorDesc}</output>
+        	<input class="java.lang.String" constant="true" name="inArg2" required="false">UNEXPECTED_INTERNAL_ERR</input>
+        	<output class="java.lang.String" constant="false" name="outArg2">${process.origNode}</output>
+    </activity>
+  
+    <decision name="CheckOutOfSequenceASN">
+	  <case condition="${process.processID}==null" label="normal" target="ProcessStarted.BarcodeScanDone"/>
+	  <case condition="${process.processID}!=null" label="OutOfSequenceASN" target="AddASNToQueue"/>
+	  <default label="DoNothing" target="WaitForEvents"/>
+  </decision>
+  
+  <!--
+    <decision name="CheckSessionState">
+	  <case condition="${process.maintenanceMode}==null and ${process.rfidSessionVar}!=null and ${process.sessionState} eq 'ON'" label="PossibleMissedEndTrigger" target="MaintenanceModeHandler"/>
+	  <case condition="${process.maintenanceMode}==null and ${process.rfidSessionVar}==null and ${process.sessionState} eq 'OFF'" label="normal" target="SessionStopped"/>
+	  <case condition="${process.maintenanceMode}!=null" label="InMaintenanceMode" target="WaitForEvents"/>
+	  <case condition="${process.maintenanceMode}==null and ${process.rfidSessionVar}==null and ${process.sessionState} == null and {process.logicalState}!=null and ${process.logicalState} eq 'Waiting'" label="PublishReadStartOutput" target="SetSessionStopErrorCode"/>
+	 <default label="DoNothing" target="WaitForEvents"/>
+  </decision>  
+  
+    <activity name="SetSessionStopErrorCode" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+      	<target exit="done" name="MaintenanceModeHandler"></target>
+      	<target exit="error" name="MaintenanceModeHandler"></target>
+	<input class="java.lang.String" constant="true" name="inArg0" required="false">IGNORE_SESSION_STOP</input>
+        <output class="java.lang.String" constant="false" name="outArg0">${process.eventErrCode}</output>
+        <input class="java.lang.String" constant="true" name="inArg1" required="false">"Received session stop event in waiting state. Ignoring event."</input>
+        <output class="java.lang.String" constant="false" name="outArg1">${process.errorDesc}</output>
+	<input class="java.lang.String" constant="false" name="inArg2" required="false">${process.sessionStopOutput}</input>
+        <output class="java.lang.String" constant="false" name="outArg2">${process.digitalOutputPattern}</output>
+ 	<input class="java.lang.String" constant="false" name="inArg3">SessionStopped</input>
+ 	<output class="java.lang.String" constant="false" name="outArg3">${process.logicalState}</output>
+ 	<input class="java.lang.String" constant="false" name="inArg4">${process.sessionState}</input>
+         <output class="java.lang.String" constant="false" name="outArg4">${process.sessionState}</output>
+    </activity> 
+    -->
+    
+    <activity name="SessionStopped" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+         <target exit="done" name="processPendingEPCs"></target>
+         <target exit="error" name="MaintenanceModeHandler"></target>
+         <input class="java.lang.String" constant="false" name="inArg0">SessionStopped</input>
+         <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+         <input class="java.lang.String" constant="false" name="inArg1">${process.sessionState}</input>
+         <output class="java.lang.String" constant="false" name="outArg1">${process.sessionState}</output>
+         <output class="java.lang.String" constant="false" name="outArg2">${process.eventErrCode}</output>
+         <!--<output class="java.lang.String" constant="false" name="outArg2">${process.sessionID}</output>-->
+     </activity> 
+	 <!-- Need to Verify - Anurag -->
+	 <decision name="processPendingEPCs">
+		 <case condition="${process.hasPendingEpcInBatch}!=null and ${process.hasPendingEpcInBatch} eq 'TRUE'" label="ProcessPendingEPCs" target="RFIDReadHandler"/>
+		 <default label="DoNothing" target="MaintenanceModeHandler"></default>
+	 </decision>
+     
+	 <!-- Anurag can be commented -->
+     <activity name="StopSessionExit" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+ 	    <target exit="done" name="WaitForEvents"/>
+ 	    <target exit="error" name="WaitForEvents"/>
+ 	    <target exit="skip" name="WaitForEvents"/>
+ 	    <output class="java.lang.String" constant="false" name="variable0">${process.sessionID}</output>
+ 	    <output class="java.lang.String" constant="false" name="variable1">${process.historyStr}</output>
+ 	    <output class="java.lang.String" constant="false" name="variable2">${process.isRejoinSession}</output>
+ 	    <output class="java.lang.String" constant="false" name="variable3">${process.processID}</output>
+ 	    <output class="java.lang.String" constant="false" name="variable4">${process.boxID}</output>
+ 	    <output class="com.oatsystems.asn.objects.Shipment" constant="false" name="variable5">${process.shipment}</output>
+ 	    <output class="java.lang.String" constant="false" name="variable6">${process.isDelayedASN}</output>
+ </activity> 
+ 	
+
+     <!-- Anurag can be commented -->
+     <activity name="SessionStarted" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="MaintenanceModeHandler"></target>
+    	    <target exit="error" name="MaintenanceModeHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">SessionStarted</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg1">${process.sessionState}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg1">${process.sessionState}</output>
+    	    <output class="java.lang.String" constant="false" name="outArg2">${process.eventErrCode}</output>
+    </activity> 
+    
+    <!-- Anurag - Not used in Table
+     <activity name="SetDeviceReaderOn" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="MaintenanceModeHandler"></target>
+    	    <target exit="error" name="MaintenanceModeHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">Point6StateTrue</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    </activity>    
+
+     <activity name="SetDeviceReaderOff" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="MaintenanceModeHandler"></target>
+    	    <target exit="error" name="MaintenanceModeHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">Point6StateFalse</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    </activity>
+-->
+     <activity name="CreateVirtualBoxID" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="ASNHandler"></target>
+    	    <target exit="error" name="ASNHandler"></target>
+    	    <input class="java.util.Map" constant="false" name="inArg0">${process.newPayload}</input>
+    	    <output class="java.util.Map" constant="false" name="outArg0">${process.newPayload}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg1">${process.logicalState}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg1">${process.logicalState}</output>
+    </activity>  
+    
+    <activity name="InProgress.CartonMsgUIReceived" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="RFIDReadHandler"></target>
+	    <target exit="error" name="RFIDReadHandler"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">InProgress.CartonMsgUIReceived</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    </activity>  
+    <!--
+    <activity name="ASNDone.ASNFound" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="MaintenanceModeHandler"></target>
+	    <target exit="error" name="MaintenanceModeHandler"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">ASNDone.ASNFound</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg1">${process.boxID}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg1">${process.boxID}</output>  
+    </activity> 
+    -->
+    
+    <activity name="ASNCreated" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="MaintenanceModeHandler"></target>
+    	    <target exit="error" name="MaintenanceModeHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">InProgress.ProcessStarted</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg1">${process.boxID}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg1">${process.boxID}</output>    	    
+    </activity>     
+    
+    <activity name="ProcessStarted.BarcodeScanDone" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="ASNHandler"></target>
+    	    <target exit="error" name="ASNHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">ProcessStarted.BarcodeScanDone</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    	<!--    <input class="java.lang.String" constant="false" name="inArg1">${process.boxID}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg1">${process.boxID}</output>   -->   
+    </activity> 
+    
+    <activity name="AddASNToQueue" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="CallASNHandler"></target>
+	    <target exit="error" name="CallASNHandler"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">ProcessStarted.BarcodeScanDone</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+            <input class="java.lang.String" constant="false" name="inArg1">${process.boxID}</input>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.boxID}</output>      
+    </activity> 
+   <decision name="CallASNHandler">
+    	<case condition="${process.boxID}!=null and ${process.inComingBoxID}!=null and ${process.boxID} ne ${process.inComingBoxID} " label="AddtoQueue" target="UpdateASNQueue"/>
+    	<case condition="${process.boxID}!=null and ${process.inComingBoxID}!=null and ${process.boxID} eq ${process.inComingBoxID} and ${process.processID} != null" label="IgnoreBarcodescan" target="WaitForEvents"/>
+    	<default label="DoNothing" target="ASNHandler"></default>
+    </decision>
+    
+    <activity name="UpdateASNQueue" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateASNQueue">
+    <target exit="done" name="WaitForEvents"></target>
+  	<target exit="error" name="WaitForEvents"></target>
+  	<input class="java.lang.String" constant="false" name="stationId">${process.stationId}</input>
+  	<input class="java.lang.String" constant="false" name="scenarioName">${process.scenarioName}</input>
+  	<input class="java.lang.String" constant="false" name="boxID">${process.inComingBoxID}</input>
+  	<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+  	<input class="java.lang.String" constant="false" name="shipToDescBarcodeMode">${process.shipToDescBarcodeMode}</input>
+	<input class="java.lang.String" constant="false" name="scenarioType">${process.scenarioType}</input>
+    </activity> 
+    
+    <activity name="InProgress.StartTriggerReceived" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="RFIDReadHandler"></target>
+	    <target exit="error" name="RFIDReadHandler"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">InProgress.StartTriggerReceived</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+	    <input class="java.lang.String" constant="false" name="inArg1">${process.boxID}</input>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.boxID}</output>
+	    <input class="com.oatsystems.asn.objects.Shipment" constant="false" name="inArg2">${process.shipment}</input>
+	    <output class="com.oatsystems.asn.objects.Shipment" constant="false" name="outArg2">${process.shipment}</output>
+	    <input class="java.util.Map" constant="false" name="inArg3">${process.newPayload}</input>
+	    <output class="java.util.Map" constant="false" name="outArg3">${process.newPayload}</output>
+		<input class="java.lang.String" constant="false" name="inArg4">false</input>
+	    <output class="java.lang.String" constant="false" name="outArg4">${process.isStopTriggerRcvd}</output>
+    </activity>  
+    
+	 
+    <activity name="InProgress.Reading" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="RFIDReadHandler"></target>
+	    <target exit="error" name="RFIDReadHandler"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">InProgress.Reading</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+	  <!--  <input class="java.lang.String" constant="false" name="inArg1">${process.rfidSessionVar}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg1">${process.rfidSessionVar}</output> -->
+    	    <input class="com.oatsystems.asn.objects.Shipment" constant="false" name="inArg1">${process.shipment}</input>
+	    <output class="com.oatsystems.asn.objects.Shipment" constant="false" name="outArg1">${process.shipment}</output>
+	    <input class="java.util.Map" constant="false" name="inArg2">${process.systemCreatedPayload}</input>
+    	    <output class="java.util.Map" constant="false" name="outArg2">${process.inProcessPayload}</output>
+    </activity>   
+    
+   <activity name="InProgress.EpcAddReadUI" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="RFIDReadHandler"></target>
+    	    <target exit="error" name="RFIDReadHandler"></target> 
+	<!--		<target exit="done" name="CreateEpcPayloadFromUIString"></target>
+    	    <target exit="error" name="CreateEpcPayloadFromUIString"></target> -->
+    	    <input class="java.lang.String" constant="false" name="inArg0">InProgress.EpcAddReadUI</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg1">${process.rfidSessionVar}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg1">${process.rfidSessionVar}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg2">${process.eventErrCode}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg2">${process.eventErrCode}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg3">${process.origNode}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg3">${process.origNode}</output>
+    </activity>  
+    
+    <activity name="InProgress.StopTriggerReceived" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="RFIDReadHandler"></target>
+	    <target exit="error" name="RFIDReadHandler"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">InProgress.StopTriggerReceived</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+	    <input class="java.lang.String" constant="false" name="inArg1">true</input>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.isStopTriggerRcvd}</output>
+    </activity>   
+    
+    <activity name="PublishReadStartOutput" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="MaintenanceModeHandler"></target>
+    	    <target exit="error" name="MaintenanceModeHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">InProgress.ProcessStarted</input>
+    	    <input class="java.util.Map" constant="false" name="inArg1">${process.inProcessPayload}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    	    <output class="java.util.Map" constant="false" name="outArg1">${process.inProcessPayload}</output>
+    </activity> 
+    <!-- Anurag Not required
+    <activity name="PublishNonRFIDStartOutput" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="MaintenanceModeHandler"></target>
+    	    <target exit="error" name="MaintenanceModeHandler"></target>
+	    <input class="java.lang.String" constant="true" name="inArg0" required="false">TRUE</input>
+	    <input class="java.lang.String" constant="true" name="inArg1" required="false">InProgress.NonRfidProcessStarted</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.nonRfidSessionVar}</output>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.logicalState}</output>
+    </activity>     
+    -->
+  <activity name="UpdateASNWithProcessID" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="ASNHandler"></target>
+    	    <target exit="error" name="ASNHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">ProcessClosed</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg1">${process.scenarioName}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg1">${process.scenarioName}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg2">${process.boxID}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg2">${process.boxID}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg3">${process.origNode}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg3">${process.origNode}</output>
+    	    <input class="com.oatsystems.asn.objects.Shipment" constant="false" name="inArg4">${process.shipment}</input>
+    	    <output class="com.oatsystems.asn.objects.Shipment" constant="false" name="outArg4">${process.shipment}</output>
+    </activity>
+    
+   <activity name="PublishReadStopOutput" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="MaintenanceModeHandler"></target>
+	    <target exit="error" name="MaintenanceModeHandler"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">ProcessClosed</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.rfidSessionVar}</output>
+	    <input class="java.lang.String" constant="false" name="inArg2">${process.processID}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg2">${process.processID}</output>
+    	    <input class="java.lang.String" constant="false" name="inArg3">${process.origNode}</input>
+    	    <output class="java.lang.String" constant="false" name="outArg3">${process.origNode}</output>
+    </activity>
+    
+        
+    <activity name="PublishRcvRfidOpOutput" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+   	 <target exit="done" name="MaintenanceModeHandler"></target>
+   	 <target exit="error" name="MaintenanceModeHandler"></target>
+    	 <input class="java.lang.String" constant="false" name="inArg0">InProgress.SimulateRfidOp</input>
+   	 <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    </activity>
+    
+            
+    <activity name="PublishRcvNonRfidOpOutput" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+       	 <target exit="done" name="MaintenanceModeHandler"></target>
+       	 <target exit="error" name="MaintenanceModeHandler"></target>
+         <input class="java.lang.String" constant="false" name="inArg0">InProgress.SimulateNonRfidOp</input>
+       	 <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    </activity>
+
+	<!-- Anurag not required
+    <activity name="PublishNonRFIDStopOutput" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+       	 <target exit="done" name="MaintenanceModeHandler"></target>
+       	 <target exit="error" name="MaintenanceModeHandler"></target>
+         <input class="java.lang.String" constant="false" name="inArg0">NonRfidProcessClosed</input>
+       	 <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+       	 <output class="java.lang.String" constant="false" name="outArg1">${process.nonRfidSessionVar}</output>
+    </activity>    
+    -->
+    
+    
+    <!-- Anurag can be removed 
+    <activity name="ProcessClosing.StopTriggerReceived" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="RFIDReadHandler"></target>
+    	    <target exit="error" name="RFIDReadHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">ProcessClosing.StopTriggerReceived</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+	    <input class="java.lang.String" constant="false" name="inArg1">true</input>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.isStopTriggerRcvd}</output>    	    
+    </activity> 
+	-->
+<!-- -->
+<!-- Anurag can be removed 
+    <activity name="des_topic_online" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="MaintenanceModeHandler"></target>
+    	    <target exit="error" name="MaintenanceModeHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">des_topic_online</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    </activity>       
+-->
+<!-- Anurag can be removed 
+    <activity name="DesTopicOnline" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="MaintenanceModeHandler"></target>
+    	    <target exit="error" name="MaintenanceModeHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">DesTopicOnline</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    </activity>
+ -->
+
+ <!-- Anurag can be removed 
+    <activity name="des_topic_offline" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="MaintenanceModeHandler"></target>
+    	    <target exit="error" name="MaintenanceModeHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">des_topic_offline</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    </activity>
+    
+
+    <activity name="DesTopicOffline" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="MaintenanceModeHandler"></target>
+    	    <target exit="error" name="MaintenanceModeHandler"></target>
+    	    <input class="java.lang.String" constant="false" name="inArg0">DesTopicOffline</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+    </activity> 
+	 -->
+    <!-- -->
+   <activity name="SetErrorCode" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	<target exit="done" name="MaintenanceModeHandler"></target>
+    	<target exit="error" name="MaintenanceModeHandler"></target>
+    	<input class="java.lang.String" constant="false" name="inArg0">${process.eventErrCode}</input>
+    	<output class="java.lang.String" constant="false" name="outArg0">${process.eventErrCode}</output>
+    	<input class="java.lang.String" constant="false" name="inArg1">${process.errorDesc}</input>
+    	<output class="java.lang.String" constant="false" name="outArg1">${process.errorDesc}</output>
+    	<input class="java.lang.String" constant="false" name="inArg2">${process.logicalState}</input>
+    	<output class="java.lang.String" constant="false" name="outArg2">${process.logicalState}</output>
+    	<input class="java.lang.String" constant="false" name="inArg3">${process.origNode}</input>
+    	<output class="java.lang.String" constant="false" name="outArg3">${process.origNode}</output>
+    </activity>
+    
+   <activity name="SetVariableValues" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	<target exit="done" name="WaitForEvents"></target>
+    	<target exit="error" name="WaitForEvents"></target>
+    	<input class="java.lang.String" constant="false" name="inArg0">${process.processID}</input>
+    	<output class="java.lang.String" constant="false" name="outArg0">${process.processID}</output>
+    	<input class="java.lang.String" constant="false" name="inArg1">${process.origNode}</input>
+    	<output class="java.lang.String" constant="false" name="outArg1">${process.origNode}</output>
+    	<input class="java.lang.String" constant="false" name="inArg2">${process.eventErrCode}</input>
+    	<output class="java.lang.String" constant="false" name="outArg2">${process.eventErrCode}</output>
+    	<input class="java.lang.String" constant="false" name="inArg3">${process.rfidSessionVar}</input>
+    	<output class="java.lang.String" constant="false" name="outArg3">${process.rfidSessionVar}</output>
+    	<input class="java.lang.String" constant="false" name="inArg4">${process.rfidOperation}</input>
+    	<output class="java.lang.String" constant="false" name="outArg4">${process.rfidOperation}</output>    	
+    </activity>   
+	
+    		<decision name="FilterBarcodeReads">
+			<case condition="${process.readBarcode} eq 'NOREAD' or ${process.readBarcode} eq 'NOREAD;NOREAD'" label="skip" target="SetDefaultShipToDesc"/>
+			<default label="process" target="ParseBarcode"/>
+		</decision>
+
+		<activity name="SetDefaultShipToDesc" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="WaitForEvents"/>
+			<target exit="error" name="WaitForEvents"/>
+			<input class="java.lang.String" constant="false" name="inArg0">${process.defaultShipToDescBarcodeMode}</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.shipToDescBarcodeMode}</output>
+		</activity>   
+		
+		<activity name="ParseBarcode" resource="class:com.oatsystems.solutions.apparel.primitives.GetShipToDescFromBarcode">
+			<target exit="done" name="CheckOutOfSequenceASN"/>
+			<target exit="error" name="CheckOutOfSequenceASN"/>
+			<target exit="noShipToDescRead" name="SetNoStoreInfoReadError"/>
+			<target exit="noBoxIdRead" name="SetNoBoxInfoReadError"/>
+			<target exit="noBarcodeRead" name="SetNoBarcodeInfoReadError"/>
+			<input class="java.lang.String" constant="false" name="readBarcode">${process.readBarcode}</input>
+			<input class="java.lang.String" constant="false" name="delimitter">;</input>
+			<input class="java.lang.String" constant="false" name="defaultShipToDesc">${process.defaultShipToDescBarcodeMode}</input>
+			<input class="java.lang.String" constant="false" name="generateBoxIdIfNull">TRUE</input>
+			<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+			<output class="java.lang.String" constant="false" name="boxID">${process.inComingBoxID}</output>
+			<output class="java.lang.String" constant="false" name="shipToDesc">${process.shipToDescBarcodeMode}</output>
+		</activity>   
+
+		<activity name="SetNoBoxInfoReadError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="MaintenanceModeHandler"/>
+			<target exit="error" name="MaintenanceModeHandler"/>
+			<input class="java.lang.String" constant="false" name="inArg1">NO_BOXID_READ</input>
+			<output class="java.lang.String" constant="false" name="outArg1">${process.eventErrCode}</output>
+			<input class="java.lang.String" constant="true" name="inArg2">"Boxid part of barcode is missing"</input>
+			<output class="java.lang.String" constant="false" name="outArg2">${process.errorDesc}</output>
+			<input class="java.lang.String" constant="true" name="inArg3" required="false">NO_BOXID_READ</input>
+			<output class="java.lang.String" constant="false" name="outArg3">${process.origNode}</output>		
+		</activity> 
+
+		<activity name="SetNoStoreInfoReadError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="MaintenanceModeHandler"/>
+			<target exit="error" name="MaintenanceModeHandler"/>
+			<input class="java.lang.String" constant="false" name="inArg1">NO_STORE_INFO_READ</input>
+			<output class="java.lang.String" constant="false" name="outArg1">${process.eventErrCode}</output>
+			<input class="java.lang.String" constant="true" name="inArg2">"Store id part of barcode is missing"</input>
+			<output class="java.lang.String" constant="false" name="outArg2">${process.errorDesc}</output>
+			<input class="java.lang.String" constant="true" name="inArg3" required="false">NO_STORE_INFO_READ</input>
+			<output class="java.lang.String" constant="false" name="outArg3">${process.origNode}</output>				
+		</activity> 
+		
+		<activity name="SetNoBarcodeInfoReadError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="MaintenanceModeHandler"/>
+			<target exit="error" name="MaintenanceModeHandler"/>
+			<input class="java.lang.String" constant="false" name="inArg1">NO_BARCODE_READ</input>
+			<output class="java.lang.String" constant="false" name="outArg1">${process.eventErrCode}</output>
+			<input class="java.lang.String" constant="true" name="inArg2">"Both part of barcode is missing"</input>
+			<output class="java.lang.String" constant="false" name="outArg2">${process.errorDesc}</output>
+			<input class="java.lang.String" constant="true" name="inArg3" required="false">NO_BARCODE_READ</input>
+			<output class="java.lang.String" constant="false" name="outArg3">${process.origNode}</output>		
+		</activity> 
+    </process>
+  <config>
+    	<var name="${process.scenarioName}" class="java.lang.String">
+          <property key="ui.group">Scenario configuratio</property>
+          <property key="ui.label">Scenario Instance name for UI display</property>
+          <property key="ui.required">true</property>
+          <property key="ui.input"><![CDATA[
+              <textinput default="dcrecvship" type="BigString"/>
+          ]]></property>
+    <!--      <property key="ui.enabler">scenarioName</property> -->
+    	</var>
+	<var name="${process.scenarioType}" class="java.lang.String">
+		<property key="ui.label">Specify type of Scenario</property>
+		<property key="ui.group">Scenario configuration</property>
+		<property key="ui.required">true</property>
+		<property key="ui.list"><![CDATA[
+		    <option SELECTED value="ITEM_RECV">RECEIVING</option>
+		    <option value="ITEM_SHIP">SHIPPING</option>
+		     <option value="ITEM_PACK">PACKING</option>
+		]]></property>
+		<property key="ui.enabler">scenarioType</property>
+        </var> 
+	<!--
+	<var name="${process.scenarioDeviceType}" class="java.lang.String">
+	  <property key="ui.label">Specify device type of Scenario</property>
+	  <property key="ui.group">Scenario configuration</property>
+	  <property key="ui.required">true</property>
+	  <property key="ui.list"><![CDATA[
+	   	    <option value="TABLE_FR">TABLE</option>
+	  ]]></property>
+	  <property key="ui.enabler">scenarioDeviceType</property>
+        </var>  
+		-->
+        <var name="${process.asnExpected}" class="java.lang.String">
+	  <property key="ui.label">Specify if UI display should be ON.</property>
+	  <property key="ui.group">Scenario configuration</property>
+	  <property key="ui.required">true</property>
+	  <property key="ui.list"><![CDATA[
+	        <option SELECTED value="true">YES</option>
+		<option value="false">NO</option>
+	   ]]></property>
+	    <property key="ui.enabler">asnExpected</property>
+        </var>
+		
+       <var name="${process.asnMode}" class="java.lang.String">
+	  <property key="ui.label">Specify ASN mode</property>
+	  <property key="ui.group">Scenario configuration</property>
+	  <property key="ui.required">true</property>
+	  <property key="ui.list"><![CDATA[
+	        <option SELECTED value="BARCODE">Verification-ASN in DB</option>
+		<option value="WMS">Verification-ASN from WMS</option>
+		<option value="LOCAL">Identification-Scenario creates ASN</option>
+	   ]]></property>
+	    <property key="ui.enabler">asnMode</property>
+        </var> 
+		
+		<var name="${process.multiBoxSupport}" class="java.lang.String">
+		  <property key="ui.label">Will multiple physical cartons be present for an ASN with one logical carton?</property>
+		  <property key="ui.group">Scenario configuration</property>
+		  <property key="ui.required">true</property>
+		  <property key="ui.list"><![CDATA[
+				<option value="yes">Yes</option>
+				<option SELECTED value="no">No</option>
+			]]></property>
+		   <property key="ui.enabler">multiBoxSupport</property>
+		   <!--property key="ui.enable.on">scenarioType:ITEM_SHIP || scenarioType:ITEM_PACK</property-->
+        </var>
+
+		<!-- PO Number scan configuration -->
+	    <var name="${process.poNumber}" class="java.lang.String">
+		  <property key="ui.label">Specify if purchare order number scan is needed</property>
+		  <property key="ui.group">Scenario configuration</property>
+		  <property key="ui.required">true</property>
+		  <property key="ui.list"><![CDATA[
+				<option value="true">YES</option>
+			<option SELECTED value="false">NO</option>
+		   ]]></property>
+		   <property key="ui.enabler">poNumber</property>
+		   <property key="ui.enable.on">scenarioType:ITEM_RECV &amp;&amp; asnMode:LOCAL &amp;&amp; multiBoxSupport:no</property>
+        </var>
+<!-- Added by Anurag -->
+			<var name="${process.stopIndicator}" class="java.lang.String">
+	  <property key="ui.label">Specify option to complete/close a carton</property>
+	  <property key="ui.group">Scenario configuration</property>
+	  <property key="ui.required">true</property>
+	  <property key="ui.list"><![CDATA[	       
+		<option SELECTED value="TIMEOUT">Use a timeout to indicate carton is completed</option>
+		<option value="SUBBUTTON">Click Submit button to indicate carton is completed</option>
+	   ]]></property>
+	   <property key="ui.enabler">stopIndicator</property>  
+	    <property key="ui.enable.on">asnMode:BARCODE</property> 	 	
+        </var>
+		
+		<var name="${process.threshold}" class="java.lang.String">
+	  <property key="ui.label">Specify the threshold Accuracy percentage</property>
+	  <property key="ui.group">Scenario configuration</property>
+	  <property key="ui.required">true</property>
+	  <property key="ui.input"><![CDATA[
+              <textinput default="70" type="BigString"/>
+          ]]></property>
+	    <property key="ui.enable.on">asnMode:BARCODE</property>
+        </var>
+		
+		
+		 <var name="${process.stopTime}" class="java.lang.String">
+	  <property key="ui.label">Specify the time in milliseconds to complete/close a carton</property>
+	  <property key="ui.group">Scenario configuration</property>
+	  <property key="ui.required">true</property>
+	  <property key="ui.input"><![CDATA[
+              <textinput default="5000" type="BigString"/>
+          ]]></property>
+	    <property key="ui.enable.on">asnMode:BARCODE &amp;&amp; stopIndicator:TIMEOUT</property>
+        </var>
+		
+         <var name="${process.generateASN}" class="java.lang.String">
+	        <property key="ui.label">Specify if ASN is to be distributed after completing a carton</property>
+	        <property key="ui.group">Scenario configuration</property>
+	        <property key="ui.required">true</property>
+	        <property key="ui.list"><![CDATA[
+	        <option SELECTED value="true">Yes</option>
+		<option value="false">no</option>
+                ]]></property>
+	        <property key="ui.enable.on">scenarioType:ITEM_SHIP</property>
+        </var>
+		
+	 <var name="${process.defaultShipToDescBarcodeMode}" class="java.lang.String">
+		<property key="ui.label">Specify default destination for carton (if destination is not available for shipping usecases)</property>
+		<property key="ui.group">Scenario configuration</property>
+		<property key="ui.required">true</property>
+	        <property key="ui.input"><![CDATA[
+	                 <textinput default="Store1" type="BigString"/>
+	         ]]></property>
+	        <!--property key="ui.enable.on">asnMode:BARCODE</property-->
+        </var>          
+        <var name="${process.locSubType}" class="java.lang.String">
+		<property key="ui.label">Specify sub-location within store for auto-receive of items (applies only for virtual ASN)</property>
+		<property key="ui.group">Scenario configuration</property>
+		<property key="ui.isconfigurable">true</property>
+		<property key="ui.required">true</property>
+	        <property key="ui.list"><![CDATA[
+                       <source="class:com.oatsystems.raf.config.LocationSubTypeListSource"/>
+                ]]></property>
+		<property key="ui.enable.on">scenarioType:ITEM_SHIP</property>
+        </var>         
+        <var class="java.lang.String" name="${process.stationId}">
+          <property key="doc">STATIONID</property>
+          <property key="name">StationId</property>
+          <property key="ui.group">Station Information</property>
+          <property key="ui.input"><![CDATA[         
+                <textinput default="" type="EPCPrefix"/>
+                       ]]></property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">Station ID</property>
+          <property key="ui.required">true</property>
+        </var>
+		<!-- Anurag not required for table
+        <var name="${process.sessionStartDeviceEpcAndPoint}" class="java.lang.String">
+            <property key="ui.label">Specify the digital input device for starting session</property>
+            <property key="ui.group">Session Information</property>
+            <property key="ui.required">false</property>
+            <property key="ui.list"><![CDATA[
+                <source="listsource:PhotoCellListSource"/>
+            ]]></property>
+            <property key="doc">DEVICEPHOTOCELL</property>
+        </var>     
+        <var class="java.lang.String" name="${process.sessionPointStateForStart}">
+          <property key="doc">DEVICEPOINTSTATEFORSTART</property>
+          <property key="ui.group">Session Information</property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Input State for Session Start Trigger</property>
+          <property key="ui.list"><![CDATA[    
+                <option value="off">off</option>
+                <option SELECTED value="on">on</option>
+          ]]></property>
+          <property key="ui.required">false</property>
+	</var>        
+        <var name="${process.sessionStopDeviceEpcAndPoint}" class="java.lang.String">
+            <property key="ui.label">Specify the digital input device for stopping session</property>
+            <property key="ui.group">Session Information</property>
+            <property key="ui.required">false</property>
+            <property key="ui.list"><![CDATA[
+                <source="listsource:PhotoCellListSource"/>
+            ]]></property>
+            <property key="doc">DEVICEPHOTOCELL</property>
+ 	</var>  
+        <var class="java.lang.String" name="${process.sessionPointStateForStop}">
+          <property key="doc">DEVICEPOINTSTATEFORSTOP</property>
+          <property key="ui.group">Session Information</property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Input State for Session Stop Trigger</property>
+          <property key="ui.list"><![CDATA[    
+                <option value="off">off</option>
+                <option SELECTED value="on">on</option>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+		-->
+        <var class="java.lang.String" name="${process.barcodeScannerEPC}">
+          <property key="doc">BARCODESCANNEREPC</property>
+          <property key="name">barcodeScannerEPC</property>
+          <property key="ui.group">Barcode Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">Barcode Scanner</property>
+          <property key="ui.list"><![CDATA[         
+            <source="listsource:BarcodeScannerListSource"/>
+              ]]></property>
+          <property key="ui.required">false</property>
+          <!--property key="ui.enable.on">asnMode:BARCODE</property-->
+        </var>         
+        <var class="java.lang.String" name="${process.readerEpc}">
+          <property key="doc">READERRPC</property>
+          <property key="name">readerEpc</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">Station Reader</property>
+          <property key="ui.list"><![CDATA[         
+            <source="class:com.oatsystems.raf.config.DeviceListSource"/>
+              ]]></property>
+          <property key="ui.required">true</property>
+        </var>
+		<!-- 
+		 <var name="${process.readerCheck}" class="java.lang.String">
+	  <property key="ui.label">Specify the time in MS to Check the Status Of Reader</property>
+	  <property key="ui.group">Device Information</property>
+	  <property key="ui.required">true</property>
+	  <property key="ui.input"><![CDATA[
+              <textinput default="10000" type="BigString"/>
+          ]]></property>
+	    </var>
+		-->
+        <!--
+        <var class="java.lang.String" name="${process.desTopic}">
+          <property key="doc">INTEGRATIONTOPIC</property>
+          <property key="ui.group">Integration</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">WMS DES configuration (DES topic reference)</property>
+          <property key="ui.list"><![CDATA[    
+                <option SELECTED value="ckp-to-inditex">ckp-to-inditex</option>
+                <option value="ckp-to-inditex-2">ckp-to-inditex-2</option>
+          ]]></property>
+          <property key="ui.required">true</property>
+        </var> 
+	<var name="${process.scenarioDeviceType}" class="java.lang.String">
+	  <property key="ui.label">Specify device type of Scenario</property>
+	  <property key="ui.group">Device Information</property>
+	  <property key="ui.required">true</property>
+	  <property key="ui.list"><![CDATA[
+	    <option SELECTED value="TUNNEL_FR">TUNNEL</option>
+	    <option value="TABLE_FR">TABLE</option>
+	  ]]></property>
+	  <property key="ui.enabler">scenarioDeviceType</property>
+        </var>  
+        <var class="java.lang.String" name="${process.stationLocationEpc}">
+          <property key="class">java.lang.String</property>
+          <property key="doc">STATIONLOCATIONEPC</property>
+          <property key="name">stationLocationEpc</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.isconfigvarprofiletype">StationLocationEpc</property>
+          <property key="ui.label">Station Location</property>
+          <property key="ui.list"><![CDATA[ 
+              <source="listsource:SimpleReadPointListSource"/>
+          ]]></property>
+          <property key="ui.required">true</property>
+        </var> -->
+        <var class="java.lang.String" name="${process.historyLength}">
+          <property key="doc">HISTORYLENGTH</property>
+          <property key="name">HistoryLength</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.input"><![CDATA[         
+                <textinput default="5" type="EPCPrefix"/>
+                       ]]></property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Number of cartons' contents to retain (to filter cross-reads)</property>
+          <property key="ui.required">true</property>
+        </var>
+        <var class="java.lang.String" name="${process.numTriesBeforeFailure}">
+          <property key="doc">NUMTRIES</property>
+          <property key="name">NumTries</property>
+          <!--property key="ui.group">Device Information</property>
+          <property key="ui.input"><![CDATA[         
+                <textinput default="3" type="EPCPrefix"/>
+                       ]]></property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Number of Tries to Confirm Hardware Trigger Failure</property>
+          <property key="ui.required">true</property-->
+        </var>	
+        <var class="java.lang.String" name="${process.configDevicePointForStart}">
+          <property key="doc">DEVICEPOINTFORSTART</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">Start Trigger</property>
+          <property key="ui.list"><![CDATA[    
+                <option value="01">01</option>
+                <option value="02">02</option>
+            <option value="03">03</option>
+            <option value="04">04</option>
+            <option value="05">05</option>
+            <option value="06">06</option>
+            <option value="07">07</option>
+            <option value="08">08</option>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+		<!-- Anurag - Commented as this is not used in Table
+        <var class="java.lang.String" name="${process.devicePointStateForStart}">
+          <property key="doc">DEVICEPOINTSTATEFORSTART</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">Input State for Start Trigger</property>
+          <property key="ui.list"><![CDATA[    
+                <option value="off">off</option>
+                <option SELECTED value="on">on</option>
+          ]]></property>
+          <property key="ui.required">true</property>
+        </var>
+		-->
+        <var class="java.lang.String" name="${process.configDevicePointEpcForEnd}">
+          <property key="doc">DEVICEPOINTEPCFOREND</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">End Trigger</property>
+          <property key="ui.list"><![CDATA[    
+                    <option value="01">01</option>
+                <option value="02">02</option>
+            <option value="03">03</option>
+            <option value="04">04</option>
+            <option value="05">05</option>
+            <option value="06">06</option>
+            <option value="07">07</option>
+            <option value="08">08</option>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+		<!-- Anurag - Commenting as this is not used in Table
+        <var class="java.lang.String" name="${process.configDevicePointStateForEnd}">
+          <property key="doc">DEVICEPOINTSTATEFOREND</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">Input State for End Trigger</property>
+          <property key="ui.list"><![CDATA[    
+                <option value="off">off</option>
+                <option SELECTED value="on">on</option>
+          ]]></property>
+          <property key="ui.required">true</property>
+        </var>
+		-->
+		
+		<!-- Anurag - Commenting as this is not used in Table
+        <var class="java.lang.String" name="${process.configDevicePoint7EpcForEnd}">
+          <property key="doc">DEVICEPOINT7EPCFOREND</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">Input Point to Indicate End of Process</property>
+          <property key="ui.list"><![CDATA[    
+                    <option value="01">01</option>
+                <option value="02">02</option>
+            <option value="03">03</option>
+            <option value="04">04</option>
+            <option value="05">05</option>
+            <option value="06">06</option>
+            <option SELECTED value="07">07</option>
+            <option value="08">08</option>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+		-->
+		
+		<!-- Anurag - Not used for Table 
+        <var class="java.lang.String" name="${process.devicePoint7StateForEnd}">
+          <property key="doc">DEVICEPOINT7STATEFOREND</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">Input State for End of Process Input Point</property>
+          <property key="ui.list"><![CDATA[    
+                <option value="off">off</option>
+                <option SELECTED value="on">on</option>
+          ]]></property>
+          <property key="ui.required">true</property>
+        </var>
+		-->
+		<!-- Anurag - Not used for Table 
+        <var class="java.lang.String" name="${process.configDevicePoint5EpcForAntennaStatus}">
+          <property key="doc">DEVICEPOINT5EPCFORANTENNA</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">Input Point to Indicate Antenna Status</property>
+          <property key="ui.list"><![CDATA[    
+                    <option value="01">01</option>
+                <option value="02">02</option>
+            <option value="03">03</option>
+            <option value="04">04</option>
+            <option SELECTED value="05">05</option>
+            <option value="06">06</option>
+            <option value="07">07</option>
+            <option value="08">08</option>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+		-->
+		
+		<!-- Anurag - Not used for Table 
+        <var class="java.lang.String" name="${process.configDevicePoint6EpcForDeviceStatus}">
+          <property key="doc">DEVICEPOINT6EPCFOREND</property>
+          <property key="ui.group">Device Information</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">Input Point to Indicate Reader Status</property>
+          <property key="ui.list"><![CDATA[    
+                    <option value="01">01</option>
+                <option value="02">02</option>
+            <option value="03">03</option>
+            <option value="04">04</option>
+            <option value="05">05</option>
+            <option SELECTED value="06">06</option>
+            <option value="07">07</option>
+            <option value="08">08</option>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+		-->
+		
+        <var class="java.lang.String" name="${process.configSessionStartOutput}">
+          <property key="doc">SESSIONSTARTOUTPUT</property>
+          <property key="name">SESSIONSTARTOUTPUT</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On Session Start</property>
+          <property key="ui.popup"><![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>     
+        <var class="java.lang.String" name="${process.configSessionStopOutput}">
+          <property key="doc">SESSIONSTOPOUTPUT</property>
+          <property key="name">SESSIONSTOPOUTPUT</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On Session Stop</property>
+          <property key="ui.popup"><![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>          
+        <var class="java.lang.String" name="${process.configRfidOpOutput}">
+          <property key="doc">RFIDOPOUTPUT</property>
+          <property key="name">RFIDOPOUTPUT</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On RFID Operation</property>
+          <property key="ui.popup"><![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+        <var class="java.lang.String" name="${process.configNonrfidOpOutput}">
+          <property key="doc">NONRFIDOPOUTPUT</property>
+          <property key="name">NONRFIDOUTPUT</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On Non-RFID Operation</property>
+          <property key="ui.popup"><![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+        <var class="java.lang.String" name="${process.configReadOnOutput}">
+          <property key="doc">READONOUTPUT</property>
+          <property key="name">ReadOnOutput</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On Reading Start</property>
+          <property key="ui.popup"><![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+        <var class="java.lang.String" name="${process.configReadOffOutput}">
+          <property key="doc">READOFFOUTPUT</property>
+          <property key="name">ReadOffOutput</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On Reading Stop</property>
+          <property key="ui.popup"><![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+        <var class="java.lang.String" name="${process.configNonrfidStartOutput}">
+          <property key="doc">NONRFIDSTART</property>
+          <property key="name">NonrfidStartOutput</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On Non-RFID Start</property>
+          <property key="ui.popup"><![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+        <var class="java.lang.String" name="${process.configNonrfidStopOutput}">
+          <property key="doc">NONRFIDSTOP</property>
+          <property key="name">NonrfidStopOutput</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On Non-RFID Stop</property>
+          <property key="ui.popup"><![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+        <var class="java.lang.String" name="${process.configCriticalErrorOutput}">
+          <property key="doc">CRITICALERROROUTPUT</property>
+          <property key="name">CriticalErrorOutput</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On Critical Error</property>
+          <property key="ui.popup"><![CDATA[    
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+        <var class="java.lang.String" name="${process.configNonCriticalErrorOutput}">
+          <property key="doc">NONCRITICALERROROUTPUT</property>
+          <property key="name">NonCriticalErrorOutput</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On Non-Critical Error</property>
+          <property key="ui.popup"><![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+        <var class="java.lang.String" name="${process.configMaintenanceDoneOutput}">
+          <property key="doc">RESOLVEERROROUTPUT</property>
+          <property key="name">ResolveErrorOutput</property>
+          <property key="ui.group">Digital Outputs</property>
+          <property key="ui.isconfigurable">true</property>
+          <property key="ui.label">On Resolving Error</property>
+          <property key="ui.popup"><![CDATA[       
+              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+          ]]></property>
+          <property key="ui.required">false</property>
+        </var>
+       <var class="java.lang.String" name="${process.configAccuracyMetOutput}">
+	          <property key="doc">ACCURACYMETOUTPUT</property>
+	          <property key="name">ACCURACYMETOUTPUT</property>
+	          <property key="ui.group">Digital Outputs</property>
+	          <property key="ui.isconfigurable">true</property>
+	          <property key="ui.label">When accuracy is met</property>
+	          <property key="ui.popup"><![CDATA[       
+	              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+	          ]]></property>
+	          <property key="ui.required">false</property>
+	          <property key="ui.enable.on">scenarioType:ITEM_PACK</property>
+        </var>
+       <var class="java.lang.String" name="${process.configAccuracyNotMetOutput}">
+	          <property key="doc">ACCURACYNOTMETOUTPUT</property>
+	          <property key="name">ACCURACYNOTMETOUTPUT</property>
+	          <property key="ui.group">Digital Outputs</property>
+	          <property key="ui.isconfigurable">true</property>
+	          <property key="ui.label">When accuracy is not met</property>
+	          <property key="ui.popup"><![CDATA[       
+	              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+	          ]]></property>
+	          <property key="ui.required">false</property>
+	          <property key="ui.enable.on">scenarioType:ITEM_PACK</property>
+        </var>
+       <var class="java.lang.String" name="${process.configWrongItemOutput}">
+	          <property key="doc">WRONGITEMOUTPUT</property>
+	          <property key="name">WRONGITEMOUTPUT</property>
+	          <property key="ui.group">Digital Outputs</property>
+	          <property key="ui.isconfigurable">true</property>
+	          <property key="ui.label">When wrong item is encountered</property>
+	          <property key="ui.popup"><![CDATA[       
+	              <source="jsp:/workflow/config/digital_output_config_nodevice.jsp"/>
+	          ]]></property>
+	          <property key="ui.required">false</property>
+	          <property key="ui.enable.on">scenarioType:ITEM_PACK</property>
+        </var>        
+        <var name="${process.transitLocation}" class="java.lang.String">
+	        <property key="ui.label">Specify business location to assign EPCs</property>
+	        <property key="ui.group">Handling read Items</property>
+	        <property key="ui.required">true</property>
+	        <property key="ui.list"><![CDATA[
+	        <source="class:com.oatsystems.raf.config.LeafLocationBusinessLocationAllowEmptyListSource"/>
+	        ]]></property>
+        </var>
+        <var name="${process.transitLocationRP}" class="java.lang.String">
+		<property key="ui.label">Specify initial read point to assign EPCs</property>
+		<property key="ui.group">Handling read Items</property>
+		<property key="ui.required">true</property>
+		<property key="ui.list"><![CDATA[
+		<source="class:com.oatsystems.workflow.config.SimpleReadPointListSource"/>
+		]]></property>
+        </var>
+     
+       
+        <var class="java.lang.String" name="${process.loggingLevel}">
+          <property key="doc">LOGLEVEL</property>
+          <property key="ui.group">Debug Settings</property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Data Logging Level</property>
+          <property key="ui.list"><![CDATA[   
+            <option value="debug">DEBUG</option>
+            <option SELECTED value="info">INFO</option>
+            ]]></property>
+          <property key="ui.required">true</property>
+        </var>
+        <var class="java.lang.String" name="${process.testWithUI}">
+          <property key="doc">TESTWITHUI</property>
+          <property key="ui.group">Debug Settings</property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Generate (Simulate) Events through UI?</property>
+          <property key="ui.list"><![CDATA[   
+            <option value="true">TRUE</option>
+            <option SELECTED value="false">FALSE</option>
+            ]]></property>
+          <property key="ui.required">true</property>
+        </var>
+        <var class="java.lang.String" name="${process.testWithWebService}">
+          <property key="doc">TESTWITHWEBSERVICE</property>
+          <property key="ui.group">Debug Settings</property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Simulate Web Services?</property>
+          <property key="ui.list"><![CDATA[   
+            <option value="true">TRUE</option>
+            <option SELECTED value="false">FALSE</option>
+            ]]></property>
+          <property key="ui.required">true</property>
+        </var>
+        <!--
+        <var class="java.lang.String" name="${process.simulateWms}">
+          <property key="doc">SIMULATEWMS</property>
+          <property key="ui.group">Debug Settings</property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Simulate Inditex WMS?</property>
+          <property key="ui.list"><![CDATA[   
+            <option value="true">TRUE</option>
+            <option SELECTED value="false">FALSE</option>
+            ]]></property>
+          <property key="ui.required">true</property>
+        </var>
+        -->
+        <var class="java.lang.String" name="${process.bypassReader}">
+          <property key="doc">BYPASSREADER</property>
+          <property key="ui.group">Debug Settings</property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Bypass Reader?</property>
+          <property key="ui.list"><![CDATA[   
+            <option value="true">TRUE</option>
+            <option SELECTED value="false">FALSE</option>
+            ]]></property>
+          <property key="ui.required">true</property>
+        </var>
+     <!--
+        <var class="java.lang.String" name="${process.debug}">
+          <property key="doc">DEBUG</property>
+          <property key="ui.group">Debug Settings</property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Show Encoding Details?</property>
+          <property key="ui.list"><![CDATA[   
+            <option value="true">TRUE</option>
+            <option SELECTED value="false">FALSE</option>
+            ]]></property>
+          <property key="ui.required">true</property>
+        </var>
+       <var class="java.lang.String" name="${process.numBoxesToShow}">
+          <property key="doc">NUMBOXES</property>
+          <property key="name">NumBoxes</property>
+          <property key="ui.group">Debug Settings</property>
+          <property key="ui.input"><![CDATA[         
+                <textinput default="3" type="EPCPrefix"/>
+                       ]]></property>
+          <property key="ui.isconfigurable">false</property>
+          <property key="ui.label">Number of Boxes to Show (at least 1)</property>
+          <property key="ui.required">true</property>
+        </var>
+        -->
+    </config>
+    <display>
+	    <tile name="scenario_ui">
+	     		<property key="eventname">submit_ui</property>
+		    <property key="ui.jsp">/workflow/floor_ui/display_tiles/dc_ship_recv_table.jsp
+			</property>
+		</tile>
+	<!--	
+        <tile name="debug_mode_display">
+            <property key="ui.jsp">/workflow/floor_ui/display_tiles/debug.jsp
+            </property>
+        </tile>
+        <tile name="carton_info_display">
+            <property key="ui.jsp">/workflow/floor_ui/display_tiles/carton_info_stats.jsp
+            </property>
+        </tile>
+        <tile name="history_statistic">
+            <property key="ui.jsp">/workflow/floor_ui/display_tiles/history_stats.jsp
+            </property>
+        </tile>
+        <tile name="encoding_statistic">
+            <property key="ui.jsp">/workflow/floor_ui/display_tiles/box_assignation_stats.jsp
+            </property>
+        </tile>
+        <tile name="event_log">
+            <property key="ui.jsp">/workflow/floor_ui/display_tiles/event_log.jsp
+            </property>
+        </tile>
+        <tile name="error_log">
+            <property key="ui.jsp">/workflow/floor_ui/display_tiles/error_log.jsp
+            </property>
+        </tile>
+        -->
+    </display>
+</scenario>

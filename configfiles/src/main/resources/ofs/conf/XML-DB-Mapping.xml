@@ -1,0 +1,796 @@
+<?xml version="1.0" ?>
+<!-- <!DOCTYPE xml-db-mapping SYSTEM "com/oatsystems/service/dquery/XML-DB-Mapping.dtd"> -->
+
+<xml-db-mapping>
+  <types>
+    <!-- Defines physical properties -->
+    <type name="PhysicalProperties" source-table="physical_property_group">
+      <child name="Property" repeated="true">
+        <join parent-column="property_group_id"
+          child-table="physical_property"
+          child-column="property_group_id"
+          type="number"/>
+
+        <attribute name="key">
+          <source-column name="property_key" type="string"/>
+        </attribute>
+
+        <text>
+          <source-column name="property_value" type="string"/>
+        </text>
+      </child>
+    </type>
+
+    <!-- Defines the contents of a location -->
+    <type name="Location" source-table="location">
+      <where-condition>
+        <equals column-name="deleted" value="F"/>
+      </where-condition>
+
+      <child name="Name">
+        <text>
+          <source-column name="description" type="string"/>
+        </text>
+      </child>
+
+      <child name="EPC">
+        <text>
+          <source-column name="epc" type="string"/>
+        </text>
+      </child>
+
+      <child name="GLN">
+        <text>
+          <source-column name="gln" type="string"/>
+        </text>
+      </child>
+
+      <child name="EPCISLocId">
+        <text>
+          <source-column name="epcis_id" type="string"/>
+        </text>
+      </child>
+
+      <child name="SSLTCode">
+        <text>
+          <source-column name="sslt_code" type="number"/>
+        </text>
+      </child>
+
+      <child name="SSLTName">
+        <join parent-column="sslt_code"
+          child-table="sslt"
+          child-column="code"
+          type="number"/>
+        <text>
+          <source-column name="name" type="string"/>
+        </text>
+      </child>
+
+      <child name="SLE">
+        <text>
+          <source-column name="sle" type="string"/>
+        </text>
+      </child>
+
+
+      <child name="Properties">
+        <join parent-column="property_group_id"
+          child-table="physical_property_group"
+          child-column="property_group_id"
+          type="number"/>
+
+        <type-ref name="PhysicalProperties"/>
+      </child>
+    </type>
+
+    <!-- Defines the contents of a device -->
+    <type name="Device" source-table="dms_device">
+      <where-condition>
+        <equals column-name="deleted" value="F"/>
+      </where-condition>
+
+      <child name="Name">
+        <text>
+          <source-column name="name" type="string"/>
+        </text>
+      </child>
+
+      <child name="EPC">
+        <text>
+          <source-column name="epc" type="string"/>
+        </text>
+      </child>
+
+      <child name="Category">
+        <text>
+          <source-column name="category" type="string"/>
+        </text>
+      </child>
+
+      <child name="Type">
+        <join parent-column="type"
+          child-table="custom_property_lookup"
+          child-column="property_value"
+          type="string"/>
+
+        <where-condition>
+          <equals column-name="property_key" value="DeviceType"/>
+        </where-condition>
+
+        <text>
+          <source-column name="ui_value" type="string"/>
+        </text>
+      </child>
+    </type>
+
+    <!-- Defines the contents of a sensor -->
+    <type name="Sensor" source-table="device">
+      <where-condition>
+        <equals column-name="deleted" value="F"/>
+      </where-condition>
+
+      <child name="EPC">
+        <text>
+          <source-column name="epc" type="string"/>
+        </text>
+      </child>
+
+      <child name="Description">
+        <text>
+          <source-column name="description" type="string"/>
+        </text>
+      </child>
+
+      <child name="AntennaNumber">
+        <join parent-column="property_group_id"
+          child-table="physical_property_group"
+          child-column="property_group_id"
+          type="number"/>
+
+        <join parent-column="property_group_id"
+          child-table="physical_property"
+          child-column="property_group_id"
+          type="number"/>
+
+        <where-condition>
+          <equals column-name="property_key" value="AntennaId"/>
+        </where-condition>
+
+        <text>
+          <source-column name="property_value" type="string"/>
+        </text>
+      </child>
+
+      <child name="Location">
+        <join parent-column="location_id"
+          child-table="location"
+          child-column="location_id"
+          type="number"/>
+
+        <type-ref name="Location"/>
+      </child>
+
+      <child name="Device">
+        <join parent-column="dms_device_id"
+          child-table="dms_device"
+          child-column="dms_device_id"
+          type="number"/>
+
+        <type-ref name="Device"/>
+      </child>
+    </type>
+
+    <!-- Defines a TagPresence state and interval -->
+    <type name="TagPresence" source-table="epc_detection">
+      <child name="Tag" namespace="pmlcore">
+        <join parent-column="epc_product_info_id"
+           child-table="epc_product_info"
+           child-column="epc_product_info_id"
+           type="number"
+           join_type="1"/>
+
+        <child name="ID" namespace="pmluid">
+          <text>
+            <parent-column name="epc" type="string"/>
+          </text>
+        </child>
+
+        <child name="IdentityType">
+          <text>
+            <source-column name="pure_identity_type" type="string"/>
+          </text>
+        </child>
+
+        <child name="EncodingType">
+          <text>
+            <source-column name="epc_encoding_type" type="string"/>
+          </text>
+        </child>
+
+        <child name="PureIdentityURI" >
+          <text>
+            <function-column name="getURI" type="string">
+                <arg child-column="pure_identity_type" type="string"/>
+                <arg child-column="pure_identity_uri_prefix" type="string"/>
+                <arg child-column="company_prefix" type="string"/>
+                <arg child-column="num_identity_digits" type="number"/>
+                <arg parent-column="epc_serial_number" type="number"/>
+            </function-column>
+          </text>
+        </child>
+
+        <child name="TagURI" >
+          <text>
+            <function-column name="getURI" type="string">
+                <arg child-column="pure_identity_type" type="string"/>
+                <arg child-column="tag_uri_prefix" type="string"/>
+                <arg child-column="company_prefix" type="string"/>
+                <arg child-column="num_identity_digits" type="number"/>
+                <arg parent-column="epc_serial_number" type="number"/>
+            </function-column>
+          </text>
+        </child>
+
+        <child name="SerialNumber">
+          <text>
+            <parent-column name="epc_serial_number" type="number"/>
+          </text>
+        </child>
+
+        <child name="SGTIN">
+          <where-condition>
+            <equals column-name="pure_identity_type" value="sgtin"/>
+          </where-condition>
+
+          <child name="GTIN">
+            <text>
+              <source-column name="identity_code" type="string"/>
+            </text>
+          </child>
+
+          <child name="Filter">
+            <text>
+              <source-column name="filter_value" type="number"/>
+            </text>
+          </child>
+
+          <child name="CompanyPrefix">
+            <text>
+              <source-column name="company_prefix" type="string"/>
+            </text>
+          </child>
+
+          <child name="ItemReference">
+            <text>
+              <source-column name="object_class" type="string"/>
+            </text>
+          </child>
+        </child>
+
+        <child name="SSCC">
+          <where-condition>
+            <equals column-name="pure_identity_type" value="sscc"/>
+          </where-condition>
+
+          <child name="SSCCCode">
+            <text>
+              <function-column name="getSSCCCode" type="string">
+                <arg child-column="pure_identity_type" type="string"/>
+                <arg child-column="company_prefix" type="string"/>
+                <arg child-column="num_identity_digits" type="number"/>
+                <arg parent-column="epc_serial_number" type="number"/>
+              </function-column>
+            </text>
+          </child>
+
+          <child name="Filter">
+            <text>
+              <source-column name="filter_value" type="number"/>
+            </text>
+          </child>
+
+          <child name="CompanyPrefix">
+            <text>
+              <source-column name="company_prefix" type="string"/>
+            </text>
+          </child>
+        </child>
+
+        <child name="GID">
+          <where-condition>
+            <equals column-name="pure_identity_type" value="GID"/>
+          </where-condition>
+
+          <child name="GeneralManagerNumber">
+            <text>
+              <source-column name="company_prefix" type="string"/>
+            </text>
+          </child>
+
+          <child name="ObjectClass">
+            <text>
+              <source-column name="object_class" type="string"/>
+            </text>
+          </child>
+        </child>
+      </child>
+
+        <child name="GRAI">
+          <where-condition>
+            <equals column-name="pure_identity_type" value="grai"/>
+          </where-condition>
+
+          <child name="Filter">
+            <text>
+              <source-column name="filter_value" type="number"/>
+            </text>
+          </child>
+
+          <child name="CompanyPrefix">
+            <text>
+              <source-column name="company_prefix" type="string"/>
+            </text>
+          </child>
+
+          <child name="AssetType">
+            <text>
+              <source-column name="object_class" type="string"/>
+            </text>
+          </child>
+        </child>
+
+        <child name="GIAI">
+          <where-condition>
+            <equals column-name="pure_identity_type" value="giai"/>
+          </where-condition>
+
+          <child name="Filter">
+            <text>
+              <source-column name="filter_value" type="number"/>
+            </text>
+          </child>
+
+          <child name="CompanyPrefix">
+            <text>
+              <source-column name="company_prefix" type="string"/>
+            </text>
+          </child>
+        </child>
+
+        <child name="DOD">
+          <where-condition>
+            <equals column-name="pure_identity_type" value="dod"/>
+          </where-condition>
+
+          <child name="Filter">
+            <text>
+              <source-column name="filter_value" type="number"/>
+            </text>
+          </child>
+
+          <child name="CAGECode">
+            <text>
+              <source-column name="company_prefix" type="string"/>
+            </text>
+          </child>
+        </child>
+
+      <child name="Location">
+        <join parent-column="location_id"
+          child-table="location"
+          child-column="location_id"
+          type="number"/>
+
+        <type-ref name="Location"/>
+      </child>
+
+      <child name="Time">
+        <text>
+          <time-interval-columns start-time="start_ts" end-time="end_ts"/>
+        </text>
+      </child>
+    </type>
+
+    <type name="StatusType" source-table="device_status">
+      <child name="Online">
+        <where-condition>
+          <equals column-name="is_online" value="T"/>
+        </where-condition>
+      </child>
+
+      <child name="Offline">
+        <where-condition>
+          <equals column-name="is_online" value="F"/>
+        </where-condition>
+      </child>
+    </type>
+
+    <type name="SensorStatus" source-table="device_status">
+      <child name="Status">
+        <type-ref name="StatusType"/>
+      </child>
+
+      <child name="Sensor">
+        <join parent-column="device_id"
+          child-table="device"
+          child-column="device_id"
+          type="number"/>
+
+        <type-ref name="Sensor"/>
+      </child>
+
+      <child name="Time">
+        <text>
+          <time-interval-columns start-time="start_time" end-time="end_time"/>
+        </text>
+      </child>
+    </type>
+
+    <type name="DigitalRead" source-table="observation">
+      <where-condition>
+        <column-in-query column-name="observation_type_id"
+          in-table-name="observation_type"
+          in-column-name="observation_type_id"
+          type="number">
+
+          <where-condition>
+            <equals column-name="type" value="DIGITAL_INPUT_EVENT"/>
+          </where-condition>
+
+        </column-in-query>
+      </where-condition>
+
+      <child name="DigitalState">
+        <text>
+          <source-column name="value" type="string"/>
+        </text>
+      </child>
+
+      <child name="Point">
+        <text>
+            <source-column name="point_number" type="number"/>
+        </text>
+      </child>
+
+      <child name="Sensor">
+        <join parent-column="device_id"
+          child-table="device"
+          child-column="device_id"
+          type="number"/>
+
+        <type-ref name="Sensor"/>
+      </child>
+
+      <child name="Time">
+        <text>
+          <time-interval-columns start-time="start_ts" end-time="end_ts"/>
+        </text>
+      </child>
+    </type>
+
+    <type name="Product" source-table="product">
+      <where-condition>
+        <equals column-name="deleted" value="F"/>
+      </where-condition>
+
+      <child name="Name">
+        <text>
+          <source-column name="product_name" type="string"/>
+        </text>
+      </child>
+
+      <child name="SKU">
+        <text>
+          <source-column name="sku" type="string"/>
+        </text>
+      </child>
+
+      <child name="UOM">
+        <text>
+           <source-column name="uom" type="string"/>
+        </text>
+      </child>
+
+      <child name="StyleCode">
+        <text>
+           <source-column name="style_code" type="string"/>
+        </text>
+      </child>
+    </type>
+
+  <type name="ObjectProperties" source-table="object_state">
+      <child name="Attribute_0">
+        <text>
+          <source-column name="state_data_0" type="string"/>
+        </text>
+      </child>
+
+      <child name="Attribute_1">
+       <text>
+          <source-column name="state_data_1" type="string"/>
+        </text>
+      </child>
+
+      <child name="Attribute_2">
+        <text>
+          <source-column name="state_data_2" type="string"/>
+        </text>
+      </child>
+
+      <child name="Attribute_3">
+        <text>
+          <source-column name="state_data_3" type="string"/>
+        </text>
+      </child>
+
+      <child name="Attribute_4">
+        <text>
+          <source-column name="state_data_4" type="string"/>
+        </text>
+      </child>
+
+      <child name="Attribute_5">
+        <text>
+          <source-column name="state_data_5" type="string"/>
+        </text>
+      </child>
+
+      <child name="Attribute_6">
+        <text>
+          <source-column name="state_data_6" type="string"/>
+        </text>
+      </child>
+
+      <child name="Attribute_7">
+        <text>
+          <source-column name="state_data_7" type="string"/>
+        </text>
+      </child>
+
+      <child name="Attribute_8">
+        <text>
+          <source-column name="state_data_8" type="string"/>
+        </text>
+      </child>
+
+      <child name="Attribute_9">
+        <text>
+          <source-column name="state_data_9" type="string"/>
+        </text>
+      </child>
+
+      <child name="AttributeGroupName">
+        <join parent-column="object_state_type_id"
+          child-table="object_state_type"
+          child-column="object_state_type_id"
+          type="number"/>
+
+        <text>
+          <source-column name="type" type="string"/>
+        </text>
+      </child>
+    </type>
+
+    <type name="ParentContainer" source-table="object">
+      <where-condition>
+        <equals column-name="deleted" value="F"/>
+      </where-condition>
+
+      <child name="Product">
+        <join parent-column="product_id"
+          child-table="product"
+          child-column="product_id"
+          type="number"/>
+
+        <type-ref name="Product"/>
+      </child>
+
+      <child name="ParentLocation">
+        <join parent-column="parent_location_id"
+          child-table="location"
+          child-column="location_id"
+          type="number"/>
+
+        <type-ref name="Location"/>
+      </child>
+
+      <child name="Properties">
+        <join parent-column="object_id"
+          child-table="object_state"
+          child-column="object_id"
+          type="number"/>
+
+        <type-ref name="ObjectProperties"/>
+      </child>
+
+      <child name="EPC">
+        <join parent-column="epc_product_info_id"
+           child-table="epc_product_info"
+           child-column="epc_product_info_id"
+           type="number"/>
+
+        <child name="ID">
+          <text>
+            <parent-column name="epc" type="string"/>
+          </text>
+        </child>
+
+
+        <child name="PureIdentityURI" >
+          <text>
+            <function-column name="getURI" type="string">
+                <arg child-column="pure_identity_type" type="string"/>
+                <arg child-column="pure_identity_uri_prefix" type="string"/>
+                <arg child-column="company_prefix" type="string"/>
+                <arg child-column="num_identity_digits" type="number"/>
+                <arg parent-column="epc_serial_number" type="number"/>
+            </function-column>
+          </text>
+        </child>
+      </child>
+    </type>
+
+    <type name="Container" source-table="object">
+      <where-condition>
+        <equals column-name="deleted" value="F"/>
+      </where-condition>
+
+      <child name="Product">
+        <join parent-column="product_id"
+          child-table="product"
+          child-column="product_id"
+          type="number"/>
+
+        <type-ref name="Product"/>
+      </child>
+
+      <child name="Container">
+        <join parent-column="parent_object_id"
+          child-table="object"
+          child-column="object_id"
+          type="number"/>
+
+        <type-ref name="ParentContainer"/>
+      </child>
+
+      <child name="ParentLocation">
+        <join parent-column="parent_location_id"
+          child-table="location"
+          child-column="location_id"
+          type="number"/>
+
+        <type-ref name="Location"/>
+      </child>
+
+      <child name="Properties">
+        <join parent-column="object_id"
+          child-table="object_state"
+          child-column="object_id"
+          type="number"/>
+
+        <type-ref name="ObjectProperties"/>
+      </child>
+
+      <child name="EPC">
+        <join parent-column="epc_product_info_id"
+           child-table="epc_product_info"
+           child-column="epc_product_info_id"
+           type="number"/>
+
+        <child name="ID">
+          <text>
+            <parent-column name="epc" type="string"/>
+          </text>
+        </child>
+
+
+        <child name="PureIdentityURI" >
+          <text>
+            <function-column name="getURI" type="string">
+                <arg child-column="pure_identity_type" type="string"/>
+                <arg child-column="pure_identity_uri_prefix" type="string"/>
+                <arg child-column="company_prefix" type="string"/>
+                <arg child-column="num_identity_digits" type="number"/>
+                <arg parent-column="epc_serial_number" type="number"/>
+            </function-column>
+          </text>
+        </child>
+      </child>
+    </type>
+
+    <!-- Defines the contents of an Object -->
+    <type name="Object" source-table="object">
+      <where-condition>
+        <equals column-name="deleted" value="F"/>
+      </where-condition>
+
+      <child name="Product">
+        <join parent-column="product_id"
+          child-table="product"
+          child-column="product_id"
+          type="number"/>
+
+        <type-ref name="Product"/>
+      </child>
+
+      <child name="Container">
+        <join parent-column="parent_object_id"
+          child-table="object"
+          child-column="object_id"
+          type="number"/>
+
+        <type-ref name="Container"/>
+      </child>
+
+      <child name="ParentLocation">
+        <join parent-column="parent_location_id"
+          child-table="location"
+          child-column="location_id"
+          type="number"/>
+
+        <type-ref name="Location"/>
+      </child>
+
+      <child name="Properties">
+        <join parent-column="object_id"
+          child-table="object_state"
+          child-column="object_id"
+          type="number"/>
+
+        <type-ref name="ObjectProperties"/>
+      </child>
+
+      <child name="EPC">
+        <join parent-column="epc_product_info_id"
+           child-table="epc_product_info"
+           child-column="epc_product_info_id"
+           type="number"/>
+
+        <child name="ID">
+          <text>
+            <parent-column name="epc" type="string"/>
+          </text>
+        </child>
+
+        <child name="PureIdentityURI" >
+          <text>
+            <function-column name="getURI" type="string">
+                <arg child-column="pure_identity_type" type="string"/>
+                <arg child-column="pure_identity_uri_prefix" type="string"/>
+                <arg child-column="company_prefix" type="string"/>
+                <arg child-column="num_identity_digits" type="number"/>
+                <arg parent-column="epc_serial_number" type="number"/>
+            </function-column>
+          </text>
+        </child>
+      </child>
+    </type>
+
+  </types>
+
+  <dimensions>
+    <dimension tag="Location" type="Location"/>
+    <dimension tag="ReadPoint" type="Location"/>
+    <dimension tag="BizLocation" type="Location"/>
+    <dimension tag="Sensor" type="Sensor"/>
+    <dimension tag="Device" type="Device"/>
+    <dimension tag="Object" type="Object"/>
+  </dimensions>
+
+  <queryable-states>
+    <state tag="TagPresenceState" type="TagPresence"/>
+
+    <state tag="SensorStatus" type="SensorStatus"/>
+
+    <state tag="DigitalReadState" type="DigitalRead"/>
+  </queryable-states>
+
+  <intervals>
+    <interval tag="TagPresenceInterval" type="TagPresence"/>
+
+    <interval tag="SensorStatusInterval" type="SensorStatus"/>
+
+    <interval tag="DigitalReadInterval" type="DigitalRead"/>
+  </intervals>
+</xml-db-mapping>

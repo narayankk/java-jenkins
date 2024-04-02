@@ -1,0 +1,263 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+<meta-data property-table="Physical">
+  <table name="device">
+    <entity type="GenericLLRPNotificationDeviceNode" extends="RFDeviceNode">
+      <locator-option value="Generic LLRP Notification Device DeviceNode">Generic LLRP Notification Device DeviceNode</locator-option>
+      <label>Generic LLRP Notification DeviceNode Configuration</label>
+      <description>Generic LLRP Notification DeviceNode Configuration</description>
+      <property key="AntennaId" is-mandatory="true">
+	<label>Antenna ID</label>
+	<description>Antenna number</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="1" is-default="true">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>
+	  <option value="4">4</option>
+	</select>
+      </property>
+      <property key="PowerLevel" is-mandatory="false">
+	<label>Power level</label>
+	<description>RF power level for the reader (in percentage)</description>
+	<type-definition>oat:Percentage</type-definition>
+	<select is-bound="false">
+	  <option value="75" is-default="true">75%</option>
+	</select>
+	</property>
+	<!-- Power Level for Write, Kill -->
+	<property key="WritePowerLevel" is-mandatory="false">
+	  <label>Power level for Kill</label>
+	  <description>RF power level for Write, Kill</description>
+	  <type-definition>oat:ImpinjPowerLevel</type-definition>
+	  <select is-bound="false">
+	     <option value="61" is-default="true">61</option>
+	  </select>
+    </property>
+	<property key="RFControlTableIndex" is-mandatory="false">
+	<label>Index to the RFControl Table</label>
+	<description>Index to the RFControl Table</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>   
+      <property key="Tari" is-mandatory="false">
+	<label>Value of Tari</label>
+	<description>Tari value to be used for inventory</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>   
+      <property key="Session" is-mandatory="false">
+	<label>Gen2 Session</label>
+	<description>Gen2 Session used for inventory</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="0" is-default="true">0</option>
+	  <option value="1">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>	
+	</select>
+      </property>        
+      <property key="TagPopulation" is-mandatory="false">
+	<label>Tag Population</label>
+	<description>Tag population expected in the inventory</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="32" is-default="true">32</option>
+	</select>
+      </property>        
+      <property key="TagTransitTime" is-mandatory="false">
+	<label>Tag Transit Time</label>
+	<description>Tag Transit Time</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>        
+      <property key="ReadTimeOut" is-mandatory="false">
+	<label>Read Time-Out</label>
+	<description>Read command time-out value. Integer between 0 and 120000; default 2000</description>
+	<type-definition>oat:ReadTimeoutMillis1</type-definition>
+	<select is-bound="false">
+	  <option value="2000" is-default="true">2000</option>
+	</select>
+      </property>
+      <property key="TimeThreshold" is-mandatory="false">
+	<label>Time Threshold</label>
+	<description>The time threshold should exceed 100 milliseconds</description>
+	<type-definition>oat:TimeThreshold</type-definition>
+      </property>
+      <property key="LoopThreshold" is-mandatory="false">
+	<label>Loop Threshold</label>
+	<description>The loop threshold should exceed -1</description>
+	<type-definition>oat:LoopThreshold</type-definition>
+      </property>
+    </entity>
+    <!-- Impinj LLRP device node -->
+    <entity type="ImpinjNotificationDeviceNode" extends="RFDeviceNode">
+      <locator-option value="Impinj Notification Device DeviceNode">Impinj Notification Device DeviceNode</locator-option>
+      <label>Impinj LLRP Notification DeviceNode Configuration</label>
+      <description>Impinj LLRP Notification DeviceNode Configuration</description>
+      <property key="AntennaId" is-mandatory="true">
+	<label>Antenna ID</label>
+	<description>Antenna number</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="1" is-default="true">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>
+	  <option value="4">4</option>
+	</select>
+      </property>
+      <property key="PowerLevel" is-mandatory="false">
+	<label>Power level</label>
+	<description>RF power level for the reader</description>
+	<type-definition>oat:ImpinjPowerLevel</type-definition>
+	<select is-bound="false">
+	  <option value="61" is-default="true">61</option>
+	</select>
+      </property>
+	<!-- Power Level for Write, Kill -->
+	<property key="WritePowerLevel" is-mandatory="false">
+	  <label>Power level for Kill</label>
+	  <description>Power level for Write, Kill</description>
+	  <type-definition>oat:ImpinjPowerLevel</type-definition>
+	  <select is-bound="false">
+	     <option value="61" is-default="true">61</option>
+	  </select>
+    </property>
+    <property key="ReceiveSensitivity" is-mandatory="false">
+	<label>Reader Receive  Sensitivity</label>
+	<description>Reader Receive Sensitivity</description>
+	<type-definition>oat:ReceiveSensitivity</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+
+      <property key="TimeThreshold" is-mandatory="false">
+	<label>Time Threshold</label>
+	<description>The time threshold should exceed 100 milliseconds</description>
+	<type-definition>oat:TimeThreshold</type-definition>
+      </property>
+      <property key="LoopThreshold" is-mandatory="false">
+	<label>Loop Threshold</label>
+	<description>The loop threshold should exceed -1</description>
+	<type-definition>oat:LoopThreshold</type-definition>
+        <select is-bound="false">
+	  <option value="999999" is-default="true">999999</option>
+	</select>
+      </property>
+    </entity>
+	
+	   <!-- Impinj xSpan device node -->
+    <entity type="ImpinjxSpanDeviceNode" extends="RFDeviceNode">
+      <locator-option value="Impinj xSpan Device DeviceNode">Impinj xSpan Device DeviceNode</locator-option>
+      <label>Impinj xSpan DeviceNode Configuration</label>
+      <description>Impinj xSpan DeviceNode Configuration</description>
+      <property key="AntennaId" is-mandatory="true">
+	<label>Antenna ID</label>
+	<description>Antenna number</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="1" is-default="true">1</option>	 
+	  <option value="2">2</option>
+	  <option value="3">3</option>
+	  <option value="4">4</option>
+	  <option value="5">5</option>
+	  <option value="6">6</option>
+	  <option value="7">7</option>
+	  <option value="8">8</option>
+	  <option value="9">9</option>
+	  <option value="10">10</option>
+	  <option value="11">11</option>
+	  <option value="12">12</option>
+	  <option value="13">13</option>
+	</select>
+      </property>
+      <property key="PowerLevel" is-mandatory="false">
+	<label>Power level</label>
+	<description>RF power level for the reader</description>
+	<type-definition>oat:ImpinjPowerLevel</type-definition>
+	<select is-bound="false">
+	  <option value="61" is-default="true">61</option>
+	</select>
+      </property>
+	
+    <property key="ReceiveSensitivity" is-mandatory="false">
+	<label>Reader Receive  Sensitivity</label>
+	<description>Reader Receive Sensitivity</description>
+	<type-definition>oat:ReceiveSensitivity</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+
+    <property key="TimeThreshold" is-mandatory="false">
+	<label>Time Threshold</label>
+	<description>The time threshold should exceed 100 milliseconds</description>
+	<type-definition>oat:TimeThreshold</type-definition>
+      </property>
+      <property key="LoopThreshold" is-mandatory="false">
+	<label>Loop Threshold</label>
+	<description>The loop threshold should exceed -1</description>
+	<type-definition>oat:LoopThreshold</type-definition>
+        <select is-bound="false">
+	  <option value="999999" is-default="true">999999</option>
+	</select>
+      </property>
+    </entity>
+	
+    <!-- Motorola LLRP device node -->
+    <entity type="MotorolaFX7400DeviceNode" extends="RFDeviceNode">
+      <locator-option value="Motorola FX7400 DeviceNode">Motorola FX7400 DeviceNode</locator-option>
+      <label>Motorola LLRP Notification DeviceNode Configuration</label>
+      <description>Motorola LLRP Notification DeviceNode Configuration</description>
+      <property key="AntennaId" is-mandatory="true">
+	<label>Antenna ID</label>
+	<description>Antenna number</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="1" is-default="true">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>
+	  <option value="4">4</option>
+	</select>
+      </property>
+      <property key="PowerLevel" is-mandatory="false">
+	<label>Power level</label>
+	<description>RF power level for the reader</description>
+	<type-definition>oat:MotorolaPowerLevel</type-definition>
+	<select is-bound="false">
+	  <option value="100" is-default="true">100</option>
+	</select>
+     </property>
+	<!-- Power Level for Write, Kill -->
+	<property key="WritePowerLevel" is-mandatory="false">
+	  <label>Power level for Kill</label>
+	  <description>Power level for Write, Kill</description>
+	  <type-definition>oat:MotorolaPowerLevel</type-definition>
+	  <select is-bound="false">
+	     <option value="100" is-default="true">100</option>
+	  </select>
+    </property>
+      <property key="TimeThreshold" is-mandatory="false">
+	<label>Time Threshold</label>
+	<description>The time threshold should exceed 100 milliseconds</description>
+	<type-definition>oat:TimeThreshold</type-definition>
+      </property>
+      <property key="LoopThreshold" is-mandatory="false">
+	<label>Loop Threshold</label>
+	<description>The loop threshold should exceed -1</description>
+	<type-definition>oat:LoopThreshold</type-definition>
+        <select is-bound="false">
+	  <option value="999999" is-default="true">999999</option>
+	</select>
+      </property>
+    </entity>
+ </table>
+</meta-data>

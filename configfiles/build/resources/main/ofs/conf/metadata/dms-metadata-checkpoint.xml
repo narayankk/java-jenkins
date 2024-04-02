@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+	<table name="dms_device">
+		<!-- Checkpoint MPOS reader -->
+		<entity type="CkpMPOS" extends="RFReader">
+			<locator-option value="Checkpoint MPOS reader">Checkpoint MPOS reader</locator-option>
+			<label>Checkpoint MPOS reader configuration</label>
+			<description>Checkpoint MPOS reader configuration</description>
+			
+			<property key="number_of_antennas" is-mandatory="false"
+				is-visible="false">
+				<label>Maximum number of antennas</label>
+				<description>Maximum number of antennas for Checkpoint MPOS reader</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="4" is-default="true">4</option>
+				</select>
+			</property>
+
+			<!-- Antenna id -->
+			<property key="ReaderNodeId" is-mandatory="true">
+				<label>Reader Node ID </label>
+				<description>Reader address. A hexadecimal number between 00 and FF.</description>
+				<type-definition>oat:ReaderNodeID</type-definition>
+				<select is-bound="false">
+					<option value="04" is-default="true">04</option>
+				</select>
+			</property>
+			
+			<!-- Event notification port -->   
+			<property key="EventPort" is-mandatory="true">
+				<label>Event Port</label>
+				<description>Async event notification port</description>
+				<type-definition>oat:Port</type-definition>
+				<select is-bound="false">
+					<option value="40013" is-default="true">40013</option>
+				</select>
+			</property>
+			
+			<!-- Use the device or OFS time -->
+		      <property key="UseDeviceTime" is-mandatory="false">
+				<label>Event time </label>
+				<description>Which time to use for logging the tags event time, default Device</description>
+				<type-definition>xsd:boolean</type-definition>
+				<select is-bound="true">
+				  <option value="false">OFS</option>
+				  <option value="true" is-default="true">Device</option>
+				</select>
+		     </property>
+		    
+		    <!-- Heartbeat interval -->   
+			<property key="HeartbeatInterval" is-mandatory="true">
+				<label>Heartbeat interval</label>
+				<description>Heartbeat interval in seconds</description>
+				<type-definition>oat:Interval</type-definition>
+				<select is-bound="false">
+					<option value="150" is-default="true">150</option>
+				</select>
+			</property>		 
+		     
+		</entity>
+	</table>
+</meta-data>

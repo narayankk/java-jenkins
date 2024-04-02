@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="PML">
+  <table name="product">
+    <entity type="ProductOld">
+    <past-name>Product</past-name>
+    <label>PML Product Properties</label>
+    <description>PML Product Properties</description>
+    </entity>
+  </table>
+
+  <table name="manufacturer">
+    <entity type="Manufacturer">
+    <label>PML Manufacturer Properties</label>
+    <description>PML Manufacturer Properties</description>
+    <property key="address" is-mandatory="false">
+      <label>Headquarters Address</label>
+          <description>Headquarters Address of the Manufacturer</description>
+      <type-definition>oat:SmallString</type-definition>
+    </property>
+    <property key="address_line2" is-mandatory="false">
+      <label>Address Line2</label>
+          <description>Address Line2</description>
+      <type-definition>oat:SmallString</type-definition>
+    </property>
+    <property key="address_line3" is-mandatory="false">
+      <label>Address Line3</label>
+          <description>Address Line3</description>
+      <type-definition>oat:SmallString</type-definition>
+    </property>
+
+    <property key="website" is-mandatory="false">
+      <label>Manufacture Website</label>
+          <description>Manufacture Website</description>
+      <type-definition>oat:WebSite</type-definition>
+    </property>
+    <property key="phone_number" is-mandatory="false">
+      <label>Manufacturer Phone Number</label>
+          <description>Manufacturer Phone Number</description>
+      <type-definition>oat:PhoneNumber</type-definition>
+    </property>
+    <property key="contact_hours" is-mandatory="false">
+      <label>Contact hours</label>
+          <description>Contact hours</description>
+      <type-definition>oat:SmallString</type-definition>
+    </property>
+    </entity>
+  </table>
+
+   <table name="asn">
+    <entity type="Asn">
+        <label>asn object</label>
+        <description>extensions for the asn schema</description>
+    </entity>
+   </table>
+
+   <table name="order_def">
+    <entity type="Order">
+        <label>Order</label>
+        <description>An order properties</description>
+        <property key="order_num" is-mandatory="false">
+          <label>Order number</label>
+          <description>Order number</description>
+          <type-definition>oat:SmallString</type-definition>
+        </property>
+        <property key="customer_id" is-mandatory="false">
+          <label>Customer Id</label>
+          <description>Customer Id</description>
+          <type-definition>oat:SmallString</type-definition>
+        </property>
+        <property key="status" is-mandatory="false">
+          <label>Order status</label>
+          <description>Order status</description>
+          <type-definition>oat:SmallString</type-definition>
+          <select is-bound="true">
+            <option value="completed" is-default="true">Completed</option>
+            <option value="shipped">Shipped</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="error">Error</option>
+          </select>
+        </property>
+    </entity>
+   </table>
+   <table name="order_li">
+    <entity type="OrderLI">
+        <label>Order LI</label>
+        <description>An order line item properties</description>
+        <property key="startEPC" is-mandatory="false">
+          <label>Start EPC</label>
+          <description>Starting EPC of ENMS order</description>
+          <type-definition>oat:EPC</type-definition>
+        </property>
+        <property key="endEPC" is-mandatory="false">
+          <label>End EPC</label>
+          <description>Ending EPC of ENMS order</description>
+          <type-definition>oat:EPC</type-definition>
+        </property>
+    </entity>
+   </table>
+</meta-data>
+

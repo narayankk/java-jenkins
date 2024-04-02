@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <scenario>
+    <property key="name">dc_maintenance_mode_handler subscenario for checking status of device</property>
+    <property key="description">Scenario Input handler is a sub-scenario responsible to handle configured UI input of scenario.</property>
+    <property key="sub_scenario">true</property>
+    <property key="parent_access">RW</property>
+   <property key="namespace">dc-recv-ship-read-sub-proc</property>
+    <property key="exits">DONE,HANDLEERROR,PublishReadStartOutput,PublishNonRFIDStartOutput,ShouldNotReachHere,PublishReadStopOutput,PublishNonRFIDStopOutput,PublishRcvRfidOpOutput,PublishRcvNonRfidOpOutput,CreateVirtualBoxID,PublishStopReadOutputWithoutProcess,PublishAccuracyMetOutput</property>
+    <property key="inputs">
+   logicalState,bypassReader,readerEpc,maintenanceMode,maintenanceDoneOutput,epc,epcPayload,inProcessPayload,uiMessage,newPayload,rfidOperation,transitLocation,transitLocationRP,processID,scenarioDeviceType,boxID,scenarioType,stationId,shipment,rfidSessionVar,sessionID,scenarioName,siteEpc,asnExpected,asnMode,epcBatchSize,shipToDescBarcodeMode,allowDatabaseTransaction,dummyProcessID<!--,eventErrCode--><!--,eventErrCode-->
+    </property>
+    <property key="outputs">
+       rfidOperation,logicalState,rfidSessionVar,inProcessPayload,newPayload,singulatedEpcs,preEncodedEpcs,badEpcs,batchId,epcPayload,rcvPayload,processID,origNode,eventErrCode,errorDesc,epc,customPayload,hasPendingEpcInBatch,isAccuracyMet,processEndTime,processStartTime,checkForASN
+    </property>
+    
+    <process>
+  
+      <start name="Start">
+          <target exit="All Cases" name="CheckScenarioState"></target>
+    </start>
+    <decision name="CheckScenarioState">
+    	<case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.Reading' and ${process.asnMode} eq 'BARCODE' and ${process.shipment} == null" label="Error" target="CheckIfProcessIsRunning"/>
+    	<case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.Reading' and ${process.asnMode} eq 'BARCODE' and ${process.shipment} != null and ${process.processID} == null" label="StartExceptionRfidProcess" target="DecideOnStartExceptionRfidProcess"/>
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.Reading'" label="CheckReaderMode" target="CheckReadSession"/>
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.EpcAddReadUI' and ${process.asnMode} eq 'BARCODE' and ${process.shipment} == null" label="Error" target="CreateExceptionEpcPayloadFromUIString"/>
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.EpcAddReadUI'" label="CreateEpcPayloadFromUIString" target="CreateEpcPayloadFromUIString"/>
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.CartonMsgUIReceived'" label="CreateWMSPayloadFromUIString" target="CreateWMSPayloadFromUIString"/>	   
+	   <case condition="${process.hasPendingEpcInBatch}!=null and ${process.hasPendingEpcInBatch} eq 'TRUE'" label="ProcessPendingEPCs" target="CheckReadSession"/>
+	<case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.StopTriggerReceived' and ${process.asnMode} eq 'BARCODE' and ${process.shipment} == null" label="Error" target="SetNoBarcodeScanError"/>
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.StopTriggerReceived'" label="CheckMaintenanceModeAtEndTrigger" target="CheckMaintenanceModeAtEndTrigger"/>
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ProcessClosing.StopTriggerReceived'" label="CheckEndRunningSession" target="CheckEndRunningSession"/>
+			<case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.StartTriggerReceived' and ${process.asnMode} eq 'BARCODE' and ${process.shipment} == null and ${process.origNode}!=null  and (${process.origNode} eq 'FORCE_SESSION_STOP' or ${process.origNode} eq 'MISSING_CARTON_INFO_ERR')" label="Error" target="CheckForStartTriggerFailure"/>
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.StartTriggerReceived' and ${process.asnMode} eq 'BARCODE' and ${process.shipment} == null" label="Error" target="SetNoBarcodeScanError"/>
+       <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.StartTriggerReceived'" label="StartTriggerEvent" target="CheckMaintenanceModeAtStartTrigger"/>
+        <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ProcessClosed'" label="CheckMissedCartonInfo" target="CheckMissedCartonInfo"/>
+        <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'ProcessStarted.BarcodeScanDone'" label="CheckMissedCartonInfo" target="CheckMaintenanceModeAtStartTrigger"/>
+		<case condition="${process.logicalState}!=null and ${process.logicalState} eq 'SessionStopped'" label="DoNothing1" target="HANDLEERROR"/>
+        <case condition="${process.logicalState}!=null and ${process.logicalState} eq 'UserCancelled.ClearData'" label="ClearDataFromUI" target="CheckMaintenanceModeAtEndTrigger"/>
+          <default label="DoNothing" target="DONE"></default>
+    </decision>
+     <decision name="CheckIfProcessIsRunning">
+	<case condition="${process.processID}==null and ${process.maintenanceMode}==null and ${process.shipment} == null and ${process.scenarioType} eq 'ITEM_PACK'" label="SetNoBarcodeScanError" target="SetNoBarcodeScanError"></case>
+	<case condition="${process.processID}==null and ${process.maintenanceMode}==null and ${process.shipment} == null and ${process.scenarioType} ne 'ITEM_PACK'" label="CreateVirtualBoxID" target="CreateVirtualBoxID"></case>
+	<case condition="${process.maintenanceMode}!=null" label="MaintenanceInProgress" target="DONE"></case>
+	<default label="NoSesssionInProgress" target="CheckProcessExists"></default>
+    </decision>    
+    <activity name="CreateExceptionEpcPayloadFromUIString" resource="class:com.oatsystems.solutions.apparel.primitives.ConvertDelimitedStringToPayload">
+			<target exit="done" name="CheckIfProcessIsRunning"/>
+			<target exit="error" name="CheckIfProcessIsRunning"/>
+    	  <target exit="end" name="DONE"></target>
+    	  <input class="java.lang.String" constant="false" name="message" required="true">${process.uiMessage}</input>
+    	  <output class="java.lang.String" constant="false" name="epc">${process.epc}</output>
+    	  <output class="java.util.Map" constant="false" name="payload">${process.epcPayload}</output>
+	</activity>
+     <activity name="SetNoBarcodeScanError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="CheckForStartTriggerFailure"/>
+			<target exit="error" name="CheckForStartTriggerFailure"/>
+        	<input class="java.lang.String" constant="true" name="inArg0" required="false">NO_BARCODE_SCAN</input>
+        	<output class="java.lang.String" constant="false" name="outArg0">${process.eventErrCode}</output>
+        	<input class="java.lang.String" constant="true" name="inArg1" required="false">"No barcode scan occurred"</input>
+        	<output class="java.lang.String" constant="false" name="outArg1">${process.errorDesc}</output>
+        	<input class="java.lang.String" constant="true" name="inArg2" required="false">NO_BARCODE_SCAN_ERR</input>
+        	<output class="java.lang.String" constant="false" name="outArg2">${process.origNode}</output>
+			<input class="java.lang.String" constant="false" name="inArg3">${process.defaultShipToDescBarcodeMode}</input>
+			<output class="java.lang.String" constant="false" name="outArg3">${process.shipToDescBarcodeMode}</output>
+    </activity>
+		<decision name="CheckForStartTriggerFailure">
+			<case condition="${process.maintenanceMode}!=null" label="IgnoreTrigger" target="DONE"/>
+			<case condition="${process.origNode}!=null  and ${process.origNode} eq 'FORCE_SESSION_STOP'" label="MultipleStartTriggerFailure" target="CheckMaintenanceModeAtStartTrigger"/>
+			<case condition="${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.StopTriggerReceived'" label="EndTriggerFailure" target="SetUnExpectedEndTrigger"/>
+			<default label="NoMultipleStartTriggerFailure" target="HANDLEERROR"/>
+		</decision>
+
+		<activity name="ResetBarcodeProcessErrorVars" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+			<target exit="done" name="CheckMaintenanceModeAtStartTrigger"/>
+			<target exit="error" name="CheckMaintenanceModeAtStartTrigger"/>
+			<target exit="skip" name="CheckMaintenanceModeAtStartTrigger"/>
+			<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+			<output class="java.lang.String" constant="false" name="variable1">${process.origNode}</output>
+			<!--<output class="java.util.Map" constant="false" name="variable1">${process.singulatedEpcs}</output>-->
+		</activity> 
+     <decision name="CheckReadSession">
+	<case condition="${process.rfidSessionVar}!=null  or (${process.rfidSessionVar}==null and ${process.processID}!=null) and ${process.maintenanceMode}==null" label="SessionInProgress" target="ResetProcessErrorVars"></case>
+	<case condition="${process.rfidSessionVar}==null and ${process.eventErrCode}!=null and ${process.eventErrCode} eq 'UNWANTED_READ' and ${process.boxID}!=null and ${process.maintenanceMode}==null" label="StartSession" target="DecideOnStartExceptionRfidProcess"></case>
+	<case condition="${process.maintenanceMode}!=null" label="MaintenanceInProgress" target="DONE"></case>
+	<default label="NoSesssionInProgress" target="CheckProcessExists"></default>
+    </decision>
+    <activity name="CheckProcessExists" resource="class:com.oatsystems.solutions.apparel.primitives.CheckDCProcessExists">
+	    <target exit="exists" name="ProcessSessionRead"></target>
+	    <target exit="error" name="SetInternalError"></target>
+	    <target exit="notexists" name="SetUnwantedReadError"></target>
+	    <input class="java.lang.String" constant="false" name="transitLocation" required="false">${process.transitLocation}</input>
+	    <input class="java.lang.String" constant="false" name="siteEpc" required="false">${process.siteEpc}</input>
+	    <input class="java.lang.String" constant="false" name="user" required="false">sys</input>
+	    <input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+	    <input class="java.lang.String" constant="false" name="scenarioDeviceType" required="false">${process.scenarioDeviceType}</input>
+	    <input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+	    <input class="java.lang.String" constant="false" name="sessionID" required="false">${process.sessionID}</input>
+	    <input class="java.lang.String" constant="false" name="boxID" required="false">${process.boxID}</input>
+	    <input class="java.lang.String" constant="false" name="scenarioName" required="false">${process.scenarioName}</input>
+	    <input class="java.lang.String" constant="false" name="maintenanceMode" required="false">${process.maintenanceMode}</input>
+	    <output class="java.lang.String" constant="false" name="processID">${process.processID}</output>
+    </activity>
+		<decision name="DecideOnStartExceptionRfidProcess">
+			<case condition="${process.allowDatabaseTransaction}!=null and ${process.allowDatabaseTransaction} eq 'true'" label="StartExceptionRfidProcess" target="StartExceptionRfidProcess"/>
+			<default label="StartDummyExceptionRfidProcess" target="StartDummyExceptionRfidProcess"/>
+		</decision>
+		<activity name="StartExceptionRfidProcess" resource="primitive:StartProcess">
+			<target name="SetRfidProcessExceptionState" exit="done" />
+			<target name="SetRfidProcessExceptionState" exit="error" />
+			<input  name="processMasterCode" class="java.lang.String">${process.scenarioType}</input>
+			<input  name="processData0" class="java.lang.String">${process.scenarioType}</input>
+			<input  name="processData1" class="java.lang.String">sys</input>
+			<input  name="processData2" class="java.lang.String">${process.sessionID}</input>
+			<input  name="processData3" class="java.lang.String">${process.boxID}</input>
+			<input  name="processData4" class="java.lang.String">${process.asnMode}</input>
+			<input  name="processData5" class="java.lang.String">${process.transitLocation}</input>
+			<input  name="processData6" class="java.lang.String">${process.siteEpc}</input>
+			<input  name="processData7" class="java.lang.String">${process.stationId}</input>
+			<input  name="processData8" class="java.lang.String">${process.scenarioName}</input>
+			<input  name="processData9" class="java.lang.String">${process.scenarioDeviceType}</input>
+			<output name="processID" class="java.lang.String">${process.processID}</output>
+		</activity>
+		
+		<activity name="StartDummyExceptionRfidProcess" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="GetExceptionRFIDProcessStartTime"/>
+			<target exit="error" name="GetExceptionRFIDProcessStartTime"/>
+			<input class="java.lang.String" constant="false" name="inArg0">${process.dummyProcessID}</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.processID}</output>
+		</activity> 		
+		<activity name="GetExceptionRFIDProcessStartTime" resource="class:com.oatsystems.workflow.apparel.primitives.GetCurrentTimestamp">
+			<target exit="done" name="SetRfidProcessExceptionState"/>
+			<target exit="error" name="SetRfidProcessExceptionState"/>
+			<output class="java.lang.Long" constant="false" name="currTimestamp">${process.processStartTime}</output>
+		</activity> 		
+    <activity name="SetRfidProcessExceptionState" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	    <target exit="done" name="ProcessSessionRead"></target>
+    	    <target exit="error" name="ProcessSessionRead"></target>
+    	    <input class="java.lang.String" constant="true" name="inArg0" required="false">TRUE</input>
+    	    <output class="java.lang.String" constant="false" name="outArg0">${process.rfidSessionVar}</output>
+    	     <input class="java.util.Map" constant="true" name="inArg1" required="false">${process.newPayload}</input>
+    	    <output class="java.util.Map" constant="false" name="outArg1">${process.inProcessPayload}</output>
+    </activity>
+    <activity name="ProcessSessionRead" resource="class:com.oatsystems.solutions.apparel.primitives.ProcessSessionRead">
+	<target exit="done" name="DecideOnRead"></target>
+	<target exit="error" name="SetInternalError"></target>
+	<input class="java.util.Map" constant="false" name="cartonInfo" required="false">${process.inProcessPayload}</input>
+	<input class="java.lang.String" constant="false" name="epc" required="true">${process.epc}</input>
+	<input class="java.util.Map" constant="false" name="epcPayload" required="false">${process.epcPayload}</input>
+	<input class="java.lang.String" constant="false" name="batchId" required="false">${process.batchId}</input>
+	<input class="java.util.Map" constant="false" name="singulatedEpcs" required="false">${process.singulatedEpcs}</input>
+	<input class="java.util.Map" constant="false" name="preEncodedEpcs" required="false">${process.preEncodedEpcs}</input>
+	<input class="java.util.Map" constant="false" name="badEpcs" required="false">${process.badEpcs}</input>
+	<input class="com.oatsystems.solutions.apparel.objects.ReadSessionHistory" constant="false" name="historyMap" required="false">${process.historyMap}</input>
+	<input class="java.lang.String" constant="false" name="transitLocation" required="false">${process.transitLocation}</input>
+	<input class="java.lang.String" constant="false" name="transitLocationRP" required="false">${process.transitLocationRP}</input>
+	<input class="java.lang.String" constant="false" name="processID">${process.processID}</input>
+	<input class="java.lang.String" constant="false" name="boxID">${process.boxID}</input>
+	<input class="java.lang.String" constant="false" name="scenarioName">${process.scenarioName}</input>
+	<input class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</input>
+	<input class="java.lang.String" name="asnExpected">${process.asnExpected}</input>
+	<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+	<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+	<input class="java.lang.String" constant="false" name="sessionID" required="false">${process.sessionID}</input>
+	<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+	<input class="java.lang.String" constant="false" name="numTriesBeforeFailure" equired="false">${process.numTriesBeforeFailure}</input>
+	<input class="java.lang.String" constant="false" name="numFailureStartTrigger" equired="false">${process.numFailureStartTrigger}</input>
+	<input class="java.lang.String" constant="false" name="eventErrCode" equired="false">${process.eventErrCode}</input>
+	<input class="java.util.Map" constant="false" name="customPayload" required="false">${process.customPayload}</input>
+	<input class="java.lang.String" constant="false" name="logicalState" required="false">${process.logicalState}</input>
+	<input class="java.lang.String" constant="false" name="epcBatchSize" required="false">${process.epcBatchSize}</input>
+    	<input class="java.lang.String" constant="false" name="allowDatabaseTransaction" required="false">${process.allowDatabaseTransaction}</input>
+	<output class="java.lang.String" constant="false" name="batchId">${process.batchId}</output>
+	<output class="java.util.Map" constant="false" name="singulatedEpcs">${process.singulatedEpcs}</output>
+	<output class="java.util.Map" constant="false" name="preEncodedEpcs">${process.preEncodedEpcs}</output>
+	<output class="java.util.Map" constant="false" name="badEpcs">${process.badEpcs}</output>
+	<output class="java.util.Map" constant="false" name="productCountMap">${process.productCountMap}</output>
+	<output class="java.util.Map" constant="false" name="customPayload" required="false">${process.customPayload}</output>
+	<output class="java.lang.String" constant="false" name="hasPendingEpcInBatch" required="false">${process.hasPendingEpcInBatch}</output>
+	<output class="java.lang.String" constant="false" name="boxID">${process.boxID}</output>
+	<output class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</output>
+    </activity>
+	
+	<decision name="DecideOnRead">
+	  <case condition="${process.logicalState}==null or ${process.logicalState} eq 'InProgress.Reading' or ${process.logicalState} eq 'InProgress.EpcAddReadUI'" label="normal" target="DecideOnError"/>
+	  <default label="goBackToStart" target="CheckScenarioState"/>
+	</decision>
+	
+    <activity name="ResetProcessErrorVars" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+	<target exit="done" name="ProcessSessionRead"></target>
+	<target exit="error" name="ProcessSessionRead"></target>
+	<target exit="skip" name="ProcessSessionRead"></target>
+	<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+	<output class="java.lang.String" constant="false" name="variable1">${process.origNode}</output>
+	<!--<output class="java.util.Map" constant="false" name="variable1">${process.singulatedEpcs}</output>-->
+    </activity>    
+  
+
+    <activity name="SetInternalError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	<target exit="done" name="HANDLEERROR"></target>
+    	<target exit="error" name="HANDLEERROR"></target>
+    	<input class="java.lang.String" constant="true" name="inArg0" required="false">INTERNAL_ERROR</input>
+    	<output class="java.lang.String" constant="false" name="outArg0">${process.eventErrCode}</output>
+    	<input class="java.lang.String" constant="true" name="inArg1" required="false">"Exception occured while processing RFID read."</input>
+    	<output class="java.lang.String" constant="false" name="outArg1">${process.errorDesc}</output>
+    	<input class="java.lang.String" constant="true" name="inArg2" required="false">UNEXPECTED_INTERNAL_ERR</input>
+    	<output class="java.lang.String" constant="false" name="outArg2">${process.origNode}</output>
+    </activity>
+    <activity name="SetUnwantedReadError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	<target exit="done" name="DecideOnError"></target>
+	<target exit="error" name="DecideOnError"></target>
+	<input class="java.lang.String" constant="true" name="inArg0" required="false">UNWANTED_READ</input>
+	<output class="java.lang.String" constant="false" name="outArg0">${process.eventErrCode}</output>
+	<input class="java.lang.String" constant="true" name="inArg1" required="false">"The read occurred while the reader is expected inactive"</input>
+	<output class="java.lang.String" constant="false" name="outArg1">${process.errorDesc}</output>
+	<input class="java.lang.String" constant="true" name="inArg2" required="false">UNEXPECTED_EPC_ERR</input>
+	<output class="java.lang.String" constant="false" name="outArg2">${process.origNode}</output>
+<!--	<input class="java.lang.String" constant="false" name="inArg3" required="false">${process.eventErrCode}</input>
+	<output class="java.lang.String" constant="false" name="outArg3">${process.eventErrCode}</output> -->
+    </activity> 
+
+     <decision name="DecideOnError">
+	
+	<case condition="${process.rfidSessionVar}!=null and ${process.origNode}!=null and ${process.origNode} eq 'UNEXPECTED_EPC_ERR' and ${process.boxID}!=null" label="SetUnwantedReadError" target="HANDLEERROR"></case>
+	<case condition="${process.scenarioType} eq 'ITEM_PACK' and ${process.origNode} eq 'ASN_NOT_FOUND_INTERNAL_ERROR'" label="StartProcess" target="DecideOnStartExceptionRfidProcess"></case>
+	<case condition="${process.scenarioType} eq 'ITEM_PACK' and ${process.rfidSessionVar}==null and ${process.processID}==null" label="ERROR" target="SetUnwantedReadErrorForPACK"></case>
+	<case condition="${process.scenarioType} eq 'ITEM_PACK' and (${process.rfidSessionVar}!=null or (${process.rfidSessionVar}==null and ${process.processID}!=null))" label="ShowUI" target="ShowScenarioUI"></case>
+	<case condition="(${process.rfidSessionVar}!=null or (${process.rfidSessionVar}==null and ${process.processID}!=null)) and ${process.origNode}==null and ${process.boxID}!=null" label="DonNothing" target="ResetProcessErrorVars2"></case>
+	<case condition="(${process.rfidSessionVar}!=null or (${process.rfidSessionVar}==null and ${process.processID}!=null)) and ${process.origNode}!=null and ${process.boxID}!=null and ${process.asnMode} eq 'BARCODE' and ${process.scenarioType} ne 'ITEM_PACK'" label="DonNothing" target="ResetProcessErrorVars2"></case>
+	<case condition="(${process.rfidSessionVar}!=null or (${process.rfidSessionVar}==null and ${process.processID}!=null)) and ${process.maintenanceMode}!=null" label="DonNothing" target="ResetProcessErrorVars2"></case>
+	<default label="CreateVirtualBoxID" target="CreateVirtualBoxID"></default>
+    </decision>  
+    
+   <activity name="ShowScenarioUI" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateScenarioUI">
+    	<target exit="done" name="ResetProcessErrorVars2"></target>
+    	<target exit="accuracyNotMet" name="AccuracyNotMet"></target>
+    	<target exit="wrongItem" name="WrongItem"></target>
+    	<target exit="accuracyMet" name="AccuracyMet"></target>
+    	<target exit="error" name="SetInternalError"></target>
+    	 <input class="java.lang.String" constant="false" name="transitLocation" required="false">${process.transitLocation}</input>
+    	<input class="java.lang.String" constant="false" name="transitLocationRP" required="false">${process.transitLocationRP}</input>
+    	<input class="java.lang.String" constant="false" name="processID">${process.processID}</input>
+    	<input class="java.lang.String" constant="false" name="boxID">${process.boxID}</input>
+    	<input class="java.lang.String" constant="false" name="scenarioName">${process.scenarioName}</input>
+    	<input class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</input>
+    	<input class="java.lang.String" name="asnExpected">${process.asnExpected}</input>
+    	<input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+    	<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+    	<input class="java.lang.String" constant="false" name="sessionID" required="false">${process.sessionID}</input>
+    	<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+    	<input class="java.lang.String" constant="false" name="logicalState" required="false">${process.logicalState}</input>
+   </activity>
+   
+       
+   <activity name="AccuracyNotMet" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+       	<target exit="done" name="PublishAccuracyMetOutput"></target>
+       	<target exit="error" name="PublishAccuracyMetOutput"></target>
+       	<target exit="skip" name="PublishAccuracyMetOutput"></target>
+       	<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+       	<output class="java.lang.String" constant="false" name="variable1">${process.origNode}</output>
+       	<input class="java.lang.String" constant="true" name="inArg2" required="false">NO</input>
+       	<output class="java.lang.String" constant="false" name="variable2">${process.isAccuracyMet}</output>
+       	<!--<output class="java.util.Map" constant="false" name="variable1">${process.singulatedEpcs}</output>-->
+    </activity> 
+
+   <activity name="AccuracyMet" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+       	<target exit="done" name="PublishAccuracyMetOutput"></target>
+       	<target exit="error" name="PublishAccuracyMetOutput"></target>
+       	<target exit="skip" name="PublishAccuracyMetOutput"></target>
+       	<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+       	<output class="java.lang.String" constant="false" name="variable1">${process.origNode}</output>
+       	<input class="java.lang.String" constant="true" name="inArg2" required="false">YES</input>
+       	<output class="java.lang.String" constant="false" name="variable2">${process.isAccuracyMet}</output>
+       	<!--<output class="java.util.Map" constant="false" name="variable1">${process.singulatedEpcs}</output>-->
+    </activity>   
+
+   <activity name="WrongItem" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+       	<target exit="done" name="PublishAccuracyMetOutput"></target>
+       	<target exit="error" name="PublishAccuracyMetOutput"></target>
+       	<target exit="skip" name="PublishAccuracyMetOutput"></target>
+       	<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+       	<output class="java.lang.String" constant="false" name="variable1">${process.origNode}</output>
+       	<input class="java.lang.String" constant="true" name="inArg2" required="false">WRONG</input>
+       	<output class="java.lang.String" constant="false" name="variable2">${process.isAccuracyMet}</output>
+       	<!--<output class="java.util.Map" constant="false" name="variable1">${process.singulatedEpcs}</output>-->
+    </activity>      
+    
+        <activity name="SetUnwantedReadErrorForPACK" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+    	<target exit="done" name="HANDLEERROR"></target>
+    	<target exit="error" name="HANDLEERROR"></target>
+    	<input class="java.lang.String" constant="true" name="inArg0" required="false">UNWANTED_READ_FOR_PACK</input>
+    	<output class="java.lang.String" constant="false" name="outArg0">${process.eventErrCode}</output>
+    	<input class="java.lang.String" constant="true" name="inArg1" required="false">"The read occurred without any barcode scan"</input>
+    	<output class="java.lang.String" constant="false" name="outArg1">${process.errorDesc}</output>
+    	<input class="java.lang.String" constant="true" name="inArg2" required="false">UNEXPECTED_EPC_ERR_FOR_PACK</input>
+    	<output class="java.lang.String" constant="false" name="outArg2">${process.origNode}</output>
+    <!--	<input class="java.lang.String" constant="false" name="inArg3" required="false">${process.eventErrCode}</input>
+    	<output class="java.lang.String" constant="false" name="outArg3">${process.eventErrCode}</output> -->
+    </activity> 
+    
+        <activity name="ResetProcessErrorVars2" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+    	<target exit="done" name="DONE"></target>
+    	<target exit="error" name="DONE"></target>
+    	<target exit="skip" name="DONE"></target>
+    	<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+    	<output class="java.lang.String" constant="false" name="variable1">${process.origNode}</output>
+    	<!--<output class="java.util.Map" constant="false" name="variable1">${process.singulatedEpcs}</output>-->
+    </activity> 
+                <!-- START Start Trigger Processing -->
+	<decision name="CheckMaintenanceModeAtStartTrigger">
+	    <case condition="${process.maintenanceMode}!=null" label="IgnoreTrigger" target="DONE"></case>
+	    <case condition="${process.boxID}==null and ${process.maintenanceMode}==null and ${process.shipment}==null and ${process.asnMode} eq 'WMS'" label="CreateVirtualBoxID" target="ResetPreviousProcessVars"></case>
+	    <case condition="${process.boxID}==null and ${process.maintenanceMode}==null and ${process.shipment}==null" label="CreateVirtualBoxID" target="CreateVirtualBoxID"></case>
+	<case condition="${process.boxID}!=null and ${process.maintenanceMode}==null and ${process.shipment}==null and ${process.processID}==null and (${process.origNode} eq 'END_TRIGGER_POINT7' or ${process.origNode} eq 'END_TRIGGER_POINT3' or ${process.origNode} eq 'UNEXPECTED_END_TRIGGER_ERR_CRITICAL')" label="CreateVirtualBoxID" target="ResetPreviousProcessVars"></case>
+       <case condition="${process.boxID}!=null and ${process.maintenanceMode}==null and ${process.shipment}!=null and ${process.processID}==null and (${process.origNode} eq 'END_TRIGGER_POINT7' or ${process.origNode} eq 'END_TRIGGER_POINT3' or ${process.origNode} eq 'UNEXPECTED_END_TRIGGER_ERR_CRITICAL') and ${process.asnMode} eq 'WMS'" label="Shipment_loaded" target="ResetPreviousProcessVars"></case>
+	    <default label="NotInMaintenanceMode" target="CheckRunningProcessAtStartTrigger"></default>
+	</decision>
+
+    <activity name="ResetPreviousProcessVars" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+	<target exit="done" name="CreateVirtualBoxID"></target>
+	<target exit="error" name="CreateVirtualBoxID"></target>
+	<target exit="skip" name="CreateVirtualBoxID"></target>
+	<output class="java.lang.String" constant="false" name="variable0">${process.eventErrCode}</output>
+	<output class="java.lang.String" constant="false" name="variable1">${process.origNode}</output>
+    </activity>	
+	<decision name="CheckRunningProcessAtStartTrigger">
+	    <case condition="${process.rfidSessionVar}!=null or ${process.processID}!=null" label="CloseRunningSession" target="SetStartTriggerRfidOrigPoint"></case>
+	    <case condition="${process.nonRfidSessionVar}!=null" label="NonRfidProcessFound" target="SetStartTriggerNonRfidOrigPoint"></case>
+	    <default label="NoMissingCartonInfo" target="CheckMissedCartonInfo"></default>
+	</decision>
+	<activity name="SetStartTriggerRfidOrigPoint" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="DecideOnCloseRfidProcess"/>
+			<target exit="error" name="DecideOnCloseRfidProcess"/>
+	    <input class="java.lang.String" constant="true" name="inArg0" required="false">FORCE_SESSION_STOP</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.origNode}</output>
+	    <input class="java.lang.String" constant="true" name="inArg1" required="false">TRUE</input>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.forceCloseRfid}</output>
+	    <output class="java.lang.String" constant="false" name="outArg2">${process.eventErrCode}</output>
+	</activity>
+	<activity name="SetStartTriggerNonRfidOrigPoint" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="DecideOnCloseNonRfidProcess"></target>
+	    <target exit="error" name="DecideOnCloseNonRfidProcess"></target>
+	    <input class="java.lang.String" constant="true" name="inArg0" required="false">FORCE_SESSION_STOP</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.origNode}</output>
+	</activity>
+	<decision name="CheckMissedCartonInfo">
+	   <!-- <case condition="${process.newPayload}==null or (${process.newPayload}.get('RfidOperation') eq 'true' and ${process.newPayload}.get('CartonId')==null)" 
+		label="MissedCartonInfo" target="SetMissedCartonInfoError"></case> -->
+	  <case condition="${process.boxID}!=null and ${process.shipment}==null" 
+		label="MissedCartonInfo" target="SetMissedCartonInfoError"></case>
+	 <default label="NoMissingCartonInfo" target="DecideOnMoveCartonToProcess"></default>
+	</decision>
+	<activity name="SetMissedCartonInfoError" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="HANDLEERROR"></target>
+	    <target exit="error" name="HANDLEERROR"></target>
+	    <input class="java.lang.String" constant="true" name="inArg0" required="false">MISSING_CARTON_INFO</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.eventErrCode}</output>
+	    <input class="java.lang.String" constant="true" name="inArg1" required="false">"Missing carton info when expected"</input>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.errorDesc}</output>
+	    <input class="java.lang.String" constant="true" name="inArg2" required="false">MISSING_CARTON_INFO_ERR</input>
+	    <output class="java.lang.String" constant="false" name="outArg2">${process.origNode}</output>
+	    <input class="java.util.Map" constant="false" name="inArg3" required="false">${process.newPayload}</input>
+	    <output class="java.util.Map" constant="false" name="outArg3">${process.errPayload}</output>
+	</activity>
+	<decision name="DecideOnMoveCartonToProcess">
+	  <case condition="(${process.shipment}==null or ${process.inProcessPayload}==null) and ${process.newPayload}!=null" 
+		label="MoveNewCartonInProcess" target="MoveNewCartonInProcess"></case>
+	<case condition="${process.asnMode} eq 'BARCODE'" label="EnsureRfidOperationMode" target="EnsureRfidOperationMode"></case>
+	 <default label="NoMissingCartonInfo" target="CheckToBeProcessed"></default>
+	</decision>	
+	<activity name="MoveNewCartonInProcess" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="CheckToBeProcessed"></target>
+	    <target exit="error" name="CheckToBeProcessed"></target>
+	    <input class="java.util.Map" constant="false" name="inArg0" required="false">${process.newPayload}</input>
+	    <output class="java.util.Map" constant="false" name="outArg0">${process.inProcessPayload}</output>
+	    <output class="java.util.HashMap" constant="false" name="outArg1">${process.newPayload}</output>
+	</activity>
+	<decision name="CheckToBeProcessed">
+	    <case condition="${process.inProcessPayload}!=null and ${process.inProcessPayload}.get('Operation') eq 'NO_READ_NO_REPORT'" label="NO_READ_NO_REPORT" target="DecideOnStartNonRfidProcess"></case>
+	    <case condition="${process.inProcessPayload}!=null and ${process.inProcessPayload}.get('Operation') eq 'READ_REPORT'" label="READ_REPORT" target="EnsureRfidOperationMode"></case>
+	    <case condition="${process.inProcessPayload}!=null and ${process.inProcessPayload}.get('Operation') eq 'READ_NO_REPORT'" label="READ_NO_REPORT" target="EnsureRfidOperationMode"></case>
+	    <!--<case condition="${process.inProcessPayload}!=null and ${process.inProcessPayload}.get('RfidOperation') eq 'true'" label="ProcessNewCarton" target="EnsureRfidOperationMode"/>
+	    <case condition="${process.inProcessPayload}!=null and ${process.inProcessPayload}.get('RfidOperation') eq 'false'" label="ProcessNewCarton" target="StartNonRfidProcess"/>-->
+	    <default label="SkipNewCarton" target="DONE"></default>
+		</decision>
+		
+		<decision name="DecideOnStartNonRfidProcess">
+			<case condition="${process.allowDatabaseTransaction}!=null and ${process.allowDatabaseTransaction} eq 'true'" label="StartNonRfidProcess" target="StartNonRfidProcess"/>
+			<default label="StartDummyNonRfidProcess" target="StartDummyNonRfidProcess"/>
+	</decision>
+	<activity name="StartNonRfidProcess" resource="primitive:StartProcess">
+	      <target name="SetNonRfidProcessState" exit="done" />
+	      <target name="SetNonRfidProcessState" exit="error" />
+	      <input  name="processMasterCode" class="java.lang.String">${process.scenarioType}</input>
+	      <input  name="processData0" class="java.lang.String">${process.scenarioType}</input>
+	      <input  name="processData1" class="java.lang.String">sys</input>
+	      <input  name="processData2" class="java.lang.String">${process.sessionID}</input>
+	      <input  name="processData3" class="java.lang.String">${process.boxID}</input>
+		  <input  name="processData4" class="java.lang.String">${process.asnMode}</input>
+	      <input  name="processData5" class="java.lang.String">${process.transitLocation}</input>
+	      <input  name="processData6" class="java.lang.String">${process.siteEpc}</input>
+	      <input  name="processData7" class="java.lang.String">${process.stationId}</input>
+	      <input  name="processData8" class="java.lang.String">${process.scenarioName}</input>
+	      <input  name="processData9" class="java.lang.String">${process.scenarioDeviceType}</input>
+	      <output name="processID" class="java.lang.String">${process.processID}</output>
+		</activity>
+		<activity name="StartDummyNonRfidProcess" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="GetNonRFIDProcessStartTime"/>
+			<target exit="error" name="GetNonRFIDProcessStartTime"/>
+			<input class="java.lang.String" constant="false" name="inArg0">${process.dummyProcessID}</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.processID}</output>
+		</activity> 		
+		<activity name="GetNonRFIDProcessStartTime" resource="class:com.oatsystems.workflow.apparel.primitives.GetCurrentTimestamp">
+			<target exit="done" name="SetNonRfidProcessState"/>
+			<target exit="error" name="SetNonRfidProcessState"/>
+			<output class="java.lang.Long" constant="false" name="currTimestamp">${process.processStartTime}</output>
+	</activity>
+	<activity name="SetNonRfidProcessState" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="PublishNonRFIDStartOutput"></target>
+	    <target exit="error" name="PublishNonRFIDStartOutput"></target>
+	    <input class="java.lang.String" constant="true" name="inArg0" required="false">TRUE</input>
+	    <input class="java.lang.String" constant="true" name="inArg1" required="false">InProgress.NonRfidProcessStarted</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.nonRfidSessionVar}</output>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.logicalState}</output>
+	</activity>
+
+		<decision name="EnsureRfidOperationMode">
+			<case condition="${process.rfidOperation}==null or ${process.rfidOperation} eq 'false'" label="FirstCartonInfo" target="StartRfidBulkRead"/>
+			<default label="Continue" target="DecideOnStartRfidProcess"/>
+		</decision>
+		<activity name="StartRfidBulkRead" resource="class:com.oatsystems.solutions.apparel.primitives.StartBulkRead">
+			<target exit="done" name="SetRfidOperationMode"/>
+			<target exit="error" name="HANDLEERROR"/>
+			<input class="java.lang.String" constant="false" name="deviceEpc" required="true">${process.readerEpc}</input>
+			<input class="java.lang.String" constant="false" name="bypassReader" required="true">${process.bypassReader}</input>
+		</activity>
+		<activity name="SetRfidOperationMode" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="DecideOnStartRfidProcess"/>
+			<target exit="error" name="DecideOnStartRfidProcess"/>
+			<input class="java.lang.String" constant="true" name="inArg0" required="false">true</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.rfidOperation}</output>
+		</activity>
+		
+		<decision name="DecideOnStartRfidProcess">
+			<case condition="${process.allowDatabaseTransaction}!=null and ${process.allowDatabaseTransaction} eq 'true'" label="StartRfidProcess" target="StartRfidProcess"/>
+			<default label="StartDummyRfidProcess" target="StartDummyRfidProcess"/>
+		</decision>
+	 <activity name="StartRfidProcess" resource="primitive:StartProcess">
+	      <target name="SetRfidProcessState" exit="done" />
+	      <target name="SetRfidProcessState" exit="error" />
+	      <input  name="processMasterCode" class="java.lang.String">${process.scenarioType}</input>
+	      <input  name="processData0" class="java.lang.String">${process.scenarioType}</input>
+	      <input  name="processData1" class="java.lang.String">sys</input>
+	      <input  name="processData2" class="java.lang.String">${process.sessionID}</input>
+	      <input  name="processData3" class="java.lang.String">${process.boxID}</input>
+		   <input name="processData4" class="java.lang.String">${process.asnMode}</input>
+	      <input  name="processData5" class="java.lang.String">${process.transitLocation}</input>
+	      <input  name="processData6" class="java.lang.String">${process.siteEpc}</input>
+	      <input  name="processData7" class="java.lang.String">${process.stationId}</input>
+	      <input  name="processData8" class="java.lang.String">${process.scenarioName}</input>
+    	      <input  name="processData9" class="java.lang.String">${process.scenarioDeviceType}</input>
+	      <output name="processID" class="java.lang.String">${process.processID}</output>
+		</activity>
+		<activity name="StartDummyRfidProcess" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="GetRFIDProcessStartTime"/>
+			<target exit="error" name="GetRFIDProcessStartTime"/>
+			<input class="java.lang.String" constant="false" name="inArg0">${process.dummyProcessID}</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.processID}</output>
+		</activity> 
+		<activity name="GetRFIDProcessStartTime" resource="class:com.oatsystems.workflow.apparel.primitives.GetCurrentTimestamp">
+			<target exit="done" name="SetRfidProcessState"/>
+			<target exit="error" name="SetRfidProcessState"/>
+			<output class="java.lang.Long" constant="false" name="currTimestamp">${process.processStartTime}</output>
+        </activity>
+	<activity name="SetRfidProcessState" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="PublishReadStartOutput"></target>
+	    <target exit="error" name="PublishReadStartOutput"></target>
+	    <input class="java.lang.String" constant="true" name="inArg0" required="false">TRUE</input>
+	    <input class="java.lang.String" constant="true" name="inArg1" required="false">InProgress.ProcessStarted</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.rfidSessionVar}</output>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.logicalState}</output>
+	    <output class="java.lang.String" constant="false" name="outArg2">${process.eventErrCode}</output>
+	</activity>
+	       
+        <!-- END Start Trigger Processing -->
+         <!-- START End trigger -->
+	<decision name="CheckMaintenanceModeAtEndTrigger">
+	    <case condition="${process.maintenanceMode}!=null" label="IgnoreTrigger" target="DONE"></case>
+	    <default label="NotInMaintenanceMode" target="ResetEndTriggerMonitoringVar"></default>
+	</decision>
+	<activity name="ResetEndTriggerMonitoringVar" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="CheckPayloadTypeForClosing"></target>
+	    <target exit="error" name="CheckPayloadTypeForClosing"></target>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.endTriggerMissed}</output>
+	     <input class="java.lang.String" constant="true" name="inArg1" required="false">END_TRIGGER_POINT3</input>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.origNode}</output>
+	    <output class="java.lang.String" constant="false" name="outArg2">${process.eventErrCode}</output>
+	</activity>
+	<decision name="CheckPayloadTypeForClosing">
+	    <case condition="${process.rfidSessionVar}!=null or (${process.rfidSessionVar}==null and ${process.processID}!=null)" label="CloseRunningSession" target="DecideOnCloseRfidProcess"></case>
+	    <case condition="(${process.rfidSessionVar}==null and ${process.processID}==null) and ${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.StopTriggerReceived' and ${process.scenarioType} eq 'ITEM_PACK'" label="UserClickedonSubmit" target="DONE"></case>
+	    <case condition="(${process.rfidSessionVar}==null and ${process.processID}==null) and ${process.logicalState}!=null and ${process.logicalState} eq 'InProgress.StopTriggerReceived'" label="ErrorEndTriggerFailure" target="SetUnExpectedEndTrigger"></case>
+	    <case condition="${process.nonRfidSessionVar}!=null" label="ResetNonRfidPayload" target="SetEndNonRfidOrigNode"></case>
+	    <case condition="${process.rfidSessionVar}!=null" label="RFIDPayload" target="DONE"></case>
+	    <case condition="${process.inProcessPayload}==null" label="NullPayloadOrAlreadyProcessed" target="DONE"></case>
+	    <default label="ShouldNotReachHere" target="ShouldNotReachHere"></default>
+	</decision>
+	<activity name="SetEndNonRfidOrigNode" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="DecideOnCloseNonRfidProcess"/>
+			<target exit="error" name="DecideOnCloseNonRfidProcess"/>
+	    <input class="java.lang.String" constant="true" name="inArg0" required="false">END_TRIGGER_NONRFID</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.origNode}</output>
+	</activity>
+        <!-- END End trigger -->
+                <!-- START Point 7 Trigger Processing -->
+	        <decision name="CheckEndRunningSession">
+	            <!--<case condition="${process.forceCloseRfid}!=null" label="IgnorePoint7" target="ResetForceCloseRfid"></case>-->
+	            <case condition="${process.rfidSessionVar}!=null or (${process.rfidSessionVar}==null and ${process.processID}!=null)" label="CloseRunningSession" target="SetEnd7OrigNode"></case>
+	            <case condition="(${process.rfidSessionVar}==null and ${process.processID}==null) and ${process.logicalState}!=null and ${process.logicalState} eq 'ProcessClosing.StopTriggerReceived'" label="Point3TriggerReceived" target="SetProcessEnd7OrigNode"></case>
+	            <default label="IgnoreNonWmsCartons" target="DONE"></default>
+	        </decision>
+		<activity name="SetUnExpectedEndTrigger" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+		    <target exit="done" name="HANDLEERROR"></target>
+	            <target exit="error" name="HANDLEERROR"></target>
+		    <input class="java.lang.String" constant="true" name="inArg0" required="false">UNEXPECTED_END_TRIGGER</input>
+		    <output class="java.lang.String" constant="false" name="outArg0">${process.eventErrCode}</output>
+		    <input class="java.lang.String" constant="true" name="inArg1" required="false">"Start trigger or End trigger hardware issue"</input>
+		    <output class="java.lang.String" constant="false" name="outArg1">${process.errorDesc}</output>
+		    <input class="java.lang.String" constant="true" name="inArg2" required="false">UNEXPECTED_END_TRIGGER_ERR_CRITICAL</input>
+		    <output class="java.lang.String" constant="false" name="outArg2">${process.origNode}</output>
+		    <input class="java.util.Map" constant="false" name="inArg3" required="false">${process.newPayload}</input>
+		    <output class="java.util.Map" constant="false" name="outArg3">${process.errPayload}</output>
+	         </activity>	        
+	        <!--
+	        <activity name="ResetForceCloseRfid" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	            <target exit="done" name="DONE"></target>
+	            <target exit="error" name="DONE"></target>
+	            <output class="java.lang.String" constant="false" name="outArg0">${process.forceCloseRfid}</output>
+	        </activity> -->
+		<activity name="SetProcessEnd7OrigNode" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="PublishStopReadOutputWithoutProcess"/>
+			<target exit="error" name="DecideOnCloseRfidProcess"/>
+			<input class="java.lang.String" constant="true" name="inArg0" required="false">END_TRIGGER_POINT7</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.origNode}</output>
+		</activity>
+		<activity name="SetEnd7OrigNode" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+			<target exit="done" name="DecideOnCloseRfidProcess"/>
+			<target exit="error" name="DecideOnCloseRfidProcess"/>
+			<input class="java.lang.String" constant="true" name="inArg0" required="false">END_TRIGGER_POINT7</input>
+			<output class="java.lang.String" constant="false" name="outArg0">${process.origNode}</output>
+		</activity>
+		<decision name="DecideOnCloseRfidProcess">
+			<case condition="${process.allowDatabaseTransaction}!=null and ${process.allowDatabaseTransaction} eq 'true'" label="CloseRfidProcess" target="CloseRfidProcess"/>
+			<default label="CloseDummyRfidProcess" target="CloseDummyRfidProcess"/>
+		</decision>
+	 <activity name="CloseRfidProcess" resource="primitive:CloseProcess">
+	      <target name="SetClosedRfidProcessState" exit="done" />
+	      <target name="SetClosedRfidProcessState" exit="error" />
+	      <input  name="processMasterCode" class="java.lang.String">${process.scenarioType}</input>
+	      <input  name="processData0" class="java.lang.String">${process.scenarioType}</input>
+	      <input  name="processData1" class="java.lang.String">sys</input>
+	      <input  name="processData2" class="java.lang.String">${process.sessionID}</input>
+	      <input  name="processData3" class="java.lang.String">${process.boxID}</input>
+		  <input  name="processData4" class="java.lang.String">${process.asnMode}</input>
+	      <input  name="processData5" class="java.lang.String">${process.transitLocation}</input>
+	      <input  name="processData6" class="java.lang.String">${process.siteEpc}</input>
+	      <input  name="processData7" class="java.lang.String">${process.stationId}</input>
+	      <input  name="processData8" class="java.lang.String">${process.scenarioName}</input>
+	      <input  name="processData9" class="java.lang.String">${process.scenarioDeviceType}</input>
+	      <input name="processID" class="java.lang.String">${process.processID}</input>
+	      <output name="processID" class="java.lang.String">${process.processID}</output>
+		</activity>
+		<activity name="CloseDummyRfidProcess" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+			<target exit="done" name="GetRFIDProcessEndTime"/>
+			<target exit="error" name="GetRFIDProcessEndTime"/>
+			<target exit="skip" name="GetRFIDProcessEndTime"/>
+			<output class="java.lang.String" constant="false" name="variable0">${process.processID}</output>
+		</activity>
+		<activity name="GetRFIDProcessEndTime" resource="class:com.oatsystems.workflow.apparel.primitives.GetCurrentTimestamp">
+			<target exit="done" name="SetClosedRfidProcessState"/>
+			<target exit="error" name="SetClosedRfidProcessState"/>
+			<output class="java.lang.Long" constant="false" name="currTimestamp">${process.processEndTime}</output>
+		</activity> 		
+
+	<activity name="SetClosedRfidProcessState" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="PublishReadStopOutput"></target>
+	    <target exit="error" name="PublishReadStopOutput"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">ProcessClosed</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.rfidSessionVar}</output>
+	    <input class="java.lang.String" constant="false" name="inArg2">${process.scenarioName}</input>
+	    <output class="java.lang.String" constant="false" name="outArg2">${process.scenarioName}</output>
+	    <output class="java.util.Map" constant="false" name="outArg3">${process.singulatedEpcs}</output>
+	    <output class="java.lang.String" constant="false" name="outArg4">${process.checkForASN}</output>
+      </activity>
+        <!-- END Point 7 Trigger Processing -->
+
+		<decision name="DecideOnCloseNonRfidProcess">
+			<case condition="${process.allowDatabaseTransaction}!=null and ${process.allowDatabaseTransaction} eq 'true'" label="CloseNonRfidProcess" target="CloseNonRfidProcess"/>
+			<default label="CloseDummyNonRfidProcess" target="CloseDummyNonRfidProcess"/>
+		</decision>
+	 <activity name="CloseNonRfidProcess" resource="primitive:CloseProcess">
+	      <target name="SetClosedNonRfidProcessState" exit="done" />
+	      <target name="SetClosedNonRfidProcessState" exit="error" />
+              <input  name="processMasterCode" class="java.lang.String">${process.scenarioType}</input>
+	      <input  name="processData0" class="java.lang.String">${process.scenarioType}</input>
+	      <input  name="processData1" class="java.lang.String">sys</input>
+	      <input  name="processData2" class="java.lang.String">${process.sessionID}</input>
+	      <input  name="processData3" class="java.lang.String">${process.boxID}</input>
+		  <input  name="processData4" class="java.lang.String">${process.asnMode}</input>
+	      <input  name="processData5" class="java.lang.String">${process.transitLocation}</input>
+	      <input  name="processData6" class="java.lang.String">${process.siteEpc}</input>
+	      <input  name="processData7" class="java.lang.String">${process.stationId}</input>
+	      <input  name="processData8" class="java.lang.String">${process.scenarioName}</input>
+	      <input  name="processData9" class="java.lang.String">${process.scenarioDeviceType}</input>
+	      <input name="processID" class="java.lang.String">${process.processID}</input>
+	      <output name="processID" class="java.lang.String">${process.processID}</output>
+		</activity>
+		
+		<activity name="CloseDummyNonRfidProcess" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+			<target exit="done" name="GetNonRFIDProcessEndTime"/>
+			<target exit="error" name="GetNonRFIDProcessEndTime"/>
+			<target exit="skip" name="GetNonRFIDProcessEndTime"/>
+			<output class="java.lang.String" constant="false" name="variable0">${process.processID}</output>
+		</activity>
+		<activity name="GetNonRFIDProcessEndTime" resource="class:com.oatsystems.workflow.apparel.primitives.GetCurrentTimestamp">
+			<target exit="done" name="SetClosedNonRfidProcessState"/>
+			<target exit="error" name="SetClosedNonRfidProcessState"/>
+			<output class="java.lang.Long" constant="false" name="currTimestamp">${process.processEndTime}</output>
+	      <!--<output name="timestamp" class="java.lang.String">${process.endTimestamp}</output>-->
+	</activity>
+
+        <activity name="SetClosedNonRfidProcessState" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="PublishNonRFIDStopOutput"></target>
+	    <target exit="error" name="PublishNonRFIDStopOutput"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">NonRfidProcessClosed</input>
+	    <output class="java.lang.String" constant="false" name="outArg1">${process.nonRfidSessionVar}</output>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+        </activity>
+        
+        <!-- SIMULATOR Start  -->
+	<activity name="CreateWMSPayloadFromUIString" resource="class:com.oatsystems.solutions.apparel.primitives.ConvertDelimitedStringToPayload">
+	  <target exit="done" name="CheckTestWithWebserviceOn"></target>
+	  <target exit="error" name="CheckTestWithWebserviceOn"></target>
+	  <target exit="end" name="DONE"></target>
+	  <input class="java.lang.String" constant="false" name="message" required="true">${process.uiMessage}</input>
+	  <input class="java.lang.String" constant="false" name="stationId" required="true">${process.stationId}</input>
+	  <input class="java.lang.String" constant="false" name="scenarioType" required="true">${process.scenarioType}</input>
+	  <input class="java.lang.String" constant="false" name="asnMode">${process.asnMode}</input>
+	  <input class="java.lang.String" constant="false" name="scenarioName">${process.scenarioName}</input>
+	  <output class="java.util.Map" constant="false" name="payload">${process.rcvPayload}</output>
+	  <output class="java.lang.String" constant="false" name="message">${process.message}</output>
+	</activity>
+	<decision name="CheckTestWithWebserviceOn">
+	    <case condition="${process.testWithWebService} eq 'true'" label="TestWithWS" target="SendTestMessageToWebService"></case>
+	    <default label="TestLocally" target="CheckOpType"></default>
+	</decision>
+	<activity name="SendTestMessageToWebService" resource="primitive:SendMsgOut">
+	  <target exit="done" name="DONE"></target>
+	  <target exit="error" name="DONE"></target>
+	  <target exit="sendMsgFailed" name="DONE"></target>
+	  <input class="java.lang.String" constant="false" name="messageChannel" required="true">TEST_WMS_CHANNEL</input>
+	  <input class="java.lang.String" constant="false" name="messageName" required="true">TEST_CARTON_INFO_OUT</input>
+	  <input class="java.lang.Object" constant="false" name="payload" required="true">${process.rcvPayload}</input>
+	</activity>
+	<activity name="CreateEpcPayloadFromUIString" resource="class:com.oatsystems.solutions.apparel.primitives.ConvertDelimitedStringToPayload">
+	  <target exit="done" name="CheckReadSession"></target>
+	  <target exit="error" name="CheckReadSession"></target>
+	  <target exit="end" name="DONE"></target>
+	  <input class="java.lang.String" constant="false" name="message" required="true">${process.uiMessage}</input>
+	  <output class="java.lang.String" constant="false" name="epc">${process.epc}</output>
+	  <output class="java.util.Map" constant="false" name="payload">${process.epcPayload}</output>
+	</activity>
+        <!-- SIMULATOR End  -->
+	<decision name="CheckOpType">
+	    <case condition="${process.rcvPayload}!=null and ${process.rcvPayload}.get('RfidOperation') eq 'true'" label="RFIDOp" target="SetPublishRcvRfidOpOutput"/>
+	    <case condition="${process.rcvPayload}!=null and ${process.rcvPayload}.get('RfidOperation') eq 'false'" label="NonRFIDOp" target="SetPublishRcvNonRfidOpOutput"/>
+	    <default label="ShouldNotReachHere" target="ShouldNotReachHere"></default>
+        </decision>
+
+        <activity name="SetPublishRcvRfidOpOutput" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="PublishRcvRfidOpOutput"></target>
+	    <target exit="error" name="PublishRcvRfidOpOutput"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">InProgress.SimulateRfidOp</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+        </activity>
+        
+        <activity name="SetPublishRcvNonRfidOpOutput" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+	    <target exit="done" name="PublishRcvNonRfidOpOutput"></target>
+	    <target exit="error" name="PublishRcvNonRfidOpOutput"></target>
+	    <input class="java.lang.String" constant="false" name="inArg0">InProgress.SimulateNonRfidOp</input>
+	    <output class="java.lang.String" constant="false" name="outArg0">${process.logicalState}</output>
+        </activity>   
+        
+        
+
+ 	<end name="HANDLEERROR"></end>
+   	<end name="DONE"></end>
+   	<end name="PublishReadStartOutput"></end>
+    	<end name="PublishNonRFIDStartOutput"></end>
+    	<end name="ShouldNotReachHere"></end>
+    	<end name="PublishReadStopOutput"></end>
+    	<end name="PublishNonRFIDStopOutput"></end>
+    	<end name="PublishRcvRfidOpOutput"></end>
+    	<end name="PublishRcvNonRfidOpOutput"></end>
+    	<end name="CreateVirtualBoxID"></end>
+    	<end name="PublishStopReadOutputWithoutProcess"></end>
+    	<end name="PublishAccuracyMetOutput"></end>
+</process>
+
+ <config/>
+
+<display/>
+</scenario>

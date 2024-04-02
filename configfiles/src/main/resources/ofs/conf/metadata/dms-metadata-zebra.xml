@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+  <table name="dms_device">
+
+    <entity type="ZebraPrinterZ4M" extends="RFReader">
+      <locator-option value="Zebra Printer Z4M">Zebra Printer Z4M</locator-option>
+
+      <label>Zebra Printer Z4M</label>
+      <description>Zebra Printer Z4M Configuration</description>
+      <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+	<label>Maximum number of antennas</label>
+	<description>Maximum number of antennas for a printer</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+      <property key="TagType" is-mandatory="true">
+	<label>Tag Type</label>
+	<description>Type of tags used.</description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="Matrics 64 bit">Matrics 64 bit</option>
+	  <option value="Alien Class1 64 bit" is-default="true">Alien Class1 64 bit</option>
+	  <option value="I Code 1">I Code 1</option>
+	  <option value="ISO 15693">ISO 15693</option>
+	  <option value="Rafsec 96 bit">Rafsec 96 bit</option>
+	</select>
+      </property>
+      <property key="LockTag" is-mandatory="false">
+	<label>Lock Tag</label>
+	<description>Lock tags after writing tag id </description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="true">true</option>
+	  <option value="false" is-default="true">false</option>
+	</select>
+      </property>
+      <property key="NumberOfPassesPerRead" is-mandatory="false">
+	<label>Number Of Passes Per Read</label>
+	<description>Number of retires for reading a tag  before throwing error.</description>
+	<type-definition>oat:NumberOfPassesPerRead</type-definition>
+	<select is-bound="false">
+	  <option value="3" is-default="true">3</option>
+	</select>
+      </property>
+      <property key="WriteRetryCount" is-mandatory="false">
+	<label>Write Retry Count</label>
+	<description>Number of retires for writing to a tag  before throwing error.</description>
+	<type-definition>oat:PrinterWriteRetryCount</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>
+      <property key="ZPLWriteRetryCount" is-mandatory="false">
+	<label>ZPL Write Retry Count</label>
+	<description>Retry count for ZPL; Zebra printer takes this count and tries at device level.</description>
+	<type-definition>oat:ZPLWriteRetryCount</type-definition>
+	<select is-bound="false">
+	  <option value="3" is-default="true">3</option>
+	</select>
+      </property>
+      <property key="DelayBetweenReadRetries" is-mandatory="false">
+	<label>Delay between Read retries</label>
+	<description>Delay (in ms) between Read retries where the previous read failed</description>
+	<type-definition>oat:DelayBetweenReadRetries</type-definition>
+	<select is-bound="false">
+	  <option value="1000" is-default="true">1000</option>
+	</select>
+      </property>
+      <property key="DelayBetweenWriteRetries" is-mandatory="false">
+	<label>Delay between Write retries</label>
+	<description>Delay (in ms) between Write/Print retries where the previous write tag or print label failed</description>
+	<type-definition>oat:DelayBetweenWriteRetries</type-definition>
+	<select is-bound="false">
+	  <option value="1000" is-default="true">1000</option>
+	</select>
+      </property>
+      <property key="PrinterType" is-mandatory="false">
+	<label>Printer Type</label>
+	<description>Type Of Printer.</description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="Zebra" is-default="true">Zebra</option>
+	  <option value="Printronix">Printronix</option>
+	</select>
+      </property>
+    </entity>
+
+    <entity type="ZebraCompatibleApplicator" extends="Applicator">
+      <locator-option value="Zebra Compatible Applicator">Zebra Compatible Applicator</locator-option>
+
+      <label>Zebra Compatible Applicator</label>
+      <description>Zebra Compatible Applicator Configuration </description>
+      <property key="DefaultTimeOut" is-mandatory="false">
+	<label>Default Time Out</label>
+	<description>Default time-out value.  Integer between 1 and 60000</description>
+	<type-definition>oat:TimeoutMillis1</type-definition>
+	<select is-bound="false">
+	  <option value="3000" is-default="true">3000</option>
+	</select>
+      </property>
+    </entity>
+
+  </table>
+</meta-data>

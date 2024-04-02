@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# $Id: jython.sh,v 1.23 2015/05/26 18:47:57 wlam Exp $
+#
+# This file starts the jython interpreter
+
+CUR_DIR=`pwd`
+DIR_NAME=`dirname $0`
+cd $DIR_NAME/../..
+
+OAT_HOME=/usr/local
+cd $CUR_DIR
+
+LIB_DIR=$OAT_HOME/ofs/lib
+OFS_HOME=$OAT_HOME/ofs
+
+OAT_JAVA_CMD=/opt/java/openjdk/bin/java
+JYTHON_HOME="$OAT_HOME/jython"
+
+#
+# NOTE: Cannot use the '$' (dollar sign) character, because InstallAnywhere
+# will remove any pair of $ on the same line. Use '__ dollar_sign__' instead,
+# it is substituted during installation.
+#
+
+#uname | grep 'CYGWIN' >> /dev/null
+uname | grep 'Linux' >> /dev/null
+if [ $? -eq 0 ]; then
+    S=';'
+else
+    S=':'
+fi
+
+CLASSPATH="$OFS_HOME/conf/shared:$OFS_HOME/conf:$OFS_HOME/classes:$OFS_HOME/lib/*:$OAT_HOME/tomcat/webapps/axis/WEB-INF/lib/*"
+
+export CLASSPATH
+
+"$OAT_JAVA_CMD" "-Dedge.home=$OAT_HOME" -classpath "$CLASSPATH" com.oatsystems.util.UpdateProperties  "$@"

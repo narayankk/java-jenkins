@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+<meta-data property-table="Physical">
+	<table name="device">
+
+		<entity type="WiramaReaderDeviceNode" extends="RFDeviceNode">
+			<locator-option value="Wirama Reader DeviceNode">Wirama Reader DeviceNode</locator-option>
+
+			<label>Wirama DeviceNode Configuration</label>
+			<description>Wirama DeviceNode Configuration</description>
+			<property key="AntennaId" is-mandatory="true">
+				<label>Antenna ID</label>
+				<description>Antenna number</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="1" is-default="true">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+				</select>
+			</property>
+			<!-- <property key="PowerLevel" is-mandatory="false">
+				<label>Power level</label>
+				<description>RF power level for the reader (in percentage)</description>
+				<type-definition>oat:Percentage</type-definition>
+				<select is-bound="false">
+					<option value="100" is-default="true">100%</option>
+				</select>
+			</property>
+			<property key="WiramaInvCount" is-mandatory="false">
+				<label>Inventory count</label>
+				<description>Number of Inventory read count per read cycle</description>
+				<type-definition>oat:WiramaInvCount</type-definition>
+				<select is-bound="false">
+					<option value="5" is-default="true">5</option>
+				</select>
+			</property>
+			 <property key="WiramaRxAntenna" is-mandatory="false">
+				<label>Receive antenna</label>
+				<description>Receive antenna for inventory</description>
+				<type-definition>oat:WiramaRxAntenna</type-definition>
+				<select is-bound="true">
+					<option value="1" is-default="true">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+				</select>
+			</property>-->
+			<property key="TimeThreshold" is-mandatory="false">
+				<label>Time Threshold</label>
+				<description>The time threshold should exceed 100 milliseconds</description>
+				<type-definition>oat:TimeThreshold</type-definition>
+			</property>
+			<property key="LoopThreshold" is-mandatory="false">
+				<label>Loop Threshold</label>
+				<description>The loop threshold should exceed -1</description>
+				<type-definition>oat:LoopThreshold</type-definition>
+			</property>
+		</entity>
+		<entity type="WiramaReaderPoExDeviceNode" extends="RFDeviceNode">
+			<locator-option value="Wirama PoEx Reader DeviceNode">Wirama PoEx Reader DeviceNode</locator-option>
+
+			<label>Wirama PoEx DeviceNode Configuration</label>
+			<description>Wirama PoEx DeviceNode Configuration</description>
+			<property key="AntennaId" is-mandatory="true">
+				<label>Antenna ID</label>
+				<description>Antenna number</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="1" is-default="true">1</option>
+				</select>
+			</property>
+		</entity>
+		
+		<entity type="WiramaMonReaderDeviceNode" extends="RFDeviceNode">
+			<locator-option value="Wirama Mon Reader DeviceNode">Wirama Monitoring Only Reader DeviceNode</locator-option>
+			<label>Wirama Monitoring DeviceNode Configuration</label>
+			<description>Wirama Monitoring DeviceNode Configuration</description>
+			<property key="AntennaId" is-mandatory="true">
+				<label>Antenna ID</label>
+				<description>Antenna number</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="1" is-default="true">1</option>
+				</select>
+			</property>
+		</entity>
+		
+		<!--  Wirama reader driver for DC application -->
+		<entity type="WiramaTunnelReaderDeviceNode" extends="RFDeviceNode">
+			<locator-option value="Wirama Tunnel Reader DeviceNode">Wirama Tunnel Reader DeviceNode</locator-option>
+			<label>Wirama Reader Antenna Configuration</label>
+			<description>Wirama Reader Antenna Configuration</description>
+			<property key="AntennaId" is-mandatory="true">
+				<label>Antenna ID</label>
+				<description>Antenna number</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="1" is-default="true">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+				</select>
+			</property>
+		</entity>	
+	</table>
+</meta-data>

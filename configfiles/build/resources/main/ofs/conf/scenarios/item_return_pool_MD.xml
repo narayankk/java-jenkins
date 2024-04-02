@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://support.oatsystems.com/xsd/scenarios4_0.xsd">
+  <property key="version">5.1</property>
+  <property key="scenario.type">Item_Return</property>
+  <property key="name">Poolable MV Handheld Item Returns Scenario</property>
+  <property key="description">This scenario 'returns' an EPC into inventory.</property>
+  <property key="poolable">true</property>
+  <process>
+    <start name="Start">
+      <target name="SetVariablesToNull" />
+    </start>
+
+	 <activity name="SetVariablesToNull" resource="primitive:SetVariablesToNull">
+      <target name="ProcessMessageIn" exit="done" />
+      <target name="ProcessMessageIn" exit="skip" />
+      <target name="ProcessMessageIn" exit="error" />
+      <output name="variable0" class="java.lang.Object">${process.parentLocationEpc}</output>
+      <output name="variable1" class="java.lang.String">${process.user}</output>
+      <output name="variable2" class="java.lang.Object">${process.processStartTime}</output>
+      <output name="variable3" class="java.lang.Object">${process.processEndTime}</output>      
+      <output name="variable4" class="java.lang.Object">${process.elapsedTimeInSeconds}</output>
+      <output name="variable5" class="java.lang.String">${process.scenarioType}</output>
+      <output name="variable6" class="java.lang.String">${process.readPointEpc}</output>
+    </activity>
+       
+    <activity name="ProcessMessageIn" resource="class:com.oatsystems.workflow.apparel.primitives.ProcessMessageIn">
+      <target name="StartMongoProcess" exit="done" />
+      <target name="FAILURE" exit="error" />
+      <input name="payload" class="java.lang.Object">${process.payload}</input>
+      <output name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</output>
+      <output name="processType" class="java.lang.String">${process.processType}</output>
+      <output name="processSubType" class="java.lang.String">${process.processSubType}</output>
+      <output name="handheldID" class="java.lang.String">${process.handheldID}</output>
+      <output name="scenarioID" class="java.lang.String">${process.scenarioID}</output>
+      <output name="user" class="java.lang.String">${process.user}</output>
+      <output name="processStartTime" class="java.lang.String">${process.processStartTime}</output>
+      <output name="processEndTime" class="java.lang.String">${process.processEndTime}</output>
+      <output name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</output>
+      <output name="location" class="java.lang.String">${process.parentLocationEpc}</output>
+      <output name="readPointEpc" class="java.lang.String">${process.readPointEpc}</output>
+      <output name="scenarioType" class="java.lang.String">${process.scenarioType}</output>
+    </activity>
+    
+    <activity name="StartMongoProcess" resource="class:com.oatsystems.workflow.primitives.StartMongoProcess">
+	  <target name="GetReturnLocation" exit="done" />
+	   <target name="SUCCESS" exit="alreadyProcessed" />
+      <target name="RETRY_NEEDED" exit="error" />
+      <input  name="user" class="java.lang.String">${process.user}</input>
+      <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+      <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input  name="hhEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input  name="processType" class="java.lang.String">${process.processType}</input>
+      <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+      <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+   </activity>
+	
+    <activity name="GetReturnLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetInferredDefaultLocation">
+      <!-- done means that parentLocationEpc is not a site EPC. No inference was done. 
+           returnLocSiteId will not be set. So ensure that it is obtained. 
+           rpLocEpc will not be set. However, the incoming message should have it already. -->
+      <target name="GetAllChildLocations" exit="done" />
+      <!-- processed means that parentLocationEpc is a site EPC. Inference was successful. 
+      -->
+      <target name="GetAllChildLocations" exit="processed" />
+      <target name="StopMongoProcessForFailure" exit="error" />
+      <input name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input name="locSubTypePrefix" class="java.lang.String">'returns'</input>
+      <output name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</output>
+      <output name="readPointLocation" class="java.lang.String">${process.rpLocEpc}</output>
+      <output name="siteId" class="java.lang.String">${process.returnLocSiteId}</output>
+    </activity>
+    
+    <activity name="GetAllChildLocations" resource="class:com.oatsystems.solutions.apparel.primitives.GetAllChildLocations">
+      <target name="GetSiteIdForLocation" exit="done" />
+      <target name="StopMongoProcessForFailure" exit="error" />
+      <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+      <output name="childLocationCount" class="java.lang.String">${process.childLocationCount}</output>
+      <output name="childLocationMap" class="java.util.HashMap">${process.childLocationMap}</output>
+    </activity>
+
+     <activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation"> 
+       <target name="DecideIfInferredRPLocIsNull" exit="done" /> 
+       <target name="StopMongoProcessForFailure" exit="error" /> 
+       <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input> 
+       <output name="siteId" class="java.lang.String">${process.returnLocSiteId}</output> 
+       <output name="siteEpc" class="java.lang.String">${process.siteEpc}</output> 
+       <output name="siteName" class="java.lang.String">${process.siteName}</output>
+     </activity> 
+
+    <decision name="DecideIfInferredRPLocIsNull">
+      <case target="SetReadPointLocation" condition="${process.rpLocEpc} eq NULL" />
+      <default target="SetInferredReadPointLocation" />
+    </decision>
+    
+    <activity name="SetReadPointLocation" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+      <target name="InitialiseFailedEpcsList" exit="done"/>
+      <target name="InitialiseFailedEpcsList" exit="error"/>
+      <input name="value" class="java.lang.String">${process.readPointEpc}</input>
+      <output name="variable" class="java.lang.String">${process.readPointLoc}</output>
+    </activity>
+
+    <activity name="SetInferredReadPointLocation" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+      <target name="InitialiseFailedEpcsList" exit="done"/>
+      <target name="InitialiseFailedEpcsList" exit="error"/>
+      <input name="value" class="java.lang.String">${process.rpLocEpc}</input>
+      <output name="variable" class="java.lang.String">${process.readPointLoc}</output>
+    </activity>
+
+<!-- 
+    <activity name="CheckEpcsInInventory" resource="class:com.oatsystems.workflow.primitives.GetContaineesInInventory">
+        <target name="InitialiseFailedEpcsList" exit="done" />
+        <target name="SendResponseForFailure" exit="error" />
+        <input name="containeesToCheck" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</input>	  
+        <output name="containeesInInventory" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tagsInInventory}</output>
+        <output name="containeesNotInInventory" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tagsNotInInventory}</output>
+    </activity>	
+-->
+ 
+    <activity name="InitialiseFailedEpcsList" resource="primitive:SetVariablesToNull" >
+      <target name="SubsItemReturn" exit="done" />
+      <target name="SubsItemReturn" exit="skip" />
+      <target name="SubsItemReturn" exit="error" />
+      <output name="variable0" class="java.util.Set">${process.failedEpcs}</output>
+     </activity>
+
+
+
+
+
+
+
+    <!--  Retire all EPCs already in inventory first. These are sold EPCs, and we've already got 
+          a data feed that reduced adjusted inventory. So do not adjust inventory for the retirements. 
+    <call name="SubsItemRetire" resource="item_return_sub.xml" namespace="retire-bef-return">
+      <target name="SubsItemReturn" exit="DONE"/>
+      <target name="SendResponseForRetry" exit="ERROR"/>
+      
+      <input name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tagsInInventory}</input>
+      <input name="processType" class="java.lang.String">'ITEM_RETIRE'</input>
+      <input name="processSubType" class="java.lang.String">'HH_RETURN'</input>
+      <input name="user" class="java.lang.String">${process.user}</input>
+      <input name="parentLocationEpc" class="java.lang.String"></input>
+      <input name="readPointEpc" class="java.lang.String">${process.readPointEpc}</input>
+      <input name="scenarioType" class="java.lang.String">${process.scenarioType}</input>
+      <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="failedEpcs" class="java.util.Set">${process.failedEpcs}</input>
+      <input name="shouldAdjustInv" class="java.lang.String">'FALSE'</input>
+      
+      <output name="failedEpcs" class="java.util.Set">${process.failedEpcs}</output>
+    </call>
+-->	
+
+
+
+    <!--  'Return' ALL EPCs. Adjust inventory for the returns since inventory is actually going up. -->
+    <call name="SubsItemReturn" resource="item_return_sub_batch.xml" namespace="return">
+      <target name="StopMongoProcess" exit="DONE"/>
+      <target name="RetryStopMongoProcess" exit="ERROR"/>
+      
+      <!--  parameters devired from message -->
+      <input name="tags" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.tags}</input>
+      <input name="processType" class="java.lang.String">${process.processType}</input>
+      <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input name="user" class="java.lang.String">${process.user}</input>
+      <input name="parentLocationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input name="readPointEpc" class="java.lang.String">${process.readPointEpc}</input>
+      <input name="scenarioType" class="java.lang.String">${process.scenarioType}</input>
+      <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input name="elapsedTimeInSeconds" class="java.lang.String">${process.elapsedTimeInSeconds}</input>
+      <input name="failedEpcs" class="java.util.Set">${process.failedEpcs}</input>
+      <input name="shouldAdjustInv" class="java.lang.String">'TRUE'</input>
+      
+      <output name="failedEpcs" class="java.util.Set">${process.failedEpcs}</output>
+    </call>
+
+     <activity name="RetryStopMongoProcess" resource="class:com.oatsystems.workflow.primitives.StopMongoProcess">
+	  <target name="RETRY_NEEDED" exit="done" />
+      <target name="RETRY_NEEDED" exit="error" />
+      <input  name="user" class="java.lang.String">${process.user}</input>
+      <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+      <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input  name="hhEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input  name="processType" class="java.lang.String">${process.processType}</input>
+      <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+      <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+   </activity>
+   
+   <activity name="StopMongoProcess" resource="class:com.oatsystems.workflow.primitives.StopMongoProcess">
+	  <target name="SUCCESS" exit="done" />
+      <target name="SUCCESS" exit="error" />
+      <input  name="user" class="java.lang.String">${process.user}</input>
+      <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+      <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input  name="hhEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input  name="processType" class="java.lang.String">${process.processType}</input>
+      <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+      <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+   </activity>
+   
+   <activity name="StopMongoProcessForFailure" resource="class:com.oatsystems.workflow.primitives.StopMongoProcess">
+	  <target name="FAILURE" exit="done" />
+      <target name="FAILURE" exit="error" />
+      <input  name="user" class="java.lang.String">${process.user}</input>
+      <input  name="hhID" class="java.lang.String">${process.handheldID}</input>
+      <input  name="hhStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input  name="hhEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input  name="processType" class="java.lang.String">${process.processType}</input>
+      <input  name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input  name="businessLocation" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input  name="readLocation" class="java.lang.String">${process.readPointEpc}</input>
+      <input  name="scenarioExternalId" class="java.lang.String">${process.scenarioID}</input>
+   </activity>
+   
+    <end name="SUCCESS"></end>
+    <end name="RETRY_NEEDED"></end>
+    <end name="FAILURE"></end>
+  </process>
+
+  <config>
+  	
+    <var name="${process.payload}" class="java.lang.Object">
+        <property key="ui.required">false</property>
+        
+    </var>
+  </config>
+
+  <display/>
+
+</scenario>

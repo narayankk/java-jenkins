@@ -1,0 +1,55 @@
+<!ELEMENT des-config (transport-clients?, messaging?, local-services?, remote-listeners?, remote-services?)>
+
+<!ELEMENT transport-clients (client)* >
+
+<!ELEMENT client EMPTY>
+<!ATTLIST client
+      class-name CDATA #REQUIRED
+      desc CDATA "">
+
+<!ELEMENT messaging (topic*, maintenance?) >
+
+<!ELEMENT topic EMPTY>
+<!ATTLIST topic
+      name CDATA #REQUIRED
+      persist CDATA #IMPLIED
+      retry CDATA #IMPLIED
+      expire CDATA #IMPLIED
+      desc CDATA "">
+
+<!ELEMENT maintenance EMPTY>
+<!ATTLIST maintenance
+      remove-after CDATA #REQUIRED
+      expired-queue-size CDATA #IMPLIED
+      purge-ratio CDATA #IMPLIED
+      desc CDATA "">
+
+<!ELEMENT local-services (service)* >
+
+<!ELEMENT service (args)>
+<!ATTLIST service
+      topic CDATA #REQUIRED
+      class-name CDATA #REQUIRED
+      desc CDATA ""
+      static CDATA "false">
+
+<!ELEMENT remote-listeners (listener)*>
+
+<!ELEMENT listener (transformer)>
+<!ATTLIST listener
+      remote-peer-id CDATA #REQUIRED
+      desc CDATA "">
+
+<!ELEMENT remote-services (remote-service)*>
+
+<!ELEMENT remote-service (transformer)>
+<!ATTLIST remote-service
+      topic CDATA #REQUIRED
+      remote-peer-id CDATA #REQUIRED
+      desc CDATA "">
+
+<!ELEMENT transformer (args)>
+<!ATTLIST transformer
+      class-name CDATA #REQUIRED>
+
+<!ELEMENT args (#PCDATA)>

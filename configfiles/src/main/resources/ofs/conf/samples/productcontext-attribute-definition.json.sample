@@ -1,0 +1,62 @@
+[
+  {
+    "marker": "GROUP_COUNTRY",
+    "attributes": [
+      {
+        "name": "MasterCompanyNumber",
+        "type": "String",
+        "display": "MasterCompanyNumber"
+      },
+      {
+        "name": "CombineNumber",
+        "type": "String",
+        "display": "CombineNumber"
+      },
+      {
+        "name": "CombineSequence",
+        "type": "String",
+        "display": "CombineSequence"
+      },
+      {
+        "name": "AdvertStartDate",
+        "type": "Date",
+        "display": "AdvertStartDate"
+      }
+    ]
+  },
+  {
+    "marker": "COUNTRY",
+    "attributes": [
+      {
+        "name": "RetailCompanyNumber",
+        "type": "String",
+        "display": "RetailCompanyNumber"
+      },
+      {
+        "name": "CustomerSize",
+        "type": "String",
+        "display": "CustomerSize"
+      }
+    ]
+  },
+  {
+    "marker": "STORE",
+    "attributes": [
+      {
+        "name": "BTCStartDate",
+        "type": "Date",
+        "display": "BTCStartDate"
+      },
+      {
+        "name": "BTCEndDate",
+        "type": "Date",
+        "display": "BTCEndDate"
+      },
+      {
+        "name": "Bins",
+        "type": "String",
+        "display": "Bins"
+      }
+    ]
+  }
+]

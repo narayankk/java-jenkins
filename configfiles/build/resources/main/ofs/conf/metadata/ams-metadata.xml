@@ -1,0 +1,291 @@
+<?xml version="1.0"?>
+<!DOCTYPE meta-data SYSTEM "props-metadata.dtd"> 
+
+  <meta-data property-table="Senseware">
+    <table name="senseware_install">
+      <entity type="Senseware">
+	<label>Senseware configuration</label>
+	<description>Senseware units configuration</description>
+
+	<property key="smx_alerts_threshold" is-mandatory="false">
+	  <label>time interval in miliseconds between consecutive ONLINE, OFFLINE events</label>
+	  <description>If a device goes from ONLINE to OFFLINE in less then smx_alerts_threshold miliseconds an action will be taken</description>
+	  <type-definition>oat:DurationInMemMillis</type-definition>
+	</property>
+
+	<property key="smx_alerts_number" is-mandatory="false">
+	  <label>Number of times alerts are sent when a monitored entity is instable</label>
+	  <description>Number of times the status of a device can frequently change until will stop sending alerts</description>
+	  <type-definition>xsd:int</type-definition>
+	</property>
+
+	<property key="smx_alerts_free_time" is-mandatory="false">
+	  <label>Period of time when alerts are not sent (in seconds)</label>
+	  <description>After this many seconds alerts will be sent.</description>
+	  <type-definition>oat:DurationSecs</type-definition>
+	</property>
+
+	<property key="MonitoringHandlers" is-mandatory="false">
+	  <label>Handlers connected to the MonitoringListeners separated by comma</label>
+	  <description>Each handler handles the events processed by Monitoring listener in a different way.</description>
+	  <type-definition>xsd:string</type-definition>
+	  <select>
+		<option value="history,alerts" is-default="true">history,alerts</option>
+	  </select>
+	</property>
+
+	<property key="StatusQueue" is-mandatory="false">
+	  <label>Status Queue</label>
+	  <description>The name of the queue where status change events will be logged.</description>
+	  <type-definition>xsd:string</type-definition>
+	  <select>
+		<option value="main_queue" is-default="true">main_queue</option>
+	  </select>
+	</property>
+
+	<property key="IpDataMigration" is-mandatory="false">
+	  <label>Data migration server IP/domain name</label>
+	  <description>The IP address or domain name of the server to which data will be migrated</description>
+	  <type-definition>oat:Host</type-definition>
+	</property>
+
+	<property key="IpCMSSynch" is-mandatory="false">
+	  <label>Configuration server IP/domain name</label>
+	  <description>The IP address or domain name of the server managing this machines configuration</description>
+	  <type-definition>oat:Host</type-definition>
+	</property>
+
+	<property key="FreqDataMigration" is-mandatory="false">
+	  <label>Time between data migration (in seconds)</label>
+	  <description>Data migration processes are scheduled with the given frequency</description>
+	  <type-definition>oat:DurationSecs</type-definition>
+	</property>
+
+	<property key="FreqConfigSync" is-mandatory="false">
+	  <label>Time between configuration downloads (in seconds)</label>
+	  <description>Configuration downloads are scheduled with the given frequency</description>
+	  <type-definition>oat:DurationSecs</type-definition>
+	</property>
+
+	<property key="description" is-mandatory="false">
+	  <label>Description</label>
+	  <description>Description of this Senseware</description>
+	  <type-definition>oat:Description</type-definition>
+	</property>
+
+	<property key="epc" column-name="senseware_epc" is-mandatory="true">
+	  <label>Senseware EPC</label>
+	  <description>A hexadecimal Electronic Product Code assigned to this Senseware. Usually 96 bits in length, i.e., 24 hex characters</description>
+	  <type-definition>oat:EPC</type-definition>
+	</property>
+
+	<property key="AMS_PARAM_LOOKUP_CLASS" is-mandatory="true">
+	  <label>The class name used for AMS parameter lookup</label>
+	  <description>This class is dynamically loaded to provide parameter lookup facility</description>
+	  <type-definition>xsd:string</type-definition>
+	  <select>
+	    <option value="com.oatsystems.ams.util.CMSproperties" is-default="true">com.oatsystems.ams.util.CMSproperties</option>
+	  </select>
+	</property>
+
+	<property key="AMS_SLEEP_TIME" is-mandatory="true">
+	  <label>Time between checks for new alerts (in millis)</label>
+	  <description>The Alert Management System will check for new alerts at the given frequency</description>
+	  <type-definition>oat:DurationDBMillis</type-definition>
+	</property>
+
+	<property key="AMS_SMTP_HOST" is-mandatory="false">
+	  <label>SMTP server IP/domain name</label>
+	  <description>The IP address or domain name of the SMTP server to which e-mail alerts are sent</description>
+	  <type-definition>oat:Host</type-definition>
+	</property>
+
+	<property key="AMS_SMTP_PORT" is-mandatory="false">
+	  <label>SMTP server port number</label>
+	  <description>The port number at which the SMTP server listens for e-mails</description>
+	  <type-definition>oat:Port</type-definition>
+	</property>
+
+	<property key="AMS_AUTHENTICATION" is-mandatory="false">
+	  <label>Enable SMTP authentication</label>
+	  <description>The Alert Management System authenticates with the SMTP server before sending e-mail alerts</description>
+	  <type-definition>xsd:boolean</type-definition>
+	</property>
+
+	<property key="AMS_USER_NAME" is-mandatory="false">
+	  <label>SMTP user name for authentication</label>
+	  <description>The user name used to authenticate with the SMTP server</description>
+	  <type-definition>oat:SmallString</type-definition>
+	</property>
+
+	<property key="AMS_PASSWORD" is-mandatory="false">
+	  <label>SMTP password for authentication</label>
+	  <description>The password used to authenticate with the SMTP server</description>
+	  <type-definition>oat:LoginPassword</type-definition>
+	</property>
+
+	<property key="AMS_SENDERS_EMAIL" is-mandatory="false">
+	  <label>Sender e-mail address</label>
+	  <description>The From address used in alert e-mails</description>
+	  <type-definition>oat:EmailAddress</type-definition>
+	</property>
+
+	<property key="AMS_DB_CONN_CLASS" is-mandatory="true">
+	  <label>The class name used by AMS for database access</label>
+	  <description>A static method in this class is invoked to obtain a connection</description>
+	  <type-definition>oat:JavaClass</type-definition>
+	</property>
+
+	<property key="AMS_DB_CONN_METHOD" is-mandatory="true">
+	  <label>The method name used by AMS for database access</label>
+	  <description>This method is invoked on the configured class to obtain a connection to the database</description>
+	  <type-definition>xsd:string</type-definition>
+	</property>
+
+	<property key="AMS_DB_SERVER" is-mandatory="true">
+	  <label>The database server type</label>
+	  <description>The flavor of SQL to be used. Eg. postgres, sqlserver</description>
+	  <type-definition>xsd:string</type-definition>
+	  <select>
+	    <option value="postgres" is-default="true">PostgreSQL</option>
+	  </select>
+	</property>
+
+	<property key="AMS_LOGGER_CLASS" is-mandatory="true">
+	  <label>The class to instantiate to configure Log4J</label>
+	  <description>A new instance of this class is created to configure Log4J</description>
+	  <type-definition>oat:JavaClass</type-definition>
+	</property>
+
+	<property key="AMS_USE_AMS_LOGGER" is-mandatory="true">
+	  <label>Indicates if AMS should use its own logger</label>
+	  <description>If this is ON, AMS uses it own logger class</description>
+	  <type-definition>xsd:string</type-definition>
+	  <select>
+	    <option value="ON" is-default="true">ON</option>
+	    <option value="OFF">OFF</option>
+	  </select>
+	</property>
+
+	<property key="AMS_COLLATED_EMAIL_SIGNATURE" is-mandatory="false">
+	  <label>Signature for collated e-mails</label>
+	  <description>The signature included at the end of collated e-mails</description>
+	  <type-definition>oat:String1000</type-definition>
+	</property>
+
+	<property key="AMS_MAX_NO_OF_TIMES_TO_SEND_FAILED_ALERTS" is-mandatory="true">
+	  <label>Number of retries on send errors</label>
+	  <description>The number of times AMS will try to send an alert on repeated failure</description>
+	  <type-definition>oat:AMSRetries</type-definition>
+	</property>
+
+	<property key="AMS_ENTERPRISE_OID" is-mandatory="true">
+	  <label>SNMP Enterprise OID</label>
+	  <description>The enterprise OID to use while sending SNMP traps</description>
+	  <type-definition>oat:SNMPEnterpriseOID</type-definition>
+	</property>
+
+	<property key="AMS_AGENT_ADDRESS" is-mandatory="false">
+	  <label>SNMP Agent IP/domain name</label>
+	  <description>The IP address or domain name of the local SNMP agent</description>
+	  <type-definition>oat:Host</type-definition>
+	</property>
+
+	<property key="AMS_AGENT_PORT" is-mandatory="false">
+	  <label>SNMP Agent port number</label>
+	  <description>The port number at which the local SNMP agent is listening</description>
+	  <type-definition>oat:Port</type-definition>
+	</property>
+
+	<property key="AMS_MANAGEMENT_HOST" is-mandatory="false">
+	  <label>SNMP management host IP/domain name</label>
+	  <description>The IP address or domain name of the SNMP management host</description>
+	  <type-definition>oat:Host</type-definition>
+	</property>
+
+	<property key="AMS_MANAGEMENT_PORT" is-mandatory="false">
+	  <label>SNMP management host port number</label>
+	  <description>The port number at which the SNMP server is listening for traps</description>
+	  <type-definition>oat:Port</type-definition>
+	</property>
+
+	<property key="AMS_GENRIC_TRAP_TYPE" is-mandatory="false">
+	  <label>SNMP Specific Trap Type</label>
+	  <description>SNMP Genric Trap Type</description>
+	  <type-definition>oat:SNMPTrap</type-definition>
+	</property>
+
+	<property key="AMS_SPECIFIC_TRAP_TYPE" is-mandatory="false">
+	  <label>SNMP Specific Trap Type</label>
+	  <description>SNMP Specific Trap Type</description>
+	  <type-definition>xsd:string</type-definition>
+	</property>
+
+	<property key="eenmsHost" is-mandatory="false">
+	  <label>EENMS server Host name or IP address</label>
+	  <description>Host name or IP address of the EENMS server</description>
+	  <type-definition>oat:Host</type-definition>
+	</property>
+
+	<property key="eenmsPort" is-mandatory="false">
+	  <label>EENMS server Port</label>
+	  <description>Webservices Port of the EENMS server</description>
+	  <type-definition>oat:Port</type-definition>
+	</property>
+
+	<property key="eenmsClientID" is-mandatory="false">
+	  <label>EENMS Client ID</label>
+	  <description>Client ID or name for accessing EENMS services</description>
+	  <type-definition>oat:Host</type-definition>
+	</property>
+
+	<property key="eenmsPassword" is-mandatory="false">
+	  <label>EENMS Client Password</label>
+	  <description>Client Password for accessing EENMS services</description>
+	  <type-definition>oat:SmallString</type-definition>
+	</property>
+
+	<property key="eenmsSerialRangeThreshold" is-mandatory="false">
+	  <label>EENMS Serial Range Usage Threshold</label>
+	  <description>Serial Range Usage Threshold at which new serial range should be obtained from EENMS</description>
+	  <type-definition>oat:Percentage1</type-definition>
+	</property>
+
+	<property key="eenmsSGTINRangeSize" is-mandatory="false">
+	  <label>EENMS SGTIN Range Size</label>
+	  <description>Size of serial range to request from EENMS for SGTIN</description>
+	  <type-definition>xsd:int</type-definition>
+	</property>
+
+	<property key="eenmsSSCCRangeSize" is-mandatory="false">
+	  <label>EENMS SSCC Range Size</label>
+	  <description>Size of serial range to request from EENMS for SSCC</description>
+	  <type-definition>xsd:int</type-definition>
+	</property>
+
+	<property key="eenmsGIDRangeSize" is-mandatory="false">
+	  <label>EENMS GID Range Size</label>
+	  <description>Size of serial range to request from EENMS for GID</description>
+	  <type-definition>xsd:int</type-definition>
+	</property>
+
+	<property key="eenmsGRAIRangeSize" is-mandatory="false">
+	  <label>EENMS GRAI Range Size</label>
+	  <description>Size of serial range to request from EENMS for GRAI</description>
+	  <type-definition>xsd:int</type-definition>
+	</property>
+
+	<property key="eenmsGIAIRangeSize" is-mandatory="false">
+	  <label>EENMS GIAI Range Size</label>
+	  <description>Size of serial range to request from EENMS for GIAI</description>
+	  <type-definition>xsd:int</type-definition>
+	</property>
+
+	<property key="eenmsUSDODRangeSize" is-mandatory="false">
+	  <label>EENMS USDOD Range Size</label>
+	  <description>Size of serial range to request from EENMS for USDOD</description>
+	  <type-definition>xsd:int</type-definition>
+	</property>
+      </entity>
+    </table>
+  </meta-data>

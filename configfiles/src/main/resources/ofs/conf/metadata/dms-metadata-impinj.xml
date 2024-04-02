@@ -1,0 +1,819 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+  <table name="dms_device">
+    <entity type="GenericLLRPNotificationReader" extends="RFReader">
+      <locator-option value="Generic LLRP Notification Device">Generic LLRP Notification Device</locator-option>
+      <label>Generic LLRP Notification Device Configuration</label>
+      <description>Generic LLRP Notification Device Configuration</description>
+      <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+	<label>Maximum number of antennas</label>
+	<description>Maximum number of antennas for a Generic LLRP reader</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="4" is-default="true">4</option>
+	</select>
+      </property>
+      <!-- Antenna id -->
+      <property key="ReaderNodeId" is-mandatory="true">
+	<label>Reader Node ID </label>
+	<description>Reader address. A hexadecimal number between 00 and FF.</description>
+	<type-definition>oat:ReaderNodeID</type-definition>
+	<select is-bound="false">
+	  <option value="04" is-default="true">04</option>
+	</select>
+      </property>
+    
+    <!-- Operating Mode -->
+    <property key="OperatingMode" is-mandatory="false">
+	   <label>Device Operating Mode</label>
+	   <description>Device Operating Mode</description>
+	   <type-definition>xsd:int</type-definition>
+		  <select is-bound="true">
+			 <option value="0" is-default="true">Read</option>
+			 <option value="1">Kill,Read</option>
+			 <option value="2">Bulk Write</option>
+			 <option value="3">Continuous Kill</option>
+	      </select>
+    </property>
+    
+    <!-- Tag Mask -->
+    <property key="TagMask" is-mandatory="false">
+        <label>Tag Mask</label>
+	    <description>Tag Mask</description>
+	    <type-definition>oat:TagMask</type-definition>
+	        <select is-bound="false">
+	       <option value="FFFFFFFFFFFFFFFFFFFFFFFF" is-default="true">FFFFFFFFFFFFFFFFFFFFFFFF</option>
+  	    </select>        	    
+    </property>
+    
+    <!-- Target Tag Pattern -->
+    <property key="TargetTagPattern" is-mandatory="false">
+        <label>Target Tag Pattern</label>
+	    <description>Target Tag Pattern</description>
+	    <type-definition>oat:TargetTagPattern</type-definition>	    
+    </property>
+
+    <!-- Kill Password -->
+    <property key="KillPassword" is-mandatory="false">
+        <label>Kill Password</label>
+	    <description>Kill Password</description>
+	    <type-definition>oat:KillPassword</type-definition>
+	    <select is-bound="false">
+	       <option value="00000000" is-default="true">00000000</option>
+  	    </select>	    
+    </property>       
+    
+    <!-- AISpec Number of Attempts-->
+    <property key="AISpecNumberOfAttempts" is-mandatory="false">
+	   <label>Maximum Retries for Write/Kill,Read(Used in Kill,Read Mode and Write,Read)</label>
+	   <description>Maximum Retries for Write/Kill,Read(Used in Kill,Read and Write,Read Mode)</description>
+	   <type-definition>oat:AISpecNumberOfAttempts</type-definition>
+	   <select is-bound="false">
+	       <option value="4" is-default="true">4</option>
+  	   </select>
+    </property>
+
+    <!-- AISpec Timeout -->
+    <property key="AISpecTimeout" is-mandatory="false">
+	   <label>Timeout for Write/Kill,Read(Used in Kill,Read and Write,Read Mode)</label>
+	   <description>Timeout for Write/Kill,Read(Used in Kill,Read Mode Write,Read) </description>
+	   <type-definition>xsd:int</type-definition>
+	   <select is-bound="false">
+	       <option value="3000" is-default="true">3000</option>
+	   </select>
+    </property>
+
+    <!-- StartTrigger -->
+      <property key="StartTrigger" is-mandatory="false">
+	<label>Start Trigger for the Read</label>
+	<description>Trigger for start the ROSpec</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="0" is-default="true">No Trigger</option>
+	  <option value="1">GPI 1 Low to High</option>
+	  <option value="2">GPI 2 Low to High</option>
+	  <option value="3">GPI 3 Low to High</option>
+	  <option value="4">GPI 4 Low to High</option>
+	  <option value="5">GPI 5 Low to High</option>
+	  <option value="6">GPI 6 Low to High</option>
+	  <option value="7">GPI 7 Low to High</option>
+	  <option value="8">GPI 8 Low to High</option>
+	  <option value="9">GPI 1 High to Low</option>
+	  <option value="10">GPI 2 High to Low</option>
+	  <option value="11">GPI 3 High to Low</option>
+	  <option value="12">GPI 4 High to Low</option>
+	  <option value="13">GPI 5 High to Low</option>
+	  <option value="14">GPI 6 High to Low</option>
+	  <option value="15">GPI 7 High to Low</option>
+	  <option value="16">GPI 8 High to Low</option>
+	</select>
+      </property>
+
+      <!-- Stop Trigger --> 
+      <property key="StopTrigger" is-mandatory="false">
+	<label>Stop Trigger for the Read</label>
+	<description>Trigger to stop the ROSpec</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="0" is-default="true">No Trigger</option>
+	  <option value="1">GPI 1 Low to High</option>
+	  <option value="2">GPI 2 Low to High</option>
+	  <option value="3">GPI 3 Low to High</option>
+	  <option value="4">GPI 4 Low to High</option>
+	  <option value="5">GPI 5 Low to High</option>
+	  <option value="6">GPI 6 Low to High</option>
+	  <option value="7">GPI 7 Low to High</option>
+	  <option value="8">GPI 8 Low to High</option>
+	  <option value="9">GPI 1 High to Low</option>
+	  <option value="10">GPI 2 High to Low</option>
+	  <option value="11">GPI 3 High to Low</option>
+	  <option value="12">GPI 4 High to Low</option>
+	  <option value="13">GPI 5 High to Low</option>
+	  <option value="14">GPI 6 High to Low</option>
+	  <option value="15">GPI 7 High to Low</option>
+	  <option value="16">GPI 8 High to Low</option>
+	</select>
+      </property>
+
+      <!-- Stop Trigger Timeout -->
+      <property key="ROStopTimeout" is-mandatory="false">
+	<label>Timeout for Stop Trigger</label>
+	<description>Timeout for the GPI trigger, default 0</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>
+
+      <!-- Use the device or OFS time -->
+      <property key="UseDeviceTime" is-mandatory="false">
+	<label>Device Time or OFS Time to Log tags</label>
+	<description>Which time to use for logging the tags, default OFS</description>
+	<type-definition>xsd:boolean</type-definition>
+	<select is-bound="true">
+	  <option value="false" is-default="true">OFS</option>
+	  <option value="true" >Device</option>
+	</select>
+      </property>
+
+      <!-- Tag Group Reporting -->
+      <property key="NumTagReport" is-mandatory="false">
+	<label>Number of Tag to wait for reporting</label>
+	<description>Number of unique tag the reader must see to report, default 1</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+
+    <!-- Tag Payload -->
+      <property key="TagPayload" is-mandatory="false">
+	<label>Tag PayLoad</label>
+	<description>Tag Payload</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+      
+      <!-- Digital Input Ports -->
+      <property key="InputPorts" is-mandatory="false">
+	<label>Digital Input Ports</label>
+	<description>Digital Input Ports in the reader</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1,2,3,4,5,6,7,8" is-default="true">1,2,3,4,5,6,7,8</option>
+	</select>
+      </property>
+
+      <!-- Digital Output Ports -->
+      <property key="OutputPorts" is-mandatory="false">
+	<label>Digital Output Ports</label>
+	<description>Digital Output Ports in the reader</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1,2,3,4,5,6,7,8" is-default="true">1,2,3,4,5,6,7,8</option>
+	</select>
+      </property>
+
+      <!-- Read Timeout -->
+      <property key="ReadTimeOut" is-mandatory="false">
+	<label>Read Time-Out</label>
+	<description>Read command time-out value. Integer between 0 and 120000; default 2000</description>
+	<type-definition>oat:ReadTimeoutMillis1</type-definition>
+	<select is-bound="false">
+	  <option value="2000" is-default="true">2000</option>
+	</select>
+      </property>
+    </entity>
+    
+    
+    <!-- Impinj LLRP device -->
+    <entity type="ImpinjNotificationReader" extends="RFReader">
+      <locator-option value="Impinj Notification Device">Impinj Notification Device</locator-option>
+      <label>Impinj LLRP Notification Device Configuration</label>
+      <description>Impinj LLRP Notification Device Configuration</description>
+      <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+	<label>Maximum number of antennas</label>
+	<description>Maximum number of antennas for a Impinj LLRP reader</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="4" is-default="true">4</option>
+	</select>
+      </property>
+      
+    <!-- Operating Mode -->
+    <property key="OperatingMode" is-mandatory="false">
+	   <label>Device Operating Mode</label>
+	   <description>Device Operating Mode</description>
+	   <type-definition>xsd:int</type-definition>
+		  <select is-bound="true">
+			 <option value="0" is-default="true">Read</option>
+			 <option value="1">Kill,Read</option>
+			 <option value="2">Bulk Write</option>	
+			 <option value="4">Read,Write</option>			 
+	      </select>
+    </property>        
+        
+    <!-- Write Mode -->
+    <property key="LLRPWriteMode" is-mandatory="false">
+	   <label>Write Mode</label>
+	   <description>Write Mode</description>
+	   <type-definition>xsd:int</type-definition>
+	   <select is-bound="true">
+		  <option value="0" is-default="true">Gen2 - 16 bit</option>
+		  <option value="1">Block - 32 bit</option>
+	   </select>
+    </property>
+    <!-- AISpec Number of attempts -->
+    <property key="AISpecNumberOfAttempts" is-mandatory="false">
+	   <label>Maximum Retries for Kill,Read(Used in Kill,Read Mode)</label>
+	   <description>Maximum Retries for Kill,Read(Used in Kill,Read Mode)</description>
+	   <type-definition>oat:AISpecNumberOfAttempts</type-definition>
+	   <select is-bound="false">
+	       <option value="4" is-default="true">4</option>
+  	   </select>
+    </property>
+    
+    <!-- AiSpec Timeout -->
+    <property key="AISpecTimeout" is-mandatory="false">
+	   <label>Timeout for Kill,Read(Used in Kill,Read Mode)</label>
+	   <description>Timeout for Kill,Read(Used in Kill,Read Mode)</description>
+	   <type-definition>xsd:int</type-definition>
+	   <select is-bound="false">
+	       <option value="3000" is-default="true">3000</option>
+	   </select>
+    </property>
+    
+    <!-- Antenna id -->
+    <property key="ReaderNodeId" is-mandatory="true">
+	<label>Reader Node ID </label>
+	<description>Reader address. A hexadecimal number between 00 and FF.</description>
+	<type-definition>oat:ReaderNodeID</type-definition>
+	<select is-bound="false">
+	  <option value="04" is-default="true">04</option>
+	</select>
+      </property>
+      <!-- RFControl table index -->
+      <property key="RFControlTableIndex" is-mandatory="false">
+	<label>Index to the RFControl Table</label>
+	<description>Index to the RFControl Table</description>
+	<type-definition>oat:ImpinjRFControlTableIndex</type-definition>
+	<select is-bound="false">
+	  <option value="2" is-default="true">2</option>
+	</select>
+      </property>   
+
+      <!-- Tari value -->
+      <property key="Tari" is-mandatory="false">
+	<label>Value of Tari</label>
+	<description>Tari value to be used for inventory</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>   
+      <!-- Session -->
+      <property key="Session" is-mandatory="false">
+	<label>Gen2 Session</label>
+	<description>Gen2 Session used for inventory</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="0">0</option>
+	  <option value="1" is-default="true">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>	
+	</select>
+      </property>     
+      <!-- Tag Population expected -->   
+      <property key="TagPopulation" is-mandatory="false">
+	<label>Tag Population</label>
+	<description>Tag population expected in the inventory</description>
+	<type-definition>oat:TagPopulation</type-definition>
+	<select is-bound="false">
+	  <option value="32" is-default="true">32</option>
+	</select>
+      </property>        
+      <!-- Tag Transit time -->
+      <property key="TagTransitTime" is-mandatory="false">
+	<label>Tag Transit Time</label>
+	<description>Tag Transit Time</description>
+	<type-definition>oat:TagTransitTime</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>        
+    <!-- StartTrigger -->
+      <property key="StartTrigger" is-mandatory="false">
+	<label>Start Trigger for the Read</label>
+	<description>Trigger for start the ROSpec</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="0" is-default="true">No Trigger</option>
+	  <option value="1">GPI 1 Low to High</option>
+	  <option value="2">GPI 2 Low to High</option>
+	  <option value="3">GPI 3 Low to High</option>
+	  <option value="4">GPI 4 Low to High</option>
+	  <option value="9">GPI 1 High to Low</option>
+	  <option value="10">GPI 2 High to Low</option>
+	  <option value="11">GPI 3 High to Low</option>
+	  <option value="12">GPI 4 High to Low</option>
+	</select>
+      </property>
+
+      <!-- Stop Trigger --> 
+      <property key="StopTrigger" is-mandatory="false">
+	<label>Stop Trigger for the Read</label>
+	<description>Trigger to stop the ROSpec</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="0" is-default="true">No Trigger</option>
+	  <option value="1">GPI 1 Low to High</option>
+	  <option value="2">GPI 2 Low to High</option>
+	  <option value="3">GPI 3 Low to High</option>
+	  <option value="4">GPI 4 Low to High</option>
+	  <option value="9">GPI 1 High to Low</option>
+	  <option value="10">GPI 2 High to Low</option>
+	  <option value="11">GPI 3 High to Low</option>
+	  <option value="12">GPI 4 High to Low</option>
+	 </select>
+      </property>
+
+      <!-- Stop Trigger Timeout -->
+      <property key="ROStopTimeout" is-mandatory="false">
+	<label>Timeout for Stop Trigger</label>
+	<description>Timeout for the GPI trigger, default 0</description>
+	<type-definition>oat:StopTimeout</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>
+
+      <!-- Use the device or OFS time -->
+      <property key="UseDeviceTime" is-mandatory="false">
+	<label>Time for logging tag events</label>
+	<description>Which time to use for logging the tags, default OFS</description>
+	<type-definition>xsd:boolean</type-definition>
+	<select is-bound="true">
+	  <option value="false" is-default="true">OFS</option>
+	  <option value="true" >Device</option>
+	</select>
+      </property>
+
+      <!-- Tag Group Reporting -->
+      <property key="NumTagReport" is-mandatory="false">
+	<label>Number of tags to trigger a notification</label>
+	<description>Number of unique tag the reader must see to report, default 1</description>
+	<type-definition>oat:NumTagReport</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+    
+    <!-- Tag Payload -->
+      <property key="TagPayload" is-mandatory="false">
+	<label>Tag PayLoad</label>
+	<description>Tag Payload</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+
+      <!-- Digital Input Ports -->
+      <property key="InputPorts" is-mandatory="false">
+	<label>Digital Input Ports</label>
+	<description>Digital Input Ports in the reader</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1,2,3,4" is-default="true">1,2,3,4</option>
+	</select>
+      </property>
+
+      <!-- Digital Output Ports -->
+      <property key="OutputPorts" is-mandatory="false">
+	<label>Digital Output Ports</label>
+	<description>Digital Output Ports in the reader</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1,2,3,4,5,6,7,8" is-default="true">1,2,3,4,5,6,7,8</option>
+	</select>
+      </property>
+      
+   <!-- Channel -->
+   <property key="ImpinjChannel" is-mandatory="true">
+  	 <label>Impinj Channel</label>
+  	 <description>Channel to use for communication</description>
+  	 <type-definition>oat:ImpinjChannel</type-definition>
+  	 <select is-bound="false">
+  	    <option value="4" is-default="true">4</option>
+   	</select>
+   </property>
+   
+   <!-- Inventory Mode -->
+   <property key="InventoryMode" is-mandatory="false">
+  	 <label>Impinj inventory mode</label>
+  	 <description>Inventory mode to use to read tags</description>
+  	 <type-definition>oat:ImpinjInventoryMode</type-definition>
+  	 <select is-bound="true">
+  	 	<option value="0">Dual target</option>
+  	 	<option value="1">Single target</option>
+  	    <option value="2">Single target with suppression</option>
+  	    <option value="3" is-default="true">Reader default</option>
+   	</select>
+   </property>
+  </entity>
+  
+  
+      <!-- Impinj xSpan device -->
+    <entity type="ImpinjxSpanReader" extends="RFReader">
+      <locator-option value="Impinj xSpan Device">Impinj xSpan Device</locator-option>
+      <label>Impinj xSpan Device Configuration</label>
+      <description>Impinj xSpan Device Configuration</description>
+      <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+	<label>Maximum number of antennas</label>
+	<description>Maximum number of antennas for a Impinj xSpan reader</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="13" is-default="true">13</option>
+	</select>
+      </property>
+      
+    <!-- Operating Mode -->
+    <property key="OperatingMode" is-mandatory="false">
+	   <label>Device Operating Mode</label>
+	   <description>Device Operating Mode</description>
+	   <type-definition>xsd:int</type-definition>
+		  <select is-bound="true">
+			 <option value="0" is-default="true">Read</option>
+			 <option value="5" is-default="true">Direction</option>			 
+	      </select>
+    </property>            
+    
+     <!-- Tag Payload -->
+    <property key="DirectionEventTypes" is-mandatory="false">
+	<label>Direction Event Types</label>
+	<description>Direction Event Types</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+    
+    
+    <!-- Antenna id -->
+    <property key="ReaderNodeId" is-mandatory="true">
+	<label>Reader Node ID </label>
+	<description>Reader address. A hexadecimal number between 00 and FF.</description>
+	<type-definition>oat:ReaderNodeID</type-definition>
+	<select is-bound="false">
+	  <option value="01" is-default="true">01</option>
+	</select>
+      </property>
+      <!-- RFControl table index -->
+      <property key="RFControlTableIndex" is-mandatory="false">
+	<label>Index to the RFControl Table</label>
+	<description>Index to the RFControl Table</description>
+	<type-definition>oat:ImpinjRFControlTableIndex</type-definition>
+	<select is-bound="false">
+	  <option value="2" is-default="true">2</option>
+	</select>
+      </property>   
+
+      <!-- Tari value -->
+      <property key="Tari" is-mandatory="false">
+	<label>Value of Tari</label>
+	<description>Tari value to be used for inventory</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>   
+      <!-- Session -->
+      <property key="Session" is-mandatory="false">
+	<label>Gen2 Session</label>
+	<description>Gen2 Session used for inventory</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="0">0</option>
+	  <option value="1" is-default="true">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>	
+	</select>
+      </property>     
+      <!-- Tag Population expected -->   
+      <property key="TagPopulation" is-mandatory="false">
+	<label>Tag Population</label>
+	<description>Tag population expected in the inventory</description>
+	<type-definition>oat:TagPopulation</type-definition>
+	<select is-bound="false">
+	  <option value="32" is-default="true">32</option>
+	</select>
+      </property>        
+      <!-- Tag Transit time -->
+      <property key="TagTransitTime" is-mandatory="false">
+	<label>Tag Transit Time</label>
+	<description>Tag Transit Time</description>
+	<type-definition>oat:TagTransitTime</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>        
+   
+      <!-- Stop Trigger Timeout -->
+      <property key="ROStopTimeout" is-mandatory="false">
+	<label>Timeout for Stop Trigger</label>
+	<description>Timeout for the GPI trigger, default 0</description>
+	<type-definition>oat:StopTimeout</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>
+
+      <!-- Use the device or OFS time -->
+      <property key="UseDeviceTime" is-mandatory="false">
+	<label>Time for logging tag events</label>
+	<description>Which time to use for logging the tags, default OFS</description>
+	<type-definition>xsd:boolean</type-definition>
+	<select is-bound="true">
+	  <option value="false" is-default="true">OFS</option>
+	  <option value="true" >Device</option>
+	</select>
+      </property>
+
+      <!-- Tag Group Reporting -->
+      <property key="NumTagReport" is-mandatory="false">
+	<label>Number of tags to trigger a notification</label>
+	<description>Number of unique tag the reader must see to report, default 1</description>
+	<type-definition>oat:NumTagReport</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+    
+    <!-- Tag Payload -->
+      <property key="TagPayload" is-mandatory="false">
+	<label>Tag PayLoad</label>
+	<description>Tag Payload</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+
+      
+   <!-- Channel -->
+   <property key="ImpinjChannel" is-mandatory="true">
+  	 <label>Impinj Channel</label>
+  	 <description>Channel to use for communication</description>
+  	 <type-definition>oat:ImpinjChannel</type-definition>
+  	 <select is-bound="false">
+  	    <option value="4" is-default="true">4</option>
+   	</select>
+   </property>
+   
+   <!-- Inventory Mode -->
+   <property key="InventoryMode" is-mandatory="false">
+  	 <label>Impinj inventory mode</label>
+  	 <description>Inventory mode to use to read tags</description>
+  	 <type-definition>oat:ImpinjInventoryMode</type-definition>
+  	 <select is-bound="true">
+  	 	<option value="0">Dual target</option>
+  	 	<option value="1">Single target</option>
+  	    <option value="2">Single target with suppression</option>
+  	    <option value="3" is-default="true">Reader default</option>
+   	</select>
+   </property>
+  </entity>
+
+    <!-- Motorola LLRP device -->
+    <entity type="MotorolaFX7400Reader" extends="RFReader">
+      <locator-option value="Motorola FX7400">Motorola FX7400</locator-option>
+      <label>Motorla LLRP Notification Device Configuration</label>
+      <description>Motorla LLRP Notification Device Configuration</description>
+      <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+	<label>Maximum number of antennas</label>
+	<description>Maximum number of antennas for a Motorla LLRP reader</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="4" is-default="true">4</option>
+	</select>
+      </property>
+      
+    <!-- Operating Mode -->
+    <property key="OperatingMode" is-mandatory="false">
+	   <label>Device Operating Mode</label>
+	   <description>Device Operating Mode</description>
+	   <type-definition>xsd:int</type-definition>
+		  <select is-bound="true">
+			 <option value="0" is-default="true">Read</option>
+			 <option value="1">Kill,Read</option>
+			 <option value="3">Continuous Kill</option>
+			 <option value="4">Read,Write</option>
+	      </select>
+    </property>
+    
+    <!-- Tag Mask -->
+    <property key="TagMask" is-mandatory="false">
+        <label>Tag Mask</label>
+	    <description>Tag Mask</description>
+	    <type-definition>oat:TagMask</type-definition>	   
+	        <select is-bound="false">
+	       <option value="FFFFFFFFFFFFFFFFFFFFFFFF" is-default="true">FFFFFFFFFFFFFFFFFFFFFFFF</option>
+  	    </select>         
+    </property>
+    
+    <!-- Target Tag Pattern -->
+    <property key="TargetTagPattern" is-mandatory="false">
+        <label>Target Tag Pattern</label>
+	    <description>Target Tag Pattern</description>
+	    <type-definition>oat:TargetTagPattern</type-definition>	    
+    </property>
+    
+    <!-- Kill Password -->
+    <property key="KillPassword" is-mandatory="false">
+        <label>Kill Password</label>
+	    <description>Kill Password</description>
+	    <type-definition>oat:KillPassword</type-definition>
+	    <select is-bound="false">
+	       <option value="00000000" is-default="true">00000000</option>
+  	    </select>	    
+    </property>
+        
+    <!-- Write Mode -->
+    <property key="LLRPWriteMode" is-mandatory="false">
+	   <label>Write Mode</label>
+	   <description>Write Mode</description>
+	   <type-definition>xsd:int</type-definition>
+	   <select is-bound="true">
+		  <option value="0" is-default="true">Gen2 - 16 bit</option>
+		  <option value="1">Block - 32 bit</option>
+	   </select>
+    </property>
+    <!-- AISpec Number of attempts -->
+    <property key="AISpecNumberOfAttempts" is-mandatory="false">
+	   <label>Maximum Retries for Kill,Read(Used in Kill,Read Mode)</label>
+	   <description>Maximum Retries for Kill,Read(Used in Kill,Read Mode)</description>
+	   <type-definition>oat:AISpecNumberOfAttempts</type-definition>
+	   <select is-bound="false">
+	       <option value="4" is-default="true">4</option>
+  	   </select>
+    </property>
+    
+    <!-- AiSpec Timeout -->
+    <property key="AISpecTimeout" is-mandatory="false">
+	   <label>Timeout for Kill,Read(Used in Kill,Read Mode)</label>
+	   <description>Timeout for Kill,Read(Used in Kill,Read Mode)</description>
+	   <type-definition>xsd:int</type-definition>
+	   <select is-bound="false">
+	       <option value="3000" is-default="true">3000</option>
+	   </select>
+    </property>
+    
+      <!-- Antenna id -->
+      <property key="ReaderNodeId" is-mandatory="true">
+	<label>Reader Node ID </label>
+	<description>Reader address. A hexadecimal number between 00 and FF.</description>
+	<type-definition>oat:ReaderNodeID</type-definition>
+	<select is-bound="false">
+	  <option value="04" is-default="true">04</option>
+	</select>
+      </property>
+
+      <!-- Tari value -->
+      <property key="Tari" is-mandatory="false">
+	<label>Value of Tari</label>
+	<description>Tari value to be used for inventory</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>   
+      <!-- Session -->
+      <property key="Session" is-mandatory="false">
+	<label>Gen2 Session</label>
+	<description>Gen2 Session used for inventory</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="0">0</option>
+	  <option value="1" is-default="true">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>	
+	</select>
+      </property>     
+      <!-- Tag Population expected -->   
+      <property key="TagPopulation" is-mandatory="false">
+	<label>Tag Population</label>
+	<description>Tag population expected in the inventory</description>
+	<type-definition>oat:TagPopulation</type-definition>
+	<select is-bound="false">
+	  <option value="32" is-default="true">32</option>
+	</select>
+      </property>        
+      <!-- Tag Transit time -->
+      <property key="TagTransitTime" is-mandatory="false">
+	<label>Tag Transit Time</label>
+	<description>Tag Transit Time</description>
+	<type-definition>oat:TagTransitTime</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>        
+    
+     <!-- Stop Trigger Timeout -->
+      <property key="ROStopTimeout" is-mandatory="false">
+	<label>Timeout for Stop Trigger</label>
+	<description>Timeout for the GPI trigger, default 0</description>
+	<type-definition>oat:StopTimeout</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>
+
+      <!-- Use the device or OFS time -->
+      <property key="UseDeviceTime" is-mandatory="false">
+	<label>Time for logging tag events</label>
+	<description>Which time to use for logging the tags, default OFS</description>
+	<type-definition>xsd:boolean</type-definition>
+	<select is-bound="true">
+	  <option value="false" is-default="true">OFS</option>
+	  <option value="true" >Device</option>
+	</select>
+      </property>
+
+      <!-- Tag Group Reporting -->
+      <property key="NumTagReport" is-mandatory="false">
+	<label>Number of tags to trigger a notification</label>
+	<description>Number of unique tag the reader must see to report, default 1</description>
+	<type-definition>oat:NumTagReport</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+    
+    <!-- Tag Payload -->
+      <property key="TagPayload" is-mandatory="false">
+	<label>Tag PayLoad</label>
+	<description>Tag Payload</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+
+      <!-- Digital Input Ports -->
+      <property key="InputPorts" is-mandatory="false">
+	<label>Digital Input Ports</label>
+	<description>Digital Input Ports in the reader</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1,2" is-default="true">1,2</option>
+	</select>
+      </property>
+
+      <!-- Digital Output Ports -->
+      <property key="OutputPorts" is-mandatory="false">
+	<label>Digital Output Ports</label>
+	<description>Digital Output Ports in the reader</description>
+	<type-definition>oat:RegExp</type-definition>
+	<select is-bound="false">
+	  <option value="1,2" is-default="true">1,2</option>
+	</select>
+      </property>
+
+   <!-- Channel -->
+   <property key="MotorolaChannel" is-mandatory="true">
+  	 <label>Motorola Channel</label>
+  	 <description>Channel to use for communication</description>
+  	 <type-definition>oat:MotorolaChannel</type-definition>
+  	 <select is-bound="false">
+  	    <option value="4" is-default="true">4</option>
+   	</select>
+   </property>
+      
+    </entity>
+  </table>
+</meta-data>

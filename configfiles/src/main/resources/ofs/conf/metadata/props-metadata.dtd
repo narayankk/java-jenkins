@@ -1,0 +1,60 @@
+<!ELEMENT meta-data (table)*>
+<!ATTLIST meta-data
+      property-table CDATA #REQUIRED
+      >
+
+<!ELEMENT table (entity* ) >
+<!ATTLIST table
+      name CDATA #REQUIRED
+      >
+
+<!ELEMENT entity ((past-name*), (locator-option?), label, description, (property*)) >
+<!ATTLIST entity
+      type CDATA #REQUIRED
+      is-abstract CDATA "false"
+      extends CDATA ""
+      child-locator-key CDATA ""
+      locator-value CDATA ""
+      is-analytic CDATA "true"
+      has-attributes CDATA "false"
+      >
+
+<!ELEMENT past-name (#PCDATA)>
+
+<!ELEMENT label (#PCDATA)>
+<!ATTLIST label
+      idtag CDATA "">
+
+<!ELEMENT description (#PCDATA)>
+<!ATTLIST description
+      idtag CDATA "">
+
+<!ELEMENT property ((past-name*), label, description, type-definition, (select*)?) >
+<!ATTLIST property
+      key CDATA #REQUIRED
+      column-name CDATA ""
+      is-visible CDATA "true"
+      is-mandatory CDATA "false"
+	  is-cycle-control CDATA "false"
+	  is-analytic CDATA "true"
+      display-type CDATA ""
+      >
+
+<!ELEMENT type-definition (#PCDATA) >
+
+<!ELEMENT select (option*)>
+<!ATTLIST select
+      is-bound CDATA "true"
+      >
+
+<!ELEMENT option (#PCDATA)>
+<!ATTLIST option
+      value CDATA #REQUIRED
+      is-default CDATA "false"
+      idtag CDATA "">
+
+<!ELEMENT locator-option (#PCDATA)>
+<!ATTLIST locator-option
+      value CDATA #REQUIRED
+      is-default CDATA "false"
+      idtag CDATA "">

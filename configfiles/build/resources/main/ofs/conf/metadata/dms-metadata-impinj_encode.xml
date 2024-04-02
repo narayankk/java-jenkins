@@ -1,0 +1,516 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+	<table name="dms_device">
+		<!-- Impinj Encode device -->
+		<entity type="ImpinjEncoder" extends="RFReader">
+			<locator-option value="Impinj Encoder">Impinj Encoder</locator-option>
+			<label>Impinj encoder configuration</label>
+			<description>Impinj encoder configuration</description>
+			<property key="number_of_antennas" is-mandatory="false"
+				is-visible="false">
+				<label>Maximum number of antennas</label>
+				<description>Maximum number of antennas for Impinj Encoder</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="4" is-default="true">4</option>
+				</select>
+			</property>
+
+			<!-- Antenna id -->
+			<property key="ReaderNodeId" is-mandatory="true">
+				<label>Reader Node ID </label>
+				<description>Reader address. A hexadecimal number between 00 and FF.</description>
+				<type-definition>oat:ReaderNodeID</type-definition>
+				<select is-bound="false">
+					<option value="04" is-default="true">04</option>
+				</select>
+			</property>
+
+			<!-- Use the device or OFS time -->
+			<property key="UseDeviceTime" is-mandatory="false">
+				<label>Event timestamp</label>
+				<description>Time to use for logging the tags, default OFS</description>
+				<type-definition>xsd:boolean</type-definition>
+				<select is-bound="true">
+					<option value="false" is-default="true">OFS</option>
+					<option value="true">Device</option>
+				</select>
+			</property>
+
+			<!-- Log driver messages as INFO -->
+			<property key="LogAsInfo" is-mandatory="false">
+				<label>Log device message as info </label>
+				<description>Log device message as info</description>
+				<type-definition>xsd:boolean</type-definition>
+				<select is-bound="true">
+					<option value="false" is-default="true">No</option>
+					<option value="true">Yes</option>
+				</select>
+			</property>
+			
+			<!--  Operating mode of the encoder -->
+			<property key="ImpinjEncoderOperatingMode" is-mandatory="false">
+				<label>Operating mode</label>
+				<description>Operating mode</description>
+				<type-definition>oat:EncodeMode</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">Box/Pallet</option>
+					<option value="1">Mixed mode</option>
+					<option value="2">Read</option>
+				</select>
+			</property>
+
+			<!--  Operating mode of the encoder -->
+			<property key="ImpinjEncoderDataSource" is-mandatory="false">
+				<label>Data source for encoding</label>
+				<description>Data source for encoding</description>
+				<type-definition>oat:EncodeDataSource</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">Scenario</option>
+					<option value="1">Block Service</option>
+				</select>
+			</property>
+			
+			<!--  Max number of tags to encode -->
+			<property key="ImpinjMaxNoOfAccessSpec" is-mandatory="false">
+				<label>Max number of tags to encode in a batch</label>
+				<description>Max number of tags to encode in a batch</description>
+				<type-definition>oat:MaxTagInBatch</type-definition>
+				<select is-bound="false">
+					<option value="250" is-default="true">250</option>
+				</select>
+			</property>
+			
+			
+			<!-- Disable ROSpec for 2nd AISpec -->
+			<property key="DisableAccessSpec" is-mandatory="false">
+				<label>Access specs state for AISpec 2</label>
+				<description>Access spec state for AISpec 2</description>
+				<type-definition>xsd:boolean</type-definition>
+				<select is-bound="true">
+					<option value="false" is-default="true">disable</option>
+					<option value="true">enable</option>
+				</select>
+			</property>
+
+			<!--   -->
+			<property key="EnableDeviceMetrics" is-mandatory="false">
+				<label>Device metric for auto tuning</label>
+				<description>Device metric for auto tuning</description>
+				<type-definition>xsd:boolean</type-definition>
+				<select is-bound="true">
+					<option value="true" is-default="true">enable</option>
+					<option value="false">disable</option>
+				</select>
+			</property>
+						
+			<property key="AccessSpecPoolUtilization" is-mandatory="false">
+				<label>Access spec pool cleanup threshold in %</label>
+				<description>% of Utilization required to start the cleaning</description>
+				<type-definition>oat:AccessSpecPoolUtilization</type-definition>
+				<select is-bound="false">
+					<option value="80" is-default="true">80</option>
+				</select>
+			</property>
+			
+			<!-- Keep alive time interval -->
+			<property key="KeepAliveTime" is-mandatory="false">
+				<label>Keep alive notification interval</label>
+				<description>Keep alive notification interval</description>
+				<type-definition>oat:KeepAlive</type-definition>
+				<select is-bound="false">
+					<option value="2000" is-default="true">2000</option>
+				</select>
+			</property>
+			
+			<!-- Power Level for Write, Kill -->
+			<property key="WritePowerLevel" is-mandatory="false">
+				<label>Power level</label>
+				<description>Power level </description>
+				<type-definition>oat:ImpinjPowerLevel</type-definition>
+				<select is-bound="false">
+					<option value="87" is-default="true">87</option>
+				</select>
+			</property>
+			
+			<!--  Receive sensitivity -->
+			<property key="ReceiveSensitivity" is-mandatory="false">
+				<label>Reader receive sensitivity</label>
+				<description>Reader receive sensitivity</description>
+				<type-definition>oat:ReceiveSensitivity</type-definition>
+				<select is-bound="false">
+					<option value="1" is-default="true">1</option>
+				</select>
+			</property>
+			<!-- Channel -->
+			<property key="ImpinjChannel" is-mandatory="true">
+				<label>Impinj channel</label>
+				<description>Channel for tag-reader communication</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1" is-default="true">1</option>
+				</select>
+			</property>
+
+			<!-- RFControl table index for encode -->
+			<property key="RFControlTableIndex" is-mandatory="false">
+				<label>Index to the RFControl table for encode</label>
+				<description>Index to the RFControl Table for read</description>
+				<type-definition>oat:ImpinjRFControlTableIndex</type-definition>
+				<select is-bound="false">
+					<option value="1000" is-default="true">1000</option>
+				</select>
+			</property>
+
+
+			<!-- RFControl table index for read -->
+			<property key="ReadRFControlTableIndex" is-mandatory="false">
+				<label>Index to the RFControl table for read</label>
+				<description>Index to the RFControl Table for read</description>
+				<type-definition>oat:ImpinjRFControlTableIndex</type-definition>
+				<select is-bound="false">
+					<option value="1000" is-default="true">1000</option>
+				</select>
+			</property>
+			
+			<!-- Tari value -->
+			<property key="Tari" is-mandatory="false">
+				<label>Tari</label>
+				<description>Tari value to be used for inventory</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="false">
+					<option value="0" is-default="true">0</option>
+				</select>
+			</property>
+
+			<!-- StartTrigger -->
+			<property key="StartTrigger" is-mandatory="false">
+				<label>Start trigger </label>
+				<description>Trigger for start the ROSpec</description>
+				<type-definition>oat:ImpinjGPITrigger</type-definition>
+				<select is-bound="true">
+					<option value="-1">Counter trigger</option>
+					<option value="0" is-default="true">No Trigger</option>
+					<option value="1">GPI 1 Low to High</option>
+					<option value="2">GPI 2 Low to High</option>
+					<option value="3">GPI 3 Low to High</option>
+					<option value="4">GPI 4 Low to High</option>
+					<option value="5">GPI 1 High to Low</option>
+					<option value="6">GPI 2 High to Low</option>
+					<option value="7">GPI 3 High to Low</option>
+					<option value="8">GPI 4 High to Low</option>
+				</select>
+			</property>
+
+			<!-- Stop Trigger -->
+			<property key="StopTrigger" is-mandatory="false">
+				<label>Stop trigger </label>
+				<description>Trigger to stop the ROSpec</description>
+				<type-definition>oat:ImpinjGPITrigger</type-definition>
+				<select is-bound="true">
+					<option value="-1">Counter trigger</option>
+					<option value="0" is-default="true">No Trigger</option>
+					<option value="1">GPI 1 Low to High</option>
+					<option value="2">GPI 2 Low to High</option>
+					<option value="3">GPI 3 Low to High</option>
+					<option value="4">GPI 4 Low to High</option>
+					<option value="5">GPI 1 High to Low</option>
+					<option value="6">GPI 2 High to Low</option>
+					<option value="7">GPI 3 High to Low</option>
+					<option value="8">GPI 4 High to Low</option>
+				</select>
+			</property>
+						
+			<property key="AISpecTimeSlice" is-mandatory="false">
+				<label>Time slice for each write-read cycle</label>
+				<description>Time slice for each write-read cycle</description>
+				<type-definition>oat:AISpecTimeSlice</type-definition>
+				<select is-bound="false">
+					<option value="2000" is-default="true">2000</option>
+				</select>
+			</property>
+			
+			<property key="AISpecReadPercent" is-mandatory="false">
+				<label>Percentage of time to read</label>
+				<description>Percentage of time to read</description>
+				<type-definition>oat:ImpinjPowerLevel</type-definition>
+				<select is-bound="false">
+					<option value="10" is-default="true">10</option>
+				</select>
+			</property>
+
+
+			<!-- Session -->
+			<property key="Session" is-mandatory="false">
+				<label>Gen2 read session</label>
+				<description>Gen2 session used for read inventory</description>
+				<type-definition>oat:Gen2Session</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">0</option>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+				</select>
+			</property>
+			<!-- Inventory Mode -->
+			<property key="InventoryMode" is-mandatory="false">
+				<label>Gen2 read inventory mode</label>
+				<description>Gen2 read inventory mode</description>
+				<type-definition>oat:InventoryMode</type-definition>
+				<select is-bound="true">
+					<option value="0">Dual target</option>
+					<option value="1">Single target</option>
+					<option value="2">Single target with suppression</option>
+					<option value="3" is-default="true">Reader selected</option>
+				</select>
+			</property>
+
+			<!-- Tag Population expected -->
+			<property key="TagPopulation" is-mandatory="false">
+				<label>Tag population</label>
+				<description>Tag population expected in the inventory</description>
+				<type-definition>oat:TagPopulation</type-definition>
+				<select is-bound="false">
+					<option value="256" is-default="true">256</option>
+				</select>
+			</property>
+
+			<!-- Tag Transit time -->
+			<property key="TagTransitTime" is-mandatory="false">
+				<label>Tag transit time</label>
+				<description>Tag Transit Time</description>
+				<type-definition>oat:TagTransitTime</type-definition>
+				<select is-bound="false">
+					<option value="0" is-default="true">0</option>
+				</select>
+			</property>
+
+			<!--  AISpec 1 configuration -->
+
+			<property key="AISpecStopOperation1" is-mandatory="false">
+				<label>Trigger to stop encode AISpec</label>
+				<description>Trigger to stop encode AISpec</description>
+				<type-definition>oat:AISpecStopTrigger</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">End of ROSpec</option>
+					<option value="1">GPI</option>
+					<option value="2">Tag Observation</option>
+				</select>
+			</property>
+
+			<property key="AISpecStopGPI1" is-mandatory="false">
+				<label>GPI trigger for encode AISpec</label>
+				<description>GPI trigger for encode AISpec</description>
+				<type-definition>oat:ImpinjGPITrigger1</type-definition>
+				<select is-bound="true">
+					<option value="1" is-default="true">GPI 1 Low to High</option>
+					<option value="2">GPI 2 Low to High</option>
+					<option value="3">GPI 3 Low to High</option>
+					<option value="4">GPI 4 Low to High</option>
+					<option value="5">GPI 1 High to Low</option>
+					<option value="6">GPI 2 High to Low</option>
+					<option value="7">GPI 3 High to Low</option>
+					<option value="8">GPI 4 High to Low</option>
+				</select>
+			</property>
+
+			<!-- AISpec Number of attempts -->
+			<property key="AISpecNumberOfAttempts1" is-mandatory="false">
+				<label>Maximum retries for encode AISpec</label>
+				<description>Maximum Retries for encode AISpec</description>
+				<type-definition>oat:AISpecNumberOfAttempts</type-definition>
+				<select is-bound="false">
+					<option value="4" is-default="true">4</option>
+				</select>
+			</property>
+
+			<!-- AiSpec Timeout -->
+			<property key="AISpecTimeout1" is-mandatory="false">
+				<label>Timeout for encode AISpec</label>
+				<description>Timeout for encode AISpec</description>
+				<type-definition>oat:ImpinjAISpecTimeout</type-definition>
+				<select is-bound="false">
+					<option value="3000" is-default="true">3000</option>
+				</select>
+			</property>
+			
+			<!--  AISpec 2 configuration -->
+			<property key="AISpecStopOperation2" is-mandatory="false">
+				<label>Trigger to stop read AISpec</label>
+				<description>Trigger to stop read AISpec</description>
+				<type-definition>oat:AISpecStopTrigger</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">End of ROSpec</option>
+					<option value="1">GPI</option>
+					<option value="2">Tag Observation</option>
+				</select>
+			</property>
+
+			<property key="AISpecStopGPI2" is-mandatory="false">
+				<label>GPI trigger for read AISpec</label>
+				<description>GPI trigger for read AISpec</description>
+				<type-definition>oat:ImpinjGPITrigger1</type-definition>
+				<select is-bound="true">
+					<option value="1" is-default="true">GPI 1 Low to High</option>
+					<option value="2">GPI 2 Low to High</option>
+					<option value="3">GPI 3 Low to High</option>
+					<option value="4">GPI 4 Low to High</option>
+					<option value="5">GPI 1 High to Low</option>
+					<option value="6">GPI 2 High to Low</option>
+					<option value="7">GPI 3 High to Low</option>
+					<option value="8">GPI 4 High to Low</option>
+				</select>
+			</property>
+
+			<!-- AISpec Number of attempts -->
+			<property key="AISpecNumberOfAttempts2" is-mandatory="false">
+				<label>Maximum retries for read AISpec</label>
+				<description>Maximum Retries for read AISpec</description>
+				<type-definition>oat:AISpecNumberOfAttempts</type-definition>
+				<select is-bound="false">
+					<option value="4" is-default="true">4</option>
+				</select>
+			</property>
+
+			<!-- AiSpec Timeout -->
+			<property key="AISpecTimeout2" is-mandatory="false">
+				<label>Timeout for read AISpec</label>
+				<description>Timeout for read AISpec</description>
+				<type-definition>oat:ImpinjAISpecTimeout</type-definition>
+				<select is-bound="false">
+					<option value="3000" is-default="true">3000</option>
+				</select>
+			</property>
+
+			<!-- Tag Group Reporting -->
+			<property key="NumTagReport" is-mandatory="false">
+				<label>Number of tags to trigger a notification</label>
+				<description>Number of unique tag the reader must see to report,
+					default 1</description>
+				<type-definition>oat:NumTagReport</type-definition>
+				<select is-bound="false">
+					<option value="1" is-default="true">1</option>
+				</select>
+			</property>
+
+
+			<!-- Digital Input Ports -->
+			<property key="InputPorts" is-mandatory="false">
+				<label>Digital input ports</label>
+				<description>Digital Input Ports on the reader</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1,2,3,4,5,6,7" is-default="true">1,2,3,4,5,6,7</option>
+				</select>
+			</property>
+			
+			
+			<!-- Digital Input Ports to debounce on the reader-->
+			<property key="ImpinjDebouncePorts" is-mandatory="false">
+				<label>Impinj debounce ports</label>
+				<description>Input ports to debounce on the reader</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1,2,3,4" is-default="false">1,2,3,4</option>
+				</select>
+			</property>
+
+			<!-- Debounce time -->
+			<property key="ImpinjDebounceTime" is-mandatory="false">
+				<label>Impinj debounce time</label>
+				<description>Impinj debounce time</description>
+				<type-definition>oat:ImpinjDebounceTime</type-definition>
+				<select is-bound="false">
+					<option value="500" is-default="true">500</option>
+				</select>
+			</property>
+
+			<!-- Digital Input Ports to debounce-->
+			<property key="DebouncePorts" is-mandatory="false">
+				<label>Input ports to debounce</label>
+				<description>Input ports to debounce</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1,2,3,4" is-default="true">1,2,3,4</option>
+				</select>
+			</property>
+
+			<!-- Digital Input Port for link counting-->
+			<property key="LinkCountingPorts" is-mandatory="false">
+				<label>Input ports for chain counting</label>
+				<description>Input ports for chain counting</description>
+				<type-definition>oat:ImpinjPort</type-definition>
+				<select is-bound="false">
+					<option value="1" >Input 1</option>
+					<option value="2" >Input 2</option>
+					<option value="3" >Input 3</option>
+					<option value="4" is-default="true">Input 4</option>
+				</select>
+			</property>
+
+			<!-- Debounce time -->
+			<property key="DebounceTime" is-mandatory="false">
+				<label>Debounce time</label>
+				<description>Debounce time</description>
+				<type-definition>oat:DebounceTime</type-definition>
+				<select is-bound="false">
+					<option value="500" is-default="true">500</option>
+				</select>
+			</property>
+			
+			<!-- Digital Output Ports -->
+			<property key="OutputPorts" is-mandatory="false">
+				<label>Digital output ports</label>
+				<description>Digital Output Portson the reader</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1,2,3,5,6,7" is-default="true">1,2,3,5,6,7</option>
+				</select>
+			</property>
+
+			<!-- Pulse duration -->
+			<property key="GPOPulseDuration" is-mandatory="false">
+				<label>Pulse duration for GPO</label>
+				<description>Pulse duration for GPO</description>
+				<type-definition>oat:ImpinjPulseDuration</type-definition>
+				<select is-bound="false">
+					<option value="500" is-default="true">500</option>
+				</select>
+			</property>
+			
+			<!-- History Threshold -->
+			<property key="ImpinjHistoryThreshold" is-mandatory="false">
+				<label>History threshold</label>
+				<description>Encode history threshold</description>
+				<type-definition>oat:ImpinjHistoryThreshold</type-definition>
+				<select is-bound="false">
+					<option value="5" is-default="true">5</option>
+				</select>
+			</property>
+			
+			
+			<!-- History Threshold -->
+			<property key="ImpinjRSSIThreshold" is-mandatory="false">
+				<label>RSSI threshold for reporting</label>
+				<description>RSSI reporting threshold</description>
+				<type-definition>oat:ImpinjRSSIThreshold</type-definition>
+				<select is-bound="false">
+					<option value="-100" is-default="true">-100</option>
+				</select>
+			</property>
+			
+			<!-- Read Timeout -->
+			<property key="DefaultTimeOut" is-mandatory="false">
+				<label>Default Time-Out</label>
+				<description>Default timeout for the commands</description>
+				<type-definition>oat:ReadTimeoutMillis1</type-definition>
+				<select is-bound="false">
+					<option value="4000" is-default="true">4000</option>
+				</select>
+			</property>
+		</entity>
+	</table>
+</meta-data>

@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<scenario>
+  <property key="description">Allows operator to scan SKU, commission EPC and print label</property>
+  <property key="device">DIGITAL_OUTPUT_OPTIONAL</property>
+  <property key="name">MV Label Print</property>
+  <property key="scenario.type">LABEL_PRINT</property>
+  <property key="version">1.0</property>
+  <process>
+<start name="Start">
+	<target exit="Exit Condition" name="InitializeScenario"></target>
+</start>
+
+<activity name="InitializeScenario" resource="primitive:SetVariablesToNull">
+	<target name="WaitForProductScan" exit="done"/>
+	<target name="WaitForProductScan" exit="skip"/>
+	<target name="WaitForProductScan" exit="error"/>
+	<output name="variable0" class="java.lang.Object">${process.printStatusMap}</output>
+	<output name="variable1" class="java.lang.Object">${process.product}</output>
+	<output name="variable2" class="java.lang.Object">${process.labelQuantity}</output>
+	<output name="variable3" class="java.lang.Object">${process.skuObjs}</output>
+	<output name="variable4" class="java.lang.Object">${process.skuObjectMap}</output>
+        <output name="variable5" class="java.lang.Object">${process.skipCalib}</output>
+</activity>
+
+<wait name="WaitForProductScan">
+    <event name="enter_sku" target="ClearDisplayVars">
+		<param class="java.lang.String" name="sku">${process.sku}</param>
+		<param class="java.lang.String" name="orderNumber">${process.orderNumber}</param>
+		<property key="ui.jsp">/workflow/floor_ui/event_tiles/enter_sku.jsp</property>
+		<property key="ui.invisibleWhenInactive">true</property>
+		<property key="ui.invisibleWhenWaitConditionFalse">false</property>
+		<property key="waitCondition">true</property>
+	</event>
+	
+	<event name="barcode_read" target="ClearDisplayVars">
+		<param class="java.lang.String" constant="false" name="gtin">${process.sku}</param>
+		<filter resource="filter:BarcodeEventFilter">
+			<argument class="java.lang.String" constant="false" name="deviceEpc">${process.barcodeScannerEpc}</argument>
+		</filter>
+	</event>
+</wait>
+
+<activity name="ClearDisplayVars" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">   
+	<target name="CheckSingleOrMultiSKULabelPrinting" exit="done"/>
+	<target name="CheckSingleOrMultiSKULabelPrinting" exit="skip"/>
+	<target name="CheckSingleOrMultiSKULabelPrinting" exit="error"/>
+	<output name="variable0" class="java.lang.Object">${process.printStatusMap}</output>
+	<output name="variable1" class="java.lang.Object">${process.product}</output>
+	<output name="variable2" class="java.lang.Object">${process.labelQuantity}</output>
+	<output name="variable3" class="[Ljava.lang.Object;">${process.skuObjs}</output>
+	<output name="variable4" class="java.util.Map">${process.skuObjectMap}</output>
+</activity>
+
+<decision name="CheckSingleOrMultiSKULabelPrinting">
+      <case condition="(${process.orderNumber} == null)" label="Null Order Number" target="StripSKU"></case>
+      <case condition="(${process.orderNumber} eq '')" label="Empty Order Number" target="StripSKU"></case>
+      <default target="GetAllSKUs"></default>
+</decision>
+
+<!-- <activity name="SetVerifyLabelQuantiyValueForMultiSKULabelPrinting" resource="primitive:SetVariableValue">
+		<target exit="done" name="GetAllSKUs"></target>
+        <target exit="error" name="GetAllSKUs"></target>
+        <input class="java.lang.String" constant="true" name="value" required="false">${process.verifyLabelQuantity}</input>
+        <output class="java.lang.String" constant="false" name="variable">'N'</output>
+</activity> -->
+
+<activity name="GetAllSKUs" resource="class:com.oatsystems.workflow.primitives.GetAllSKUFromASN">   
+	<target name="IterateOnSKUObjectArray" exit="done"/>
+	<target name="WaitForProductScan" exit="error"/>
+	<input name="orderNumber" class="java.lang.String">${process.orderNumber}</input>
+	<input name="sku" class="java.lang.String">${process.sku}</input>
+	<output name="skuObjectMap" class="java.util.Map">${process.skuObjectMap}</output>
+	<output name="skuObjects" class="[Ljava.lang.Object;">${process.skuObjs}</output>
+</activity>
+
+<activity name="IterateOnSKUObjectArray" resource="class:com.oatsystems.workflow.primitives.IterateOnSKUImplObjects">   
+	<target name="StripSKU" exit="continue"/>
+	<target name="WaitForProductScan" exit="break"/>
+	<target name="WaitForProductScan" exit="error"/>
+	<input name="skuObjects" class="[Ljava.lang.Object;">${process.skuObjs}</input>
+	<input  name="currentIndex" class="java.lang.String">${process.currentIndex}</input>
+    <output name="currentIndex" class="java.lang.String">${process.currentIndex}</output>
+	<output name="sku" class="java.lang.String">${process.sku}</output>
+	<output name="labelQuantity" class="java.lang.String">${process.labelQuantity}</output>
+	<output name="verifyLabelQuantity" class="java.lang.String">${process.verifyLabelQuantity}</output>
+</activity>
+
+<activity name="StripSKU" resource="class:com.oatsystems.workflow.primitives.StripString">   
+	<target name="LoadProductFromSku" exit="done"/>
+	<target name="LoadProductFromSku" exit="error"/>
+	<input name="strToBeStripped" class="java.lang.String">${process.sku}</input>
+	<input name="noOfBeginningChars" class="java.lang.String">${process.stripAtBegin}</input>
+	<input name="noOfEndChars" class="java.lang.String">${process.stripAtEnd}</input>
+	<output name="strippedString" class="java.lang.String">${process.sku}</output>
+</activity>
+
+<activity name="LoadProductFromSku" resource="primitive:LoadProductFromSku">
+	<target exit="productLoaded" name="CheckSingleOrMultipleLabelPrinting"></target>
+	<target exit="noProductForSku" name="AddInvalidSKUToErrorLog"></target>
+	<target exit="error" name="WaitForProductScan"></target>
+	<input class="java.lang.String" constant="false" name="sku" required="false">${process.sku}</input>
+	<input class="java.lang.String" constant="false" name="styleCode" required="false">${process.styleCode}</input>
+    <input class="java.lang.String" constant="false" name="uom" required="false">${process.uom}</input>
+	<output class="com.oatsystems.workflow.objects.ProductReference" constant="false" name="product">${process.product}</output>
+	<output class="java.lang.String" constant="false" name="productID">${process.productId}</output>
+</activity>
+
+<activity name="AddInvalidSKUToErrorLog" resource="primitive:AddToErrorLog">
+  <target exit="done" name="PublishInvalidSKUOutput"></target>
+  <target exit="error" name="PublishInvalidSKUOutput"></target>
+  <input class="java.lang.String" constant="true" name="errorCode" required="false">INVALID_SKU</input>
+  <input class="java.lang.String" constant="true" name="errorString" required="false">'Invalid SKU scanned'</input>
+</activity>
+	
+<activity name="PublishInvalidSKUOutput" resource="class:com.oatsystems.solutions.apparel.primitives.SetDigitalOutput">
+	<target exit="done" name="CheckIfPrintInvalidSKULabel"/>
+	<target exit="error" name="CheckIfPrintInvalidSKULabel"/>
+	<input name="errorCode" class="java.lang.String">SUCCESS</input>
+	<input name="successOP" class="java.lang.String">${process.invalidSKUOutput}</input>           
+</activity>
+
+<decision name="CheckIfPrintInvalidSKULabel">
+      <case condition="${process.invalidSKUTemplatePath} eq ''" label="Don't Print" target="IterateOnSKUObjectArray"></case>
+      <default label="Print" target="LoadLabelPrinterWithNoVerify"></default>
+ </decision>
+
+<activity name="LoadLabelPrinterWithNoVerify" resource="primitive:LoadLabelPrinter">
+	<target exit="done" name="PrintInvalidSKULabel"></target>
+	<target exit="error" name="PrintInvalidSKULabel"></target>
+	<input class="java.lang.String" name="labelPrinterEpc">${process.labelPrinterEpc}</input>
+	<input class="java.lang.String" name="verifyPrinterStatus">N</input>
+	<input class="java.lang.String" name="verifyTagWrite">N</input>
+	<output class="com.oatsystems.workflow.objects.LabelPrinter" name="labelPrinter">${process.labelPrinter}</output>
+	<output class="java.util.LinkedList" name="printerList">${process.printerList}</output>
+</activity>
+
+<activity name="PrintInvalidSKULabel" resource="class:com.oatsystems.workflow.primitives.CommissionAndPrintLabel">
+	<target exit="error" name="IterateOnSKUObjectArray"></target>
+	<target exit="commissioningFailure" name="IterateOnSKUObjectArray"></target>
+	<target exit="printerNotReady" name="IterateOnSKUObjectArray"></target>
+	<target exit="printerNotCalibrated" name="IterateOnSKUObjectArray"></target>
+	<target exit="printFailure" name="IterateOnSKUObjectArray"></target>
+	<target exit="printSuccess" name="IterateOnSKUObjectArray"></target>
+	<input class="com.oatsystems.workflow.objects.ASNSKUObject" constant="false" name="skuObject" required="false">${process.skuObject}</input>
+	<input class="java.lang.String" constant="false" name="associationLocationEpc" required="false">${process.associationLocationEpc}</input>
+	<input class="java.lang.String" constant="false" name="encodingScheme" required="false">${process.encodingScheme}</input>
+	<input class="com.oatsystems.workflow.objects.EpcCommissioningLog" constant="false" name="epcCommissioningLog" required="false">${process.epcCommissioningLog}</input>
+	<input class="com.oatsystems.workflow.api.IPrinter" constant="false" name="labelPrinter" required="false">${process.labelPrinter}</input>
+	<input class="java.lang.String" constant="true" name="noOfEPCs" required="false">${process.labelQuantity}</input>
+	<input class="java.lang.String" constant="false" name="productID" required="false">${process.productId}</input>
+	<input class="java.lang.String" constant="true" name="templateKey01" required="false">SKU</input>
+	<input class="java.lang.String" constant="false" name="templatePath" required="false">${process.invalidSKUTemplatePath}</input>
+	<input class="java.lang.String" constant="false" name="templateValue01" required="false">${process.sku}</input>
+	<input class="java.lang.String" constant="false" name="verifyPrinterStatusBeforePrint" required="false">N</input>
+	<input class="java.lang.String" constant="true" name="maxRetries" required="false">${process.maxRetries}</input>
+        <input class="java.lang.String" constant="false" name="verifyPrinterCalibrationBeforePrint" required="false">N</input>
+	<input class="java.lang.String" constant="true" name="lblLenMin" required="false">${process.labelLengthMinStr}</input>
+	<input class="java.lang.String" constant="true" name="lblLenMax" required="false">${process.labelLengthMaxStr}</input>
+	<input class="java.lang.String" constant="true" name="skipCalib" required="false">${process.skipCalib}</input>
+	<output class="com.oatsystems.workflow.objects.EpcCommissioningLog" constant="false" name="epcCommissioningLog">${process.epcCommissioningLog}</output>
+	<output class="java.util.Map" name="printStatusMap">${process.printStatusMap}</output>
+	<output class="com.oatsystems.workflow.objects.ASNSKUObject" name="skuObject">${process.skuObject}</output>
+	<output class="java.lang.String" name="skipCalib">${process.skipCalib}</output>
+</activity>
+
+<decision name="CheckSingleOrMultipleLabelPrinting">
+	<case condition="${process.verifyLabelQuantity} eq 'Y'" label="print_multiple_labels" target="WaitForLabelQuantityReadForMultipleLabelPrinting"></case>
+	<default label="print_single_label" target="SetLabelQuantiyValueForSingleLabelPrinting"></default>
+</decision>
+
+<wait name="WaitForLabelQuantityReadForMultipleLabelPrinting">
+	<event name="enter_label_quantity" target="ExecutePrintJob">
+		<param class="java.lang.String" name="labelQuantity">${process.labelQuantity}</param>
+		<property key="ui.jsp">/workflow/floor_ui/event_tiles/enter_label_quantity.jsp</property>
+		<property key="ui.invisibleWhenInactive">true</property>
+		<property key="ui.invisibleWhenWaitConditionFalse">true</property>
+		<property key="waitCondition">true</property>
+	</event>
+</wait>
+
+<!--Print single label for each product sku-->
+<activity name="SetLabelQuantiyValueForSingleLabelPrinting" resource="primitive:SetVariableValue">
+		<target exit="done" name="ExecutePrintJob"></target>
+        <target exit="error" name="ExecutePrintJob"></target>
+        <input class="java.lang.String" constant="true" name="value" required="false">${process.labelQuantity}</input>
+        <output class="java.lang.String" constant="false" name="variable">'1'</output>
+</activity>
+
+<activity name="ExecutePrintJob" resource="class:com.oatsystems.workflow.primitives.ExecutePrintJob">
+	<target exit="error" name="IterateOnSKUObjectArray"></target>
+	<target exit="noProductIDSet" name="IterateOnSKUObjectArray"></target>
+	<target exit="printFailure" name="IterateOnSKUObjectArray"></target>
+	<target exit="printSuccess" name="IterateOnSKUObjectArray"></target>
+	<input class="java.util.Map" constant="false"  name="skuObjectMap" required="false">${process.skuObjectMap}</input>
+	<input class="java.lang.String" constant="false" name="orderNumber" required="false">${process.orderNumber}</input>
+	<input class="java.lang.String" constant="false" name="sku" required="false">${process.sku}</input>
+	<input class="java.lang.String" constant="false" name="encodingScheme" required="false">${process.encodingScheme}</input>
+	<input class="java.lang.String" constant="false" name="associationLocationEpc" required="false">${process.associationLocationEpc}</input>
+	<input class="java.lang.String" constant="false" name="labelPrinterEpc" required="false">${process.labelPrinterEpc}</input>
+	<input class="java.lang.String" constant="false" name="labelQuantity" required="false">${process.labelQuantity}</input>
+	
+	<input class="java.lang.String" constant="false" name="maxRetries" required="false">${process.maxRetries}</input>
+	<input class="java.lang.String" constant="false" name="styleCode" required="false">${process.styleCode}</input>
+	<input class="java.lang.String" constant="false" name="templatePath" required="false">${process.templatePath}</input>
+	<input class="java.lang.String" constant="false" name="invalidSKUTemplatePath" required="false">${process.invalidSKUTemplatePath}</input>
+	<input class="java.lang.String" constant="false" name="outOfCalibTemplatePath" required="false">${process.outOfCalibTemplatePath}</input>
+	<input class="java.lang.String" constant="false" name="uom" required="false">${process.uom}</input>
+	<input class="java.lang.String" constant="false" name="verifyLabelQuantity" required="false">${process.verifyLabelQuantity}</input>
+	<input class="java.lang.String" constant="false" name="verifyPrinterStatus" required="false">${process.verifyPrinterStatus}</input>
+	<input class="java.lang.String" constant="false" name="verifyTagWrite" required="false">${process.verifyTagWrite}</input>
+	<input class="java.lang.String" constant="false" name="verifyPrinterCalibration" required="false">${process.verifyPrinterCalibration}</input>
+	<input class="java.lang.String" constant="false" name="lblLenMin" required="false">${process.labelLengthMinStr}</input>
+	<input class="java.lang.String" constant="false" name="lblLenMax" required="false">${process.labelLengthMaxStr}</input>
+    <input class="java.lang.String" constant="false" name="skipCalib" required="false">${process.skipCalib}</input>
+	
+	<input class="java.lang.String" constant="false" name="commissioningFailureOutput" required="false">${process.commissioningFailureOutput}</input>
+    <input class="java.lang.String" constant="false" name="invalidSKUOutput" required="false">${process.invalidSKUOutput}</input>
+	<input class="java.lang.String" constant="false" name="validSKUOutput" required="false">${process.validSKUOutput}</input>
+	<input class="java.lang.String" constant="false" name="printSucceededOutput" required="false">${process.printSucceededOutput}</input>
+	<input class="java.lang.String" constant="false" name="printerFailureOutput" required="false">${process.printerFailureOutput}</input>
+	<input class="java.lang.String" constant="false" name="printFailedOutput" required="false">${process.printFailedOutput}</input>	
+	<input class="java.lang.String" constant="false" name="resetOutputConfiguration" required="false">${process.resetOutputConfiguration}</input>		
+	<output name="skuObjectMap" class="java.util.Map">${process.skuObjectMap}</output>	
+    <output name="skipCalib" class="java.lang.String">${process.skipCalib}</output>
+	
+	
+</activity>
+
+	
+</process>
+	<config>
+		<var class="java.lang.String" name="${process.encodingScheme}">
+			<property key="doc">ENCODINGSCHEME</property>
+			<property key="ui.group">General</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Encoding schemes</property>
+			<property key="ui.list"><![CDATA[                                   
+				<source="listsource:EncodingSchemeListSource"/>
+			]]></property>
+			<property key="ui.required">true</property>
+		</var>
+
+		<var class="java.lang.String" name="${process.associationLocationEpc}">
+			<property key="doc">ASSOCIATIONLOCATIONEPC</property>
+			<property key="ui.group">General</property>
+			<property key="ui.label">Tag Commissioning Association Location</property>
+			<property key="ui.list"><![CDATA[
+				<source="listsource:SimpleBusinessLocationListSource"/>
+			]]></property>
+			<property key="ui.required">true</property>
+		</var>
+
+		<var class="java.lang.String" name="${process.displayItems}">
+			<property key="class">java.lang.String</property>
+			<property key="name">DISPLAYITEMS</property>
+			<property key="ui.group">General</property>
+			<property key="ui.input"><![CDATA[                       
+				<textinput default="name,sku,Size,Color,manufacturer" type="BigString"/>
+			]]></property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.isconfigvarcustomtype">bigString</property>
+			<property key="ui.label">Product details on display (comma seperated list)</property>
+			<property key="ui.required">true</property>
+		</var>
+		
+		<var class="java.lang.String" name="${process.stripAtBegin}">
+			<property key="class">java.lang.String</property>
+			<property key="name">STRIPATBEGIN</property>
+			<property key="ui.group">General</property>
+			<property key="ui.input"><![CDATA[                       
+				<textinput default="0" type="BigString"/>
+			]]></property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.isconfigvarcustomtype">bigString</property>
+			<property key="ui.label">Number of chars to strip from beginning of SKU</property>
+			<property key="ui.required">true</property>
+		</var>
+		
+		<var class="java.lang.String" name="${process.stripAtEnd}">
+			<property key="class">java.lang.String</property>
+			<property key="name">STRIPATEND</property>
+			<property key="ui.group">General</property>
+			<property key="ui.input"><![CDATA[                       
+				<textinput default="0" type="BigString"/>
+			]]></property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.isconfigvarcustomtype">bigString</property>
+			<property key="ui.label">Number of chars to strip from end of SKU</property>
+			<property key="ui.required">true</property>
+		</var>
+		
+		<!-- Scanned SKU configuration -->
+		<var class="java.lang.String" name="${process.styleCode}">
+		  <property key="doc">STYLECODE</property>
+		  <property key="ui.group">Product Identification</property>
+		  <property key="ui.input"><![CDATA[               
+			<textinput default="" type="BigString"/>
+						 ]]></property>
+		  <property key="ui.isconfigurable">true</property>
+		  <property key="ui.label">Style Code of Scanned Product</property>      
+		</var>
+		
+		<var class="java.lang.String" name="${process.uom}">
+		  <property key="class">java.lang.String</property>
+		  <property key="doc">PRODUCTUOM</property>
+		  <property key="name">uom</property>
+		  <property key="ui.group">Product Identification</property>
+		  <property key="ui.isconfigurable">true</property>
+		  <property key="ui.isconfigvarprofiletype">ProductUom</property>
+		  <property key="ui.label">Default product UOM</property>
+		  <property key="ui.list"><![CDATA[  
+			<source="listsource:ProductUomListSource"/>
+			]]></property>
+		  <property key="ui.required">true</property>
+		</var>
+		
+		<var class="java.lang.String" name="${process.labelPrinterEpc}">
+			<property key="doc">PRINTERSTOLOAD</property>
+			<property key="ui.group">Printer Configuration</property>
+			<property key="ui.label">Printers to Load</property>
+			<property key="ui.popup"><![CDATA[
+				<source="jsp:/workflow/config/printer_group_config.jsp"/>
+			]]></property>
+			<property key="ui.required">true</property>
+		</var>
+
+		<var class="java.lang.String" name="${process.templatePath}">
+			<property key="class">java.lang.String</property>
+			<property key="doc">TEMPLATEPATH</property>
+			<property key="name">templatePath</property>
+			<property key="ui.group">Printing Configuration</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Select Print template</property>
+			<property key="ui.list"><![CDATA[                                   
+				<source="listsource:PrintLabelTemplateListSource"/>
+			]]></property>
+			<property key="ui.required">true</property>
+		</var>
+	
+		<var class="java.lang.String" name="${process.invalidSKUTemplatePath}">
+			<property key="class">java.lang.String</property>
+			<property key="doc">INVALIDSKUTEMPLATEPATH</property>
+			<property key="name">invalidSKUTemplatePath</property>
+			<property key="ui.group">Printing Configuration</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Select Invalid SKU Print template</property>
+			<property key="ui.list"><![CDATA[                                   
+				<source="listsource:PrintLabelTemplateListSource"/>
+			]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		
+		<var class="java.lang.String" name="${process.outOfCalibTemplatePath}">
+			<property key="class">java.lang.String</property>
+			<property key="doc">OUTOFCALIBTEMPLATEPATH</property>
+			<property key="name">outOfCalibTemplatePath</property>
+			<property key="ui.group">Printing Configuration</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Select Out of Calibration Print template</property>
+			<property key="ui.list"><![CDATA[                                   
+				<source="listsource:PrintLabelTemplateListSource"/>
+			]]></property>
+			<property key="ui.required">false</property>
+		</var>
+	
+		<var class="java.lang.String" name="${process.verifyPrinterStatus}">
+			<property key="doc">VERIFYPRINTERSTATUS</property>
+			<property key="ui.group">Printer Configuration</property>
+			<property key="ui.label">Verify printer status before writing</property>
+			<property key="ui.list"><![CDATA[
+				<option value="N">No</option>
+				<option value="Y">Yes</option>
+			]]></property>
+			<property key="ui.required">true</property>
+		</var>
+
+		<var class="java.lang.String" name="${process.verifyTagWrite}">
+			<property key="doc">VERIFYTAGWRITE</property>
+			<property key="ui.group">Printer Configuration</property>
+			<property key="ui.label">Verify tag after printing</property>
+			<property key="ui.list"><![CDATA[
+				<option value="N">No</option>
+				<option value="Y">Yes</option>
+			]]></property>
+			<property key="ui.required">true</property>
+		</var>
+
+		<var class="java.lang.String" name="${process.verifyPrinterCalibration}">
+			<property key="doc">VERIFYPRINTERCALIBRATION</property>
+			<property key="ui.group">Printer Configuration</property>
+			<property key="ui.label">Verify printer calibration before writing</property>
+			<property key="ui.list"><![CDATA[
+				<option SELECTED value="N">No</option>
+				<option value="Y">Yes</option>
+			]]></property>
+			<property key="ui.required">false</property>
+          	        <property key="ui.enabler">verifyPrinterCalibration</property>
+		</var>
+		
+		<var class="java.lang.String" name="${process.labelLengthMinStr}">
+			<property key="name">labelLengthMin</property>
+			<property key="ui.group">Printer Configuration</property>
+			<property key="ui.input"><![CDATA[                       
+			<textinput default="230" type="LongID"/>
+                             ]]></property>
+			<property key="ui.label">Label Length - Range Min value</property>
+			<property key="ui.required">true</property>
+			<property key="ui.enable.on">verifyPrinterCalibration:Y</property>
+		</var>
+		
+		<var class="java.lang.String" name="${process.labelLengthMaxStr}">
+			<property key="name">labelLengthMax</property>
+			<property key="ui.group">Printer Configuration</property>
+			<property key="ui.input"><![CDATA[                       
+			<textinput default="250" type="LongID"/>
+                             ]]></property>
+			<property key="ui.label">Label Length - Range Max value</property>
+			<property key="ui.required">true</property>
+			<property key="ui.enable.on">verifyPrinterCalibration:Y</property>
+		</var>
+		
+		<var class="java.lang.String" name="${process.barcodeScannerEpc}">
+			<property key="doc">BARCODESCANNEREPC</property>
+			<property key="ui.group">Barcode Scanner Configuration</property>
+			<property key="ui.isconfigurable">true</property>
+			<property key="ui.label">Barcode scanner</property>
+			<property key="ui.list"><![CDATA[
+				<source="listsource:BarcodeScannerListSource"/>
+			]]></property>
+			<property key="ui.required">false</property>
+		</var>
+		
+		<var class="java.lang.String" name="${process.maxRetries}">
+		  <property key="doc">MAXRETRIES</property>
+		  <property key="ui.group">Printing Configuration</property>
+		  <property key="ui.input"><![CDATA[
+			<textinput default="2" type="LongID"/>
+			]]></property>
+		  <property key="ui.label">Maximum retries when label print fail</property>
+		  <property key="ui.required">true</property>
+		</var>
+		
+		<var class="java.lang.String" name="${process.verifyLabelQuantity}">
+			<property key="doc">VERIFYLABELQUANTITY</property>
+			<property key="ui.group">Printing Configuration</property>
+			<property key="ui.label">Will user print multiple labels for a SKU?</property>
+			<property key="ui.list"><![CDATA[
+				<option value="N">No</option>
+				<option value="Y">Yes</option>
+			]]></property>
+			<property key="ui.required">true</property>
+			<property key="ui.enabler">verifyLabelQuantity</property>
+		</var>
+		
+		<var class="java.lang.String" name="${process.maxLabels}">
+		  <property key="doc">MAXLABELS</property>
+		  <property key="ui.group">Printing Configuration</property>
+		  <property key="ui.input"><![CDATA[
+			<textinput default="10000" type="LongID"/>
+			]]></property>
+		  <property key="ui.label">Maximum labels for a SKU</property>
+		  <property key="ui.required">true</property>
+		  <property key="ui.enable.on">verifyLabelQuantity:Y</property>
+		</var>		
+		
+		
+    <var class="java.lang.String" name="${process.invalidSKUOutput}">
+      <property key="doc">WRONGSKUOUTPUT</property>
+      <property key="ui.group">Digital Output</property>
+      <property key="ui.label">On invalid SKU read</property>
+      <property key="ui.popup"><![CDATA[
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.commissioningFailureOutput}">
+      <property key="doc">COMMISSIONFAILEDOUTPUT</property>
+      <property key="ui.group">Digital Output</property>
+      <property key="ui.label">On epc commission failure</property>
+      <property key="ui.popup"><![CDATA[
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.printerFailureOutput}">
+      <property key="doc">PRINTERFAILUREOUTPUT</property>
+      <property key="ui.group">Digital Output</property>
+      <property key="ui.label">On printer failure</property>
+      <property key="ui.popup"><![CDATA[
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+    <var class="java.lang.String" name="${process.printFailedOutput}">
+      <property key="doc">PRINTFAILEDOUTPUT</property>
+      <property key="ui.group">Digital Output</property>
+      <property key="ui.label">On print failure</property>
+      <property key="ui.popup"><![CDATA[
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>		
+	<var class="java.lang.String" name="${process.validSKUOutput}">
+      <property key="doc">PRINTSTARTEDOUTPUT</property>
+      <property key="ui.group">Digital Output</property>
+      <property key="ui.label">On Valid SKU scan</property>
+      <property key="ui.popup"><![CDATA[
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>		
+	<var class="java.lang.String" name="${process.printSucceededOutput}">
+      <property key="doc">PRINTSUCCEEDEDOUTPUT</property>
+      <property key="ui.group">Digital Output</property>
+      <property key="ui.label">On print succeeded</property>
+      <property key="ui.popup"><![CDATA[
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>	
+	
+	<var class="java.lang.String" name="${process.resetOutputConfiguration}">
+      <property key="doc">resetConfiguration</property>
+      <property key="ui.group">Digital Output</property>
+      <property key="ui.label">Reset Output Configuration</property>
+      <property key="ui.popup"><![CDATA[
+        <source="jsp:/workflow/config/digital_output_config.jsp"/>
+        ]]></property>
+      <property key="ui.required">false</property>
+    </var>
+	</config>
+	<display>
+		<tile name="/workflow/floor_ui/display_tiles/product_detail.jsp">
+			<property key="ui.jsp">/workflow/floor_ui/display_tiles/product_detail.jsp</property>
+		</tile>
+		<tile name="/workflow/floor_ui/display_tiles/audit_log.jsp">
+			<property key="ui.jsp">/workflow/floor_ui/display_tiles/audit_log.jsp</property>
+		</tile>
+	</display>
+</scenario>

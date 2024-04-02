@@ -1,0 +1,81 @@
+package drools.ccEvent;
+
+import com.oatsystems.cc.event.CCEvent;
+import static com.oatsystems.messaging.async.AsyncMessagingPropertyUtil.isMessageTypeEnabled;
+import static com.oatsystems.service.apparel.MVPropertyManager.getProperty;
+import static com.checkpt.util.InventoryDataUtilIO.isSell1Replen1Rule;
+import static com.checkpt.util.InventoryDataUtilIO.getShelfTargetId;
+import static com.checkpt.util.InventoryDataUtilIO.getShelfTargetInvLevel;
+
+
+rule "Inventory Attribute Synchronization on eventList presence"
+no-loop
+when
+$ccEvent : CCEvent(inventoryAttrSync == false, eventSet != null, eventSet.size()>0)
+then
+$ccEvent.getMessageTypeList().add("inventory-attr-sync");
+update($ccEvent);
+end
+
+rule "Inventory Staging Synchronization on eventList presence"
+no-loop
+when
+$ccEvent : CCEvent(inventoryStagingSync == false, eventSet != null, eventSet.size()>0, "true".equalsIgnoreCase(getProperty("inventory_staging_logging_enabled")))
+then
+$ccEvent.setInventoryStagingSync(true);
+$ccEvent.getMessageTypeList().add("inventory-staging-sync");
+update($ccEvent);
+end
+
+rule "Inventory Activation Synchronization on authoritative CC with Shelf Target Reset enabled"
+no-loop
+when
+$ccEvent : CCEvent(inventoryActivationSync == false, shelfTargetResetCC == true, getAuthoritative().equals("T") || getAuthoritative().equalsIgnoreCase("TRUE"), isMessageTypeEnabled("inventory-shelf-target-sync"))
+then
+$ccEvent.setInventoryActivationSync(true);
+$ccEvent.getMessageTypeList().add("inventory-shelf-target-sync");
+update($ccEvent);
+end
+
+rule "Track EPC Synchronization"
+no-loop
+when
+$ccEvent : CCEvent(trackEPCSync == false, isTrackEPCRule() == true, isDisplayItemCC() == false, epcTrackMap!= null, epcTrackMap.isEmpty() == false)
+then
+$ccEvent.setTrackEPCSync(true);
+update($ccEvent);
+end
+
+rule "Sell1Replen1 Synchronization"
+no-loop
+when
+$ccEvent : CCEvent(sell1Replen1 == false, isSell1Replen1Rule(), getShelfTargetId()!=null, getShelfTargetInvLevel()!=null)
+then
+$ccEvent.setSell1Replen1(true);
+update($ccEvent);
+end
+
+rule "Shelf Target Logging"
+no-loop
+when
+$ccEvent : CCEvent(sftLoggingEnabled == true, sell1Replen1 == true, "false".equalsIgnoreCase(getProperty("replenishment.sell1replen1.logging.enabled")))
+then
+$ccEvent.setSftLoggingEnabled(false);
+update($ccEvent);
+end
+
+rule "EPC History Synchronization"
+no-loop
+when
+$ccEvent : CCEvent(epcHistorySync == false, isEpcHistoryLog() == false, isDisplayItemCC() == false)
+then
+$ccEvent.setEpcHistorySync(true);
+$ccEvent.getMessageTypeList().add("epc-history-sync");
+update($ccEvent);
+end
+
+
+query "getCCEvent"
+    $result: CCEvent()
+end
+

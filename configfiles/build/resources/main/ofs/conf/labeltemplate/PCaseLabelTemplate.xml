@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+ $Source: /usr/local/cvs/ofs/install/src/dist/conf/labeltemplate/PCaseLabelTemplate.xml,v $
+ $Revision: 1.1 $
+ $State: Exp $
+-->
+
+<!--
+  This template is for a Printronix printer using 4" X 2" label printing 64-bit or 96-bit EPC Case label
+  Tested on Printronix SL5000r printer.
+
+  The barcode position may need to be adjusted if printing 96-bit EPC label,
+  change FO150,250 to FO70,250
+-->
+<template name="PCaseLabelTemplate">
+    <variables>
+        <variable name="EPCCODE_URI" defaultValue=""/>
+        <variable name="EPCCODE" defaultValue=""/>
+        <variable name="GTIN" defaultValue=""/>
+        <variable name="PRODUCT" defaultValue=""/>
+        <variable name="MANUFACTURER" defaultValue=""/>
+    </variables>
+    <printcode>
+    <![CDATA[
+^XA
+^CF0,32,32
+^FO0,75
+^FB725,4,,C^FDCase EPC {EPCCODE_URI}\&Case EPC (Hex format) {EPCCODE}\&GTIN: {GTIN}\&Product Description: {PRODUCT}^FS
+^FO150,250
+^BY2^BCN,50,Y,N,N^FD{EPCCODE}^FS
+^FO0,350
+^FB725,4,,C^FD{MANUFACTURER}^FS
+^RS^FS
+^WT0,3,1,0,1,n^FH_^FD{TAG_EPC_ZPL}^FS
+^RT0,0,1,1,3,0,0^FS
+^HV0
+^XZ
+]]>
+    </printcode>
+</template>
+

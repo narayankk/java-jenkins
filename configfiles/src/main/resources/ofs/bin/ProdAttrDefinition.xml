@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:ProductAttributes xsi:schemaLocation="urn:ProdAttrDefinition ../ProdAttrDefinition.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:x="urn:ProdAttrDefinition">
+
+  <x:Entity name="Product" >
+	<!-- Mandatory attributes -->
+    <x:Attribute name="Size"              display="Disp Size"                        type="String"/>
+    <x:Attribute name="Color"             display="Disp Color"                       type="String"/>
+    <x:Attribute name="SalesFloorTarget"  display="Disp Sales Floor Target Quantity" type="Integer"/>
+    <x:Attribute name="TradeItem"         display="Disp Trade Item"                  type="String" >
+    	<x:EnumeratedAttributeValue value="YES"/>
+        <x:EnumeratedAttributeValue value="NO"/>
+    </x:Attribute>
+
+    <!-- Custom attributes -->
+    <x:Attribute name="ModelSKU"          display="Disp Model SKU"                    type="String"/>
+    <x:Attribute name="Department"        display="Disp Department"                  type="String"/>
+    <x:Attribute name="DeptName"          display="Disp Dept Name"                    type="String"/>
+    <x:Attribute name="Style"             display="Disp Style"                       type="String"/>
+    <x:Attribute name="StyleID"           display="Disp Style ID"                     type="String"/>
+
+    <x:Attribute name="VendorStyle"       display="Disp Vendor Style"                type="String"/>
+    <x:Attribute name="MajorClassID"      display="Disp Major Class Number"          type="String"/>
+    <x:Attribute name="SubClassID"        display="Disp Sub class Number"            type="String"/>
+    <x:Attribute name="Active"            display="Disp Active"                      type="String" >
+    	<x:EnumeratedAttributeValue value="YES"/>
+        <x:EnumeratedAttributeValue value="NO"/>
+    </x:Attribute>
+
+    <x:Attribute name="BusinessGroupID"      display="Disp Business Group Number"     type="String"/>
+    <x:Attribute name="BusinessGroupDesc"    display="Disp Business Group Desc"       type="String"/>
+    <x:Attribute name="FloorPadID"           display="Disp Floor Pad ID"              type="String"/>
+    <x:Attribute name="FloorPadDesc"         display="Disp Floor Pad Desc"            type="String"/>
+    <x:Attribute name="MajorClassCode"       display="Disp Major Class Code"          type="String"/>
+    <x:Attribute name="MajorClassDesc"       display="Disp Major Class Desc"          type="String"/>
+    <x:Attribute name="BoxID"                display="Disp Box ID"                    type="String"/>
+    <x:Attribute name="WideIndicator"        display="Disp Wide Indicator"            type="String"/>
+    <x:Attribute name="Price"        		 display="Disp Price"            		  type="Double"/>
+  </x:Entity>
+</x:ProductAttributes>

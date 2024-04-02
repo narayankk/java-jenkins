@@ -1,0 +1,501 @@
+<?xml version="1.0" ?>
+<!-- <!DOCTYPE xml-event-mapping SYSTEM "com/oatsystems/service/dquery/XML-Event-Mapping.dtd"> -->
+
+<xml-event-mapping>
+  <types>
+
+        <type name="Tag">
+          <child name="ID" namespace="pmluid">
+            <text type="string"/>
+          </child>
+
+          <child name="IdentityType">
+            <text type="string"/>
+          </child>
+
+          <child name="EncodingType">
+            <text type="string"/>
+          </child>
+
+          <child name="PureIdentityURI" >
+            <text type="string"/>
+          </child>
+
+          <child name="TagURI" >
+            <text type="string"/>
+          </child>
+
+          <child name="SerialNumber">
+            <text type="number"/>
+          </child>
+
+          <child name="SGTIN">
+            <child name="GTIN">
+              <text type="string"/>
+            </child>
+
+            <child name="Filter">
+              <text type="number"/>
+            </child>
+
+            <child name="CompanyPrefix">
+              <text type="string"/>
+            </child>
+
+            <child name="ItemReference">
+              <text type="string"/>
+            </child>
+          </child>
+
+          <child name="SSCC">
+            <child name="SSCCCode">
+              <text type="string"/>
+            </child>
+
+            <child name="Filter">
+              <text type="number"/>
+            </child>
+
+            <child name="CompanyPrefix">
+              <text type="string"/>
+            </child>
+          </child>
+
+          <child name="GID">
+            <child name="GeneralManagerNumber">
+              <text type="string"/>
+            </child>
+
+            <child name="ObjectClass">
+              <text type="string"/>
+            </child>
+          </child>
+
+          <child name="GRAI">
+            <child name="CompanyPrefix">
+              <text type="string"/>
+            </child>
+
+            <child name="AssetType">
+              <text type="string"/>
+            </child>
+
+            <child name="Filter">
+              <text type="number"/>
+            </child>
+          </child>
+
+          <child name="GIAI">
+            <child name="CompanyPrefix">
+              <text type="string"/>
+            </child>
+
+            <child name="Filter">
+              <text type="number"/>
+            </child>
+          </child>
+
+          <child name="DOD">
+            <child name="CAGECode">
+              <text type="string"/>
+            </child>
+
+            <child name="Filter">
+              <text type="number"/>
+            </child>
+          </child>
+      </type>
+
+
+    <!-- Defines a TagAppearance event and TagDisappearanceEvent -->
+    <type name="TagAddRemoveEvent">
+      <child name="Tag" namespace="pmlcore">
+          <child-type-ref name="Tag"/>
+      </child>
+
+      <child-ref name="Location">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Location"/>
+      </child-ref>
+    </type>
+
+    <!-- Defines a raw read event -->
+    <type name="RawReadEvent">
+      <child name="Tag" namespace="pmlcore">
+        <child name="ID" namespace="pmluid">
+          <text type="string"/>
+        </child>
+      </child>
+
+      <child-ref name="Sensor">
+        <source-table-key table="device"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Sensor"/>
+      </child-ref>
+    </type>
+
+    <!-- Defines a barcode read event -->
+    <type name="BarcodeReadEvent">
+      <child name="Barcode" namespace="pmlcore">
+          <text type="string"/>
+      </child>
+
+      <child-ref name="Sensor">
+        <source-table-key table="device"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Sensor"/>
+      </child-ref>
+    </type>
+
+    <type name="SensorStatusEvent">
+      <child name="Status">
+        <!-- One of these two will be present -->
+        <child name="Online"/>
+        <child name="Offline"/>
+      </child>
+
+      <!-- The key used is device.name and not the EPC -->
+      <child-ref name="Sensor">
+        <source-table-key table="device"
+          column="dms_device_node_name"
+          type="string"/>
+
+        <type-ref name="Sensor"/>
+      </child-ref>
+    </type>
+
+    <type name="DigitalReadChangeEvent">
+      <child name="OldDigitalState">
+        <text type="number"/>
+      </child>
+
+      <child name="NewDigitalState">
+        <text type="number"/>
+      </child>
+
+      <child name="Point">
+        <text type="number"/>
+      </child>
+
+      <!-- This event unlike others uses device_id as the table key -->
+      <child-ref name="Sensor">
+        <source-table-key table="device"
+          column="device_id"
+          type="number"/>
+
+        <type-ref name="Sensor"/>
+      </child-ref>
+    </type>
+
+    <type name="ContainerIdentifiedEvent">
+      <child name="WorkflowID">
+        <text type="string"/>
+      </child>
+
+      <child name="ContainerEPC">
+        <child-type-ref name="Tag"/>
+      </child>
+
+      <child-ref name="Location">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Location"/>
+      </child-ref>
+    </type>
+
+    <type name="ContainerCanceledEvent">
+      <child name="WorkflowID">
+        <text type="string"/>
+      </child>
+
+      <child name="ContainerEPC">
+        <child-type-ref name="Tag"/>
+      </child>
+
+      <child-ref name="Location">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Location"/>
+      </child-ref>
+    </type>
+
+    <type name="ContaineeEPC">
+        <child name="ContaineeRawEPC">
+          <text type="string"/>
+        </child>
+
+        <child name="ContaineeEPCTagURI">
+          <text type="string"/>
+        </child>
+    </type>
+
+    <type name="ContainerVerificationCompletedEvent">
+      <child name="WorkflowID">
+        <text type="string"/>
+      </child>
+
+      <child name="ContainerEPC">
+        <child-type-ref name="Tag"/>
+      </child>
+
+      <child-ref name="Location">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Location"/>
+      </child-ref>
+
+      <child name="GenericPayLoad">
+        <child name="ContaineeEPC">
+          <child-type-ref name="ContaineeEPC"/>
+        </child>
+      </child>
+    </type>
+
+    <type name="ContainerReceivedEvent">
+      <child name="WorkflowID">
+        <text type="string"/>
+      </child>
+
+      <child name="ContainerEPC">
+        <child-type-ref name="Tag"/>
+      </child>
+
+      <child-ref name="Location">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Location"/>
+      </child-ref>
+    </type>
+
+    <type name="WriteSucceededEvent">
+      <child name="WorkflowID">
+        <text type="string"/>
+      </child>
+
+      <child name="TagEPC">
+        <child-type-ref name="Tag"/>
+      </child>
+
+      <child-ref name="Sensor">
+        <source-table-key table="device"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Sensor"/>
+      </child-ref>
+    </type>
+
+    <type name="ContainerReleasedEvent">
+      <child name="WorkflowID">
+        <text type="string"/>
+      </child>
+
+      <child name="ContainerEPC">
+        <child-type-ref name="Tag"/>
+      </child>
+
+      <child-ref name="Location">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Location"/>
+      </child-ref>
+
+      <child name="GenericPayLoad">
+        <child name="ContaineeEPC">
+          <child-type-ref name="ContaineeEPC"/>
+        </child>
+      </child>
+    </type>
+
+    <type name="ContainerStartedEvent">
+      <child name="WorkflowID">
+        <text type="string"/>
+      </child>
+
+      <child name="ContainerEPC">
+        <child-type-ref name="Tag"/>
+      </child>
+
+      <child-ref name="Location">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Location"/>
+      </child-ref>
+    </type>
+
+    <type name="VerificationThresholdMetEvent">
+      <child name="WorkflowID">
+        <text type="string"/>
+      </child>
+
+      <child name="ContainerEPC">
+        <child-type-ref name="Tag"/>
+      </child>
+
+      <child-ref name="Location">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="Location"/>
+      </child-ref>
+    </type>
+
+    <type name="EPCTagUri">
+      <text type="string"/>
+    </type>
+
+    <!-- Defines a EPCIS Object Event -->
+
+    <type name="EPCISObjectEvent">
+      <child name="BizStep">
+        <text type="string"/>
+      </child>
+      <child name="Disposition">
+        <text type="string"/>
+      </child>
+      <child-ref name="ReadPoint">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="ReadPoint"/>
+      </child-ref>
+      <child-ref name="BizLocation">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="BizLocation"/>
+      </child-ref>
+      <child name="Action">
+        <text type="string"/>
+      </child>
+    </type>
+
+    <!-- Defines a EPCIS Aggregation Event -->
+    <type name="EPCISAggregationEvent">
+      <child name="BizStep">
+        <text type="string"/>
+      </child>
+      <child name="Disposition">
+        <text type="string"/>
+      </child>
+      <child-ref name="ReadPoint">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="ReadPoint"/>
+      </child-ref>
+      <child-ref name="BizLocation">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="BizLocation"/>
+      </child-ref>
+      <child name="Action">
+        <text type="string"/>
+      </child>
+    </type>
+
+    <!-- Defines a EPCIS Quantity Event -->
+    <type name="EPCISQuantityEvent">
+      <child name="BizStep">
+        <text type="string"/>
+      </child>
+      <child name="Disposition">
+        <text type="string"/>
+      </child>
+      <child-ref name="ReadPoint">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="ReadPoint"/>
+      </child-ref>
+      <child-ref name="BizLocation">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="BizLocation"/>
+      </child-ref>
+      <child name="EpcClass">
+        <text type="string"/>
+      </child>
+      <child name="Quantity">
+        <text type="number"/>
+      </child>
+    </type>
+
+    <!-- Defines a EPCIS Transaction Event -->
+    <type name="EPCISTransactionEvent">
+      <child name="BizStep">
+        <text type="string"/>
+      </child>
+      <child name="Disposition">
+        <text type="string"/>
+      </child>
+      <child-ref name="ReadPoint">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="ReadPoint"/>
+      </child-ref>
+      <child-ref name="BizLocation">
+        <source-table-key table="location"
+          column="epc"
+          type="string"/>
+
+        <type-ref name="BizLocation"/>
+      </child-ref>
+      <child name="Action">
+        <text type="string"/>
+      </child>
+    </type>
+  </types>
+
+  <events>
+    <event tag="TagAppearanceEvent" type="TagAddRemoveEvent"/>
+    <event tag="TagDisappearanceEvent" type="TagAddRemoveEvent"/>
+    <event tag="RawReadEvent" type="RawReadEvent"/>
+    <event tag="BarcodeReadEvent" type="BarcodeReadEvent"/>
+    <event tag="DigitalReadChangeEvent" type="DigitalReadChangeEvent"/>
+    <event tag="SensorStatusEvent" type="SensorStatusEvent"/>
+    <event tag="ContainerIdentifiedEvent" type="ContainerIdentifiedEvent"/>
+    <event tag="ContainerCanceledEvent" type="ContainerCanceledEvent"/>
+    <event tag="ContainerVerificationCompletedEvent" type="ContainerVerificationCompletedEvent"/>
+    <event tag="ContainerReceivedEvent" type="ContainerReceivedEvent"/>
+    <event tag="WriteSucceededEvent" type="WriteSucceededEvent"/>
+    <event tag="ContainerReleasedEvent" type="ContainerReleasedEvent"/>
+    <event tag="ContainerStartedEvent" type="ContainerStartedEvent"/>
+    <event tag="VerificationThresholdMetEvent" type="VerificationThresholdMetEvent"/>
+    <event tag="EPCISObjectEvent" type="EPCISObjectEvent"/>
+    <event tag="EPCISAggregationEvent" type="EPCISAggregationEvent"/>
+    <event tag="EPCISQuantityEvent" type="EPCISQuantityEvent"/>
+    <event tag="EPCISTransactionEvent" type="EPCISTransactionEvent"/>
+  </events>
+
+</xml-event-mapping>

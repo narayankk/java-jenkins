@@ -1,0 +1,52 @@
+<!ELEMENT data-migration-spec (table)*>
+
+<!ELEMENT table (column | deleted-column | state-column | last-update-state-column | guid-column)* >
+<!ATTLIST table
+      name CDATA #REQUIRED 
+>
+
+<!ELEMENT column (primary-key | foreign-key | referenced-key | globally-unique-key )? >
+<!ATTLIST column
+      name CDATA #REQUIRED
+      type CDATA #REQUIRED
+>
+
+<!ELEMENT deleted-column EMPTY>
+<!ATTLIST deleted-column
+      name CDATA #REQUIRED
+>
+
+<!ELEMENT guid-column EMPTY>
+<!ATTLIST guid-column
+      name CDATA #REQUIRED
+>
+
+<!ELEMENT state-column EMPTY>
+<!ATTLIST state-column
+      name CDATA #REQUIRED
+>
+
+<!ELEMENT last-update-state-column EMPTY>
+<!ATTLIST last-update-state-column
+      name CDATA #REQUIRED
+>
+
+<!ELEMENT primary-key EMPTY >
+<!ATTLIST primary-key
+      sequence CDATA #REQUIRED
+>
+
+<!ELEMENT foreign-key EMPTY >
+<!ATTLIST foreign-key
+      table CDATA #REQUIRED
+      column CDATA #REQUIRED
+      update-later CDATA "false"
+      is-primary-key CDATA "false"
+>
+
+<!ELEMENT referenced-key EMPTY >
+<!ATTLIST referenced-key
+      global CDATA "false"
+>
+
+<!ELEMENT globally-unique-key EMPTY >

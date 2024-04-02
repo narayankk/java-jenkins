@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <scenario>
+    <property key="name">DC Process initializer subscenario for initializing station and scenario variables</property>
+    <property key="description">This sub-scenario will set all data structure to initial values and will change Controller state to 'WAIT'.</property>
+    <property key="sub_scenario">true</property>
+    <property key="parent_access">RW</property>
+    <property key="namespace">dc-recv-ship-initializer-sub-proc</property>
+    <property key="exits">DONE,ERROR</property>
+    <property key="inputs">
+       stationId,criticalErrorOutput,scenarioType,scenarioName,transitLocationRP,scenarioDeviceType,transitLocation,asnMode
+    </property>
+    <property key="outputs">
+	codeList,desOnlineFlag,logicalState,historyStr,historyMap,siteName,siteEpc,siteId,boxID,sessionID,processID,shipment,isRejoinSession,epcBatchSize,allowDatabaseTransaction,publishDataToSubscribers,dummyProcessID
+    </property>
+    
+    <process>
+  
+      <start name="Start">
+          <target exit="All Cases" name="InitializeStation"></target>
+    </start>
+            <activity name="InitializeStation" resource="class:com.oatsystems.solutions.apparel.primitives.InitializeStation">
+              <target exit="done" name="RegisterServices"/>
+              <target exit="error" name="ERROR"/>
+              <input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+              <input class="java.lang.String" constant="false" name="digitalOutputPattern" required="false">${process.criticalErrorOutput}</input>
+            </activity>
+            <activity name="RegisterServices" resource="class:com.oatsystems.solutions.apparel.primitives.RegisterCommunicationService">
+		  <target exit="done" name="GetSiteIdForLocation"/>
+		  <target exit="error" name="ERROR"/>
+		  <input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+		  <input class="java.lang.String" constant="false" name="scenarioName" required="false">${process.scenarioName}</input>
+		  <input class="java.lang.String" constant="true" name="operation" required="false">register</input>
+            </activity>
+           <activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+			<target exit="done" name="loadProperty"/>
+			<target exit="error" name="ERROR"/>
+	    	<input class="java.lang.String" constant="false" name="locationEpc" required="true">${process.transitLocationRP}</input>
+	    	<output class="java.lang.String" constant="false" name="siteId">${process.siteId}</output>
+	    	<output class="java.lang.String" constant="false" name="siteEpc">${process.siteEpc}</output>
+	    	<output class="java.lang.String" constant="false" name="siteName">${process.siteName}</output>
+            </activity> 
+		 <activity name="loadProperty" resource="class:com.oatsystems.solutions.apparel.primitives.GetMVProperty">
+			<target exit="done" name="loadDBProperty"/>
+			<target exit="error" name="loadDBProperty"/>
+			<input class="java.lang.String" constant="false" name="propertykey" required="true">DC.epcread_batch_size</input>
+			<output class="java.lang.String" constant="false" name="propertyValue">${process.epcBatchSize}</output>
+		</activity>
+		<activity name="loadDBProperty" resource="class:com.oatsystems.solutions.apparel.primitives.GetMVProperty">
+			<target exit="done" name="loadProperty1"/>
+			<target exit="error" name="loadProperty1"/>
+			<input class="java.lang.String" constant="false" name="propertykey" required="true">DC.allow_database_transactions</input>
+			<output class="java.lang.String" constant="false" name="propertyValue">${process.allowDatabaseTransaction}</output>
+		</activity>
+		<activity name="loadProperty1" resource="class:com.oatsystems.solutions.apparel.primitives.GetMVProperty">
+			<target exit="done" name="CheckIfSessionExists"/>
+		    <target exit="error" name="CheckIfSessionExists"/>
+			<input class="java.lang.String" constant="false" name="propertykey" required="true">DC.publish_data_to_subscribers</input>
+			<output class="java.lang.String" constant="false" name="propertyValue">${process.publishDataToSubscribers}</output>
+		</activity>
+		<activity name="CheckIfSessionExists" resource="class:com.oatsystems.solutions.apparel.primitives.CheckIfSessionExists">
+			<target exit="done" name="DCSendFailedMessages"/>
+			<target exit="error" name="ERROR"/>
+			<target exit="notExists" name="DCSendFailedMessages"/>
+			<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="scenarioName" required="false">${process.scenarioName}</input>
+			<input class="java.lang.String" constant="false" name="scenarioType" required="false">${process.scenarioType}</input>
+			<input class="java.lang.String" constant="false" name="scenarioDeviceType" required="false">${process.scenarioDeviceType}</input>
+			<input class="java.lang.String" constant="false" name="siteName">${process.siteName}</input>
+			<input class="java.lang.String" constant="false" name="shipToDesc">${process.shipToDesc}</input>
+			<input class="java.lang.String" constant="false" name="historyLength" required="true">${process.historyLength}</input>
+			<input class="java.lang.String" constant="false" name="allowDatabaseTransaction" required="true">${process.allowDatabaseTransaction}</input>
+			<output class="java.lang.String" constant="false" name="boxID">${process.boxID}</output>
+			<output class="java.lang.String" constant="false" name="sessionID">${process.sessionID}</output>
+			<output class="java.lang.String" constant="false" name="processID">${process.processID}</output>
+			<output class="com.oatsystems.asn.objects.Shipment" constant="false" name="shipment">${process.shipment}</output>
+			<output class="java.lang.String" constant="false" name="isRejoinSession">${process.isRejoinSession}</output>
+			<output class="com.oatsystems.solutions.apparel.objects.ReadSessionHistory" constant="false" name="historyMap">${process.historyMap}</output>
+		</activity>
+		<activity name="DCSendFailedMessages" resource="class:com.oatsystems.solutions.apparel.primitives.DCSendFailedMessages">
+			<target exit="done" name="ResetMaintenanceModeCodes"/>
+			<target exit="error" name="ERROR"/>
+			<input class="java.lang.String" constant="false" name="stationId" required="false">${process.stationId}</input>
+			<input class="java.lang.String" constant="false" name="scenarioName" required="false">${process.scenarioName}</input>
+		</activity>
+
+    
+	     <!--
+            <activity name="LoadProcessVar" resource="class:com.oatsystems.solutions.apparel.primitives.LoadStringProcessVarFromFile">
+              <target exit="valueFound" name="ConvertStringVarToMap"></target>
+              <target exit="valueNotFound" name="ConvertStringVarToMap"></target>
+              <target exit="error" name="WaitForEvents"/>
+              <input class="java.lang.String" constant="false" name="fileId" required="true">${process.stationId}</input>
+              <input class="java.lang.String" constant="true" name="key" required="true">HISTORYSTR</input>
+              <output class="java.lang.String" constant="false" name="value">${process.historyStr}</output>
+            </activity>
+            <activity name="ConvertStringVarToMap" resource="class:com.oatsystems.solutions.apparel.primitives.ConvertStringVarToMap">
+                <target exit="done" name="ClearIMSMaintenanceStatus"></target>
+                <target exit="error" name="ClearIMSMaintenanceStatus"></target>
+                <input class="java.lang.String" constant="false" name="historyLength" required="true">${process.historyLength}</input>
+                <input class="java.lang.String" constant="false" name="historyStr" required="false">${process.historyStr}</input>
+                <output class="java.util.Map" constant="false" name="historyMap">${process.historyMap}</output>
+            </activity>	             
+
+            <activity name="ClearIMSMaintenanceStatus" resource="class:com.oatsystems.solutions.apparel.primitives.ClearIMSMaintenanceStatus">
+              <target exit="done" name="ResetMaintenanceModeCodes"/>
+              <target exit="error" name="ResetMaintenanceModeCodes"/>
+              <input class="java.lang.String" constant="false" name="errorCode0" required="false">START_TRIGGER_FAILURE_OK</input>
+              <input class="java.lang.String" constant="false" name="errorCode1" required="false">RFID_READER_UNACCESSIBLE_OK</input>
+              <input class="java.lang.String" constant="false" name="errorCode2" required="false">END_TRIGGER_FAILURE_OK</input>
+    		  <input class="java.lang.String" constant="false" name="errorCode3" required="false">WMS_INTEGRATION_ERROR_OK</input>
+            </activity> 
+            -->
+            <activity name="ResetMaintenanceModeCodes" resource="class:com.oatsystems.workflow.primitives.finegrained.SetProcessVar">
+                <target exit="done" name="DecideOnStartNoDBModeProcess"/>
+                <target exit="error" name="ERROR"/>
+                <input class="java.lang.String" constant="false" name="inArg2">Waiting</input>
+                <output class="java.util.List" constant="false" name="outArg0">${process.codeList}</output>
+    		<output class="java.lang.String" constant="false" name="outArg1">${process.desOnlineFlag}</output>
+    		<output class="java.lang.String" constant="false" name="outArg2">${process.logicalState}</output>
+            </activity>
+		<decision name="DecideOnStartNoDBModeProcess">
+			<case condition="${process.allowDatabaseTransaction}!=null and ${process.allowDatabaseTransaction} eq 'false'" label="StartNoDBModeProcess" target="StartNoDBModeProcess"/>
+			<default label="DONE" target="DONE"/>
+		</decision>
+		<activity name="StartNoDBModeProcess" resource="primitive:StartProcess">
+    	      <target name="CloseNoDBModeProcess" exit="done" />
+    	      <target name="ERROR" exit="error" />
+    	      <input  name="processMasterCode" class="java.lang.String">${process.scenarioType}</input>
+    	      <input  name="processData0" class="java.lang.String">${process.scenarioType}</input>
+    	      <input  name="processData1" class="java.lang.String">sys</input>
+    	      <input  name="processData3" class="java.lang.String">NODBMODE</input>
+			  <input  name="processData4" class="java.lang.String">${process.asnMode}</input>
+    	      <input  name="processData5" class="java.lang.String">${process.transitLocation}</input>
+    	      <input  name="processData6" class="java.lang.String">${process.siteEpc}</input>
+    	      <input  name="processData7" class="java.lang.String">${process.stationId}</input>
+    	      <input  name="processData8" class="java.lang.String">${process.scenarioName}</input>
+        	  <input  name="processData9" class="java.lang.String">${process.scenarioDeviceType}</input>
+    	      <output name="processID" class="java.lang.String">${process.dummyProcessID}</output>
+		</activity>
+		<activity name="CloseNoDBModeProcess" resource="primitive:CloseProcess">
+		  <target name="DONE" exit="done" />
+	      <target name="ERROR" exit="error" />
+	      <input  name="processMasterCode" class="java.lang.String">${process.scenarioType}</input>
+	      <input  name="processData0" class="java.lang.String">${process.scenarioType}</input>
+	      <input  name="processData1" class="java.lang.String">sys</input>
+	      <input  name="processData3" class="java.lang.String">NODBMODE</input>
+		  <input  name="processData4" class="java.lang.String">${process.asnMode}</input>
+	      <input  name="processData5" class="java.lang.String">${process.transitLocation}</input>
+	      <input  name="processData6" class="java.lang.String">${process.siteEpc}</input>
+	      <input  name="processData7" class="java.lang.String">${process.stationId}</input>
+	      <input  name="processData8" class="java.lang.String">${process.scenarioName}</input>
+	      <input  name="processData9" class="java.lang.String">${process.scenarioDeviceType}</input>
+	      <input name="processID" class="java.lang.String">${process.dummyProcessID}</input>
+		</activity>
+		
+       <end name="ERROR"></end>
+       <end name="DONE"></end>
+       <end name="WaitForEvents"></end>
+    </process>
+       	
+     <config/>
+       	
+    <display/>
+</scenario>
+        

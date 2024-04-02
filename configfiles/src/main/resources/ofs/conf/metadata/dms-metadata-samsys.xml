@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+  <table name="dms_device">
+
+    <entity type="SamsysMP9320Reader" extends="RFReader">
+      <locator-option value="Samsys MP9320 Reader">Samsys MP9320 Reader</locator-option>
+
+      <label>Samsys MP9320 Reader</label>
+      <description>Samsys MP9320 Reader Configuration</description>
+      <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+	<label>Maximum number of antennas</label>
+	<description>Maximum number of antennas for Samsys MP9320 Reader</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="4" is-default="true">4</option>
+	</select>
+      </property>
+      <property key="TagType" is-mandatory="true">
+	<label>Tag Type</label>
+	<description>Type of tags used.</description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="EPC1" is-default="true">EPC1</option>
+	  <option value="IS186B">IS186B</option>
+	  <option value="Philips UCODE V1.19">Philips UCODE V1.19</option>
+	  <option value="EPC1G2">Gen2</option>
+	  <option value="ALL">EPC1/IS186B/Gen2</option>
+	</select>
+      </property>
+      <property key="AutoMode" is-mandatory="false">
+	<label>Auto Mode</label>
+	<description>True implies Continous. False implies Polled behaviour. </description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="True">Yes</option>
+	  <option value="NoAction" is-default="true">No Action</option>
+	</select>
+      </property>
+      <property key="NumberOfPassesPerRead" is-mandatory="false">
+	<label>Number of passes per read</label>
+	<description>The number of times to query an antenna before moving onto the next antenna</description>
+	<type-definition>oat:NumberOfPassesPerReadSamsys</type-definition>
+	<select is-bound="false">
+	  <option value="2" is-default="true">2</option>
+	</select>
+      </property>
+      <property key="SerialNumber" is-mandatory="false">
+	<label>Serial Number</label>
+	<description>Serial Number required to enable the reader to use IS186b Tags. </description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	</select>
+      </property>
+      <property key="Session" is-mandatory="false">
+	<label>Session </label>
+	<description>Session </description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="0" is-default="true">0</option>
+	  <option value="1">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>
+	</select>
+      </property>
+      
+      <property key="QValue" is-mandatory="false">
+	<label>Q value</label>
+	<description>Q Value</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="0">00</option>
+	  <option value="1" is-default="true">01</option>
+	  <option value="2">02</option>
+	  <option value="3">03</option>
+	  <option value="4">04</option>
+	  <option value="5">05</option>
+	  <option value="6">06</option>
+	  <option value="7">07</option>
+	  <option value="8">08</option>
+	  <option value="9">09</option>
+	  <option value="10">10</option>
+	  <option value="11">11</option>
+	  <option value="12">12</option>
+	  <option value="13">13</option>
+	  <option value="14">14</option>
+	  <option value="15">15</option>
+	</select>
+      </property>
+      
+      <property key="SamsysARS" is-mandatory="false">
+	<label>Adaptive Round Sizing </label>
+	<description> Adaptive tuning of Q value </description>
+	<type-definition>oat:SmallString</type-definition>
+	<select is-bound="true">
+	  <option value="True"> On </option>
+	  <option is-default="true" value="False">Off</option>
+	</select>
+      </property>
+      
+    </entity>
+
+  </table>
+</meta-data>

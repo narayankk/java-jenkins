@@ -1,0 +1,69 @@
+  <table name="senseware_property_group">
+    <column name="property_group_id" type="NUMERIC">
+      <primary-key sequence="senseware_property_group_seq"/>
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="senseware_property">
+    <column name="property_id" type="NUMERIC">
+      <primary-key sequence="senseware_property_seq"/>
+    </column>
+    <column name="property_group_id" type="NUMERIC">
+      <foreign-key table="senseware_property_group" column="property_group_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="property_key" type="VARCHAR">
+    </column>
+    <column name="property_value" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="senseware_install">
+    <column name="senseware_install_id" type="NUMERIC">
+      <primary-key sequence="senseware_install_seq"/>
+    </column>
+    <column name="senseware_epc" type="VARCHAR">
+      <!-- UPDATE senseware_install SET guid = senseware_epc -->
+      <globally-unique-key/>
+    </column>
+    <column name="senseware_serial_prefix" type="VARCHAR">
+    </column>
+    <column name="name" type="VARCHAR">
+    </column>
+    <column name="description" type="VARCHAR">
+    </column>
+    <column name="time_zone" type="VARCHAR">
+    </column>
+    <column name="start_of_day" type="VARCHAR">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>
+
+  <table name="senseware_session">
+    <column name="senseware_session_id" type="NUMERIC">
+      <primary-key sequence="senseware_session_seq"/>
+    </column>
+    <column name="senseware_install_id" type="NUMERIC">
+      <foreign-key table="senseware_install" column="senseware_install_id" update-later="false" is-primary-key="false"/>
+    </column>
+    <column name="start_ts" type="TIMESTAMP">
+    </column>
+    <column name="heartbeat_ts" type="TIMESTAMP">
+    </column>
+    <column name="end_ts" type="TIMESTAMP">
+    </column>
+    <deleted-column name="deleted"/>
+    <state-column name="state"/>
+    <last-update-state-column name="last_update_state"/>
+    <guid-column name="guid"/>
+  </table>

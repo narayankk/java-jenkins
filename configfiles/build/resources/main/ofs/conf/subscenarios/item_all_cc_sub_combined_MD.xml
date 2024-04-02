@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<scenario>
+  <property key="name">item_cc - subscenario for association</property>
+  <property key="description">Associate a set of tags to the specified location.</property>
+  <property key="sub_scenario">true</property>
+  <property key="parent_access">R</property>
+  <property key="namespace">assn-sub-combined</property>
+  <property key="exits">DONE,ERROR</property>
+  <property key="inputs">
+     isCombined,combinedCC,hasWholeStoreCC,
+     acceptanceStatus,processType,processSubType,user,
+     isAuthoritative,
+     useStoredProc,isManualAcceptance,isCCAcceptanceFromUI,callAutoretirement,taskSource,processStartTime,processEndTime
+  </property>
+  <property key="outputs">failedEpcs</property>
+  
+  <process>
+
+    <start name="Start">
+        <target exit="All Cases" name="StartAssociationProcess"></target>
+    </start>
+
+    <activity name="StartAssociationProcess" resource="primitive:StartProcess">
+      <!--Fix for MV-486-->
+      <target name="CreateCombinedCC" exit="done" />
+      <!-- Primitive never returns an error exit value. Safe to go to next activity. -->
+      <target name="ERROR" exit="error" />
+      <input  name="processMasterCode" class="java.lang.String">${process.processType}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData9" class="java.lang.String">COMBINED_CC</input>      
+      <output name="processID" class="java.lang.String">${process.localProcId}</output>
+    </activity>
+   
+    <activity name="CreateCombinedCC" resource="class:com.oatsystems.solutions.apparel.primitives.CreateCombinedCC">
+      <target exit="done" name="GetSiteIdForLocationForSP"></target>
+      <target exit="error" name="CloseAssociationProcessOnError"></target>
+      <input  class="com.oatsystems.solutions.apparel.objects.CombinedCC" constant="false" name="combinedCC">${process.combinedCC}</input>
+      <input  name="processId" class="java.lang.String">${process.localProcId}</input>
+      <input name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</input>
+      <input name="acceptedByUser" class="java.lang.String">${process.user}</input>
+      <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <output class="java.lang.Long" constant="false" name="combinedCCId">${process.combinedCCId}</output>
+      <output name="mccProcessStartTime" class="java.lang.String">${process.mccProcessStartTime}</output>
+      <output name="mccProcessEndTime" class="java.lang.String">${process.mccProcessEndTime}</output>
+   </activity>
+
+	<activity name="GetSiteIdForLocationForSP" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIDForCombinedCC">
+	  <target name="UpdateAcceptedProcess" exit="done" />
+	  <target name="CloseAssociationProcessOnError" exit="error" />
+	  <input name="isCombined" class="java.lang.Boolean">${process.isCombined}</input>
+	  <input  name="ccDetailId" class="java.lang.Long">${process.combinedCCId}</input>
+	  <output name="siteId" class="java.lang.String">${process.ccLocSiteId}</output>
+	  <output name="siteEpc" class="java.lang.String">${process.ccLocSiteEpc}</output>
+	  <output name="siteName" class="java.lang.String">${process.ccLocSiteName}</output>
+	</activity>
+
+   <activity name="UpdateAcceptedProcess" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateAcceptedProcess">
+      <target name="RejectOlderCCs" exit="done" />
+      <target name="CloseAssociationProcessOnError" exit="error" />
+      <input  name="acceptedProcessId" class="java.lang.String">${process.localProcId}</input>
+      <input  name="isCombined" class="java.lang.Boolean">${process.isCombined}</input>
+      <input  name="ccDetailId" class="java.lang.Long">${process.combinedCCId}</input>
+    </activity>
+   
+    <activity name="RejectOlderCCs" resource="class:com.oatsystems.solutions.apparel.primitives.RejectOlderCCs">
+      <target name="GetMissingBLRPsForMergeSP" exit="done" />
+      <target name="CloseAssociationProcessOnError" exit="error" />
+      <input name="ccDetailId" class="java.lang.Long">${process.combinedCCId}</input>
+      <input name="isCombined" class="java.lang.Boolean">${process.isCombined}</input>
+      <input name="acceptedProcessId" class="java.lang.String">${process.localProcId}</input>
+      <input name="useStoredProc" class="java.lang.String">${process.useStoredProc}</input>
+      <input name="isWholeStoreCC" class="java.lang.String">${process.isWholeStoreCCInCombined}</input>
+      <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+    </activity>
+	
+	<!-- Fix for MV-3813-->
+	<activity name="GetMissingBLRPsForMergeSP" resource="class:com.oatsystems.solutions.apparel.primitives.GetLocationsForStateSite">	 
+      <target name="UpdateCCData" exit="done" />	 
+      <target name="CloseAssociationProcessOnError" exit="error" />	 
+      <input  name="itemState" class="java.lang.String">'Missing'</input>	 
+      <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>	 
+      <output name="blLocEpcs" class="java.util.List" constant="false">${process.missingItemBLs}</output>
+      <output name="rpLocEpcs" class="java.util.List" constant="false">${process.missingItemRPs}</output>
+    </activity>	 
+    
+    <activity name="UpdateCCData" resource="class:com.oatsystems.solutions.apparel.primitives.UpdateCCData">
+      <target name="StoreCCDetails" exit="done" />
+      <target name="CloseAssociationProcessOnError" exit="error" />
+      <input name="ccDetailId" class="java.lang.Long">${process.combinedCCId}</input>
+      <input name="isCombined" class="java.lang.Boolean">${process.isCombined}</input>
+      <input name="processID" class="java.lang.String">${process.localProcId}</input>
+    </activity> 
+    
+    <activity name="StoreCCDetails" resource="class:com.oatsystems.solutions.apparel.primitives.StoreCombinedCCDetailsMD">
+      <target name="GetChildCCArray" exit="done" />
+      <target name="GetChildCCArray" exit="rejected" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+
+      <input  name="ccDetailId" class="java.lang.Long">${process.combinedCCId}</input>
+      <input  name="parentLocationEpc" class="java.lang.String">${process.ccLocSiteEpc}</input>
+      <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input  class="com.oatsystems.solutions.apparel.objects.CombinedCC" name="combinedCC">${process.combinedCC}</input>
+      <output name="accuracy" class="java.lang.Long">${process.accuracy}</output>
+    </activity>
+
+
+
+    <activity name="GetChildCCArray" resource="class:com.oatsystems.solutions.apparel.primitives.GetChildCCListByBLRP">
+        <target exit="done" name="IterateOnChildCCArrayForAdjInv"></target>
+        <target exit="error" name="SetVariablesToNullOnError"></target>
+        <input name="isCombined" class="java.lang.Boolean">${process.isCombined}</input>
+        <input name="ccDetailId" class="java.lang.Long">${process.combinedCCId}</input>
+        <output name="childCCArray" class="[Ljava.lang.String;">${process.childCCArray}</output>
+    </activity>
+    
+    <activity name="IterateOnChildCCArrayForAdjInv" resource="primitive:IterateOnObjectArray">
+        <target name="ProcessCCData" exit="continue" />
+        <target name="DecideToCallMissing" exit="break" />
+        <input name="iterationRange" class="[Ljava.lang.Object;">${process.childCCArray}</input>
+        <input name="currentIndex" class="java.lang.String">${process.currentIndex}</input>
+        <output name="currentIndex" class="java.lang.String">${process.currentIndex}</output>
+        <output name="currentValue" class="java.lang.String">${process.childCCID}</output>
+    </activity>
+
+    <!--activity name="CheckIfProcessedCC" resource="class:com.oatsystems.solutions.apparel.primitives.CheckIfCCProcessed">
+      <target exit="processed" name="CheckCCStatus"></target>
+      <target exit="notProcessed" name="ProcessCCData"></target>
+      <target exit="partiallyProcessed" name="CheckCCStatus"></target>
+      <target exit="uiPartiallyProcessed" name="CheckCCStatus"></target>
+      <target exit="notClosed" name="CheckCCStatus"></target>
+      <target exit="invalidCCDetailId" name="SetVariablesToNullOnError"></target>
+      <target exit="error" name="SetVariablesToNullOnError"></target>
+      <input class="java.lang.Long" constant="false" name="ccDetailID">${process.childCCID}</input>
+      <input class="java.lang.Boolean" constant="false" name="isCombined">F</input>
+      <input class="java.lang.String" constant="false" name="scenarioType">'HH'</input>
+      <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+      <output class="com.oatsystems.solutions.apparel.objects.CombinedCC" constant="false" name="validCombinedCC">${process.combinedCC}</output>
+      <output class="java.lang.Long" constant="false" name="ccDetailID">${process.ccDetailID}</output>
+      <output class="java.lang.String" constant="false" name="hasWholeStoreCC">${process.hasWholeStoreCC}</output>
+      <output class="java.lang.String" name="acceptedProcessID">${process.processID}</output>
+      <output class="java.lang.String" constant="false" name="processStartTime">${process.processStartTime}</output>
+      <output class="java.lang.String" name="ccAlreadySumitted">${process.ccAlreadySumitted}</output>
+      <output class="java.lang.String" constant="false" name="parentLocationEpc">${process.parentLocationEpc}</output>
+      <output class="java.lang.String" constant="false" name="ccStatus">${process.ccStatus}</output>
+    </activity>
+	
+    <decision name="CheckCCStatus">
+      <case condition="${process.ccStatus} ne null and ${process.ccStatus} eq 'T'" label="Associate Read EPCs To location or not" target="IterateOnChildCCArrayForAdjInv"></case>
+      <default target="ProcessCCData"/>
+    </decision-->
+	
+    <activity name="ProcessCCData" resource="class:com.oatsystems.solutions.apparel.primitives.ProcessCCData">
+      <target name="IterateOnChildCCArrayForAdjInv" exit="done" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+      <input  name="ccDetailId" class="java.lang.Long">${process.combinedCCId}</input>
+      <input name="processID" class="java.lang.String">${process.localProcId}</input>
+      <input  name="processType" class="java.lang.String">${process.processType}</input>
+      <input  name="processSubType" class="java.lang.String">COMBINED_CC</input>
+      <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+      <input name="missingItemBL" class="java.lang.String" constant="false" required="false">${process.missingItemBLs}.get(0)</input>
+      <input name="missingItemRP" class="java.lang.String" constant="false" required="false">${process.missingItemRPs}.get(0)</input>
+      <input name="ccList" class="java.lang.String">${process.childCCID}</input>
+	  <input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+      <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <input  name="filterExpression" constant="false" class="java.lang.String">${process.filterExpression}</input>
+    </activity>
+
+	<decision name="DecideToCallMissing">
+      <case condition="${process.isAuthoritative}.equalsIgnoreCase('TRUE') or ${process.isAuthoritative}.equalsIgnoreCase('T')" label="Move Missing EPCs To OOS or not" target="ProcessCombinedCCMissing"></case>
+      <default target="CloseCCDetail"/>
+ 	</decision>
+	
+	<activity name="ProcessCombinedCCMissing" resource="class:com.oatsystems.solutions.apparel.primitives.ProcessMergeCCData">
+      <target name="CloseCCDetail" exit="done" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+      <input  name="ccDetailId" class="java.lang.Long">${process.combinedCCId}</input>
+      <!--input name="processID" class="java.lang.String">${process.localProcId}</input>
+	  <input  name="processType" class="java.lang.String">${process.processType}</input>
+      <input  name="processSubType" class="java.lang.String">COMBINED_CC</input-->
+      <input name="isAuthoritative" class="java.lang.String">'T'</input>
+      <!--input name="missingItemBL" class="java.lang.String" constant="false" required="false">${process.missingItemBLs}.get(0)</input>
+      <input name="missingItemRP" class="java.lang.String" constant="false" required="false">${process.missingItemRPs}.get(0)</input-->
+	  <input  name="filterExpression" constant="false" class="java.lang.String">${process.filterExpression}</input>
+	  <!--input name="childCCArray" class="[Ljava.lang.Long;">${process.childCCArray}</input-->
+    </activity>
+	
+	<activity name="CloseCCDetail" resource="class:com.oatsystems.solutions.apparel.primitives.CloseCCDetail">
+      <target name="CloseAssociationProcessRead" exit="done" />
+      <target name="CloseAssociationProcessOnError" exit="error" />
+      <input name="isCombined" class="java.lang.Boolean">${process.isCombined}</input>
+      <input name="ccDetailId" class="java.lang.Long">${process.combinedCCId}</input>
+      <input name="acceptanceStatus" class="java.lang.String">${process.acceptanceStatus}</input>
+      <input name="acceptedUser" class="java.lang.String">${process.user}</input>
+      <input name="useStoredProc" class="java.lang.String">${process.useStoredProc}</input>
+      <input name="isWholeStoreCC" class="java.lang.String">${process.isWholeStoreCCInCombined}</input>
+      <input name="isAcceptanceFromUI" class="java.lang.String">${process.isCCAcceptanceFromUI}</input>
+      <input name="siteId" class="java.lang.String">${process.ccLocSiteId}</input>
+    </activity>
+
+	<activity name="CloseAssociationProcessRead" resource="primitive:CloseProcess">
+      <target name="SetVariablesToNull" exit="done" />
+      <target name="SetVariablesToNull" exit="error" />
+      <input name="processID" class="java.lang.String">${process.localProcId}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData9" class="java.lang.String">COMBINED_CC</input>      
+      <input name="processData2" class="java.lang.String">${process.mccProcessStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.mccProcessEndTime}</input>    
+      <output name="processID" class="java.lang.String">${process.localProcId}</output>
+    </activity>
+
+    <activity name="SetVariablesToNull" resource="primitive:SetVariablesToNull">
+      <target name="DONE" exit="done" />
+      <target name="DONE" exit="skip" />
+      <target name="ERROR" exit="error" />
+      <output name="variable0" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currTag}</output>
+      <output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+      <output name="variable2" class="java.lang.String">${process.parentLocEpc}</output>
+      <output name="variable3" class="java.lang.Object">${process.parentLocationEpcForAssociation}</output>
+      <output name="variable4" class="java.lang.Object">${process.inferredParentLocationEpc}</output>
+      <output name="variable5" class="java.util.Collection">${process.expectedEpcs}</output>
+      <output name="variable6" class="java.lang.String">${process.childLocationCount}</output>
+      <output name="variable7" class="java.util.HashMap">${process.childLocationMap}</output>
+      <output name="variable8" class="java.lang.Long">${process.ccDtlId}</output>
+      <output name="variable9" class="java.lang.Long">${process.curCCDetailIndex}</output>
+    </activity>
+
+    <activity name="CloseAssociationProcessOnError" resource="primitive:CloseProcess">
+      <target name="SetVariablesToNullOnError" exit="done" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+      <input name="processID" class="java.lang.String">${process.processID}</input>
+      <input name="processData0" class="java.lang.String">${process.processType}</input>
+      <input name="processData1" class="java.lang.String">${process.user}</input>
+      <input name="processData9" class="java.lang.String">COMBINED_CC</input>      
+      <input name="processData2" class="java.lang.String">${process.mccProcessStartTime}</input>
+      <input name="processData3" class="java.lang.String">${process.mccProcessEndTime}</input>   
+      <output name="processID" class="java.lang.String">${process.processID}</output>
+    </activity>
+
+    <activity name="SetVariablesToNullOnError" resource="primitive:SetVariablesToNull">
+      <target name="ERROR" exit="done" />
+      <target name="ERROR" exit="skip" />
+      <target name="ERROR" exit="error" />
+      <output name="variable0" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currTag}</output>
+      <output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+      <output name="variable2" class="java.lang.String">${process.parentLocEpc}</output>
+      <output name="variable3" class="java.lang.Object">${process.parentLocationEpcForAssociation}</output>
+      <output name="variable4" class="java.lang.Object">${process.inferredParentLocationEpc}</output>
+      <output name="variable5" class="java.util.Collection">${process.expectedEpcs}</output>
+      <output name="variable6" class="java.lang.String">${process.childLocationCount}</output>
+      <output name="variable7" class="java.util.HashMap">${process.childLocationMap}</output>
+      <output name="variable8" class="java.lang.Long">${process.ccDtlId}</output>
+      <output name="variable9" class="java.lang.Long">${process.curCCDetailIndex}</output>
+    </activity>
+	
+    <end name="ERROR"></end>
+    <end name="DONE"></end>
+    
+    </process>
+
+    <config/>
+
+    <display/>
+</scenario>

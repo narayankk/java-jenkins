@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:ProductAttributes xsi:schemaLocation="urn:ProdAttrDefinition ../conf/ProdAttrDefinition.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:x="urn:ProdAttrDefinition">
+
+  <x:Entity name="Product" >
+		<!-- attribute: GTIN -->
+		<!-- Mandatory: If "SKU" is different from GTIN, then this field is mandatory -->
+		<!-- Description: "Other standard item identifier such as GTIN. -->
+		<x:Attribute name="GTIN"  display="GTIN" type="String"/>
+		<!-- attribute: Style-Color -->
+		<!-- Mandatory: No -->
+		<!-- Description: "Product Code used internally by Retailer -->
+		<x:Attribute name="StyleColor"  display="Style-Color" type="String"/>
+		<!-- attribute: Style -->
+		<!-- Mandatory: Yes -->
+		<!-- Description: "Code uniquely identifies the item’s product. Also referred to as Article by other retailers. -->
+		<x:Attribute name="Style"  display="Style" type="String"/>
+		<!-- attribute: Color -->
+		<!-- Mandatory: Yes -->
+		<!-- Description: "Color as printed on the label -->
+		<x:Attribute name="Color"  display="Color" type="String"/>
+		<!-- attribute: Color Description -->
+		<!-- Mandatory: No -->
+		<!-- Description: "Color Description-->
+		<x:Attribute name="ColorDescription"  display="Color Description" type="String"/>
+		<!-- attribute: Size -->
+		<!-- Mandatory: Yes -->
+		<!-- Description: "Size as printed on the label-->
+		<x:Attribute name="Size"  display="Size" type="String"/>
+		<!-- attribute: Size Code -->
+		<!-- Mandatory: No -->
+		<!-- Description: "Size Code (Alternate Representation of Size)-->
+		<x:Attribute name="SizeCode"  display="SizeCode" type="String"/>   
+		<!-- attribute: Sales Floor Target -->
+		<!-- Mandatory: Yes -->
+		<!-- Description: "Numeric value for sales floor target (Optimum number of items per sku that should be on Salesfloor). Default value is 1-->
+		<x:Attribute name="SalesFloorTarget"  display="Sales Floor Target" type="Integer"/> 
+		<!-- attribute: Trade Item -->
+		<!-- Mandatory: Yes -->
+		<!-- Description: "Name of source manufacturer or vendor or supplier-->
+		<x:Attribute name="TradeItem"         display="Trade Item"   type="String" >
+			<x:EnumeratedAttributeValue value="YES"/>
+			<x:EnumeratedAttributeValue value="NO"/>
+		</x:Attribute>
+		<!-- attribute: Gender -->
+		<!-- Mandatory: No -->
+		<!-- Description: "Gender Identifier-->
+		<x:Attribute name="Gender"  display="Gender" type="String"/>
+		<!-- attribute: Brand -->
+		<!-- Mandatory: Yes -->
+		<!-- Description: "Internal Brand for the product. Like “Disney” or “Marvel”-->
+		<x:Attribute name="Brand"  display="Brand" type="String"/>
+		<!-- attribute: Department -->
+		<!-- Mandatory: Yes -->
+		<!-- Description: "e.g.: Men. Ladies etc-->
+		<x:Attribute name="Department"  display="Department" type="String"/>
+		<!-- attribute: MerchandiseCategory -->
+		<!-- Mandatory: No -->
+		<!-- Description: "Merchandise Category-->
+		<x:Attribute name="MerchandiseCategory"  display="Merchandise Category" type="String"/>			
+		<!-- attribute: SubCategory -->
+		<!-- Mandatory: No -->
+		<!-- Description: "e.g. Jumpsuites-->
+		<x:Attribute name="SubCategory"  display="Sub Category" type="String"/>	
+		<!-- attribute: Season -->
+		<!-- Mandatory: No -->
+		<!-- Description: "e.g. Jumpsuites-->
+		<x:Attribute name="Season"  display="Season" type="String"/>
+		<!-- attribute: Collection -->
+		<!-- Mandatory: No -->
+		<!-- Description: "Fashion Collection-->
+		<x:Attribute name="Collection"  display="Collection" type="String"/>
+		<!-- attribute: Price -->
+		<!-- Mandatory: No -->
+		<!-- Description: "Current price of the item-->
+		<x:Attribute name="Price"  display="Price" type="Double"/>	
+		<!-- attribute: ModelSKU -->
+		<!-- Mandatory: Required if there is one customer product to multiple UPC mapping -->
+		<!-- Description: "Customer SKU identifier required if there is one customer product to multiple UPC mapping-->
+		<x:Attribute name="ModelSKU"  display="ModelSKU" type="String"/>
+		<!-- attribute: ImageURL -->
+		<!-- Mandatory: Required if there is one customer product to multiple UPC mapping -->
+		<!-- Description: "Image URL for the SKU-->
+		<x:Attribute name="ImageURL"  display="ImageURL" type="String"/>	
+	</x:Entity>
+</x:ProductAttributes>

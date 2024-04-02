@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+<meta-data property-table="Physical">
+  <table name="device">
+
+    <entity type="SamsysMP9320ReaderDeviceNode" extends="RFDeviceNode">
+      <locator-option value="Samsys MP9320 Reader DeviceNode">Samsys MP9320 Reader DeviceNode</locator-option>
+
+      <label>Samsys MP 9320 DeviceNode Configuration</label>
+      <description>Samsys MP 9320 DeviceNode Configuration</description>
+      <property key="AntennaId" is-mandatory="true">
+	<label>Antenna ID</label>
+	<description>Antenna number</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="true">
+	  <option value="1" is-default="true">1</option>
+	  <option value="2">2</option>
+	  <option value="3">3</option>
+	  <option value="4">4</option>
+	</select>
+      </property>
+      <property key="ReadTimeOut" is-mandatory="false">
+	<label>Read Time-Out</label>
+	<description>Time out value used for reading tag-ids</description>
+	<type-definition>oat:TimeoutMillisSamsys</type-definition>
+	<select is-bound="false">
+	  <option value="2000" is-default="true">2000</option>
+	</select>
+      </property>
+      <property key="TimeThreshold" is-mandatory="false">
+	<label>Time Threshold</label>
+	<description>The time threshold should exceed 100 milliseconds</description>
+	<type-definition>oat:TimeThreshold</type-definition>
+      </property>
+      <property key="LoopThreshold" is-mandatory="false">
+	<label>Loop Threshold</label>
+	<description>The loop threshold should exceed -1</description>
+	<type-definition>oat:LoopThreshold</type-definition>
+      </property>
+    </entity>
+
+  </table>
+</meta-data>

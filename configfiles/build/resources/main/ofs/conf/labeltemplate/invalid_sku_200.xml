@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+ $Revision: 1.1.2.1 $
+ $State: Exp $
+-->
+<template name="invalid-sku-template">
+    <variables>
+       	<variable name="SKU" defaultValue="SKU"/>
+	</variables>
+    <printcode>                                      
+    <![CDATA[
+^XA
+^FT10,108^A0N,20,24^FH\^FD{SKU}^FS
+^FO90,15^GB240,38,38^FS
+^FT90,45^A0N,31,33^FR^FH\^FD   Invalid UPC.   ^FS
+^FO90,54^GB240,38,38^FS
+^FT90,84^A0N,31,33^FR^FH\^FD    Do not use. ^FS
+^XZ
+]]>
+    </printcode>
+</template>

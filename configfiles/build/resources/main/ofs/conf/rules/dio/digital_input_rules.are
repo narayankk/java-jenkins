@@ -1,0 +1,132 @@
+%% The rule set computes the Adapters on which action has to be taken when
+%% a digital input event occurs
+
+%%% Configuration tables
+
+%% Contains the name of the adapters
+%% Each tuple is of the form (AdapterName)
+:-    dynamic('adapter/1').
+
+%% Contains the mapping between the io_device and the adapter
+%% Each tuple is of the form (AdapterName, DeviceName)
+:-    dynamic('target_mapping/2').
+
+%% Contains the action types that need to be reported for devices
+%% Each tuple is of the form (DeviceName, ActionType) 
+%% The action type should be one of ON_ACTION, ON_ACTION_TIMEOUT, OFF_ACTION
+:-    dynamic('reported_action_type/2').
+
+%% Contains the delay after ON action
+%% Each tuple is of the form (DeviceName, DelayTs) 
+:-    dynamic('on_action_delay/2').
+
+%% Contains the duration after ON action.
+%% Each tuple is of the form (DeviceName, DurationTs) 
+:-    dynamic('on_action_duration/2').
+
+%% Contains the delay after OFF action
+%% Each tuple is of the form (DeviceName, DelayTs) 
+:-    dynamic('off_action_delay/2').
+
+%%% Runtime tables. Do not have to be configured. 
+%% Contains the latest event reported for each adapter
+%% Each tuple is of the form (AdapterName, EventTs)
+:-    dynamic('last_event_ts/2').
+
+%%% The wrappers need to define the following events (streams)
+%% 1. on_event(DeviceName, EventTs) on motion sensing ON action
+%% 2. off_event(DeviceName, EventTs) on motion sensing OFF action
+%% 3. shutdown() when the logger is shutdown
+%%
+%%% The wrappers need to define the following evaluables
+%% 1. report_action(DeviceName, AdapterName, ActionType), where ActionType is one of
+%%    ON_ACTION, ON_ACTION_TIMEOUT, OFF_ACTION
+
+:-    include('general_utils.are').
+
+%% The process rule is invoked during the start of the environment
+%% It spawns processes for each adapter
+process :-
+     adapter(AdapterName),
+     process_adapter(AdapterName),
+     fail.   
+
+%% This rule stops all timed operations
+process :-
+    wait shutdown(),
+    %% Remove all waits
+    !.
+
+%% This rule handles the processing for each adapter
+%% It reports all actions for a given adapter, making
+%% sure that only the actions corresponding to the latest 
+%% event is sent to the action handler
+%% Inputs: AdapterName. Outputs: None
+process_adapter(AdapterName) :-
+    %% Get all devices that trigger this adapter
+    target_mapping(AdapterName, DeviceName),
+    %% Find out the action types to be reported
+    reported_action_type(DeviceName, ActionType),
+    %% Get the next action to be taken on the device. 
+    %% Returns one of ON_ACTION, ON_ACTION_TIMEOUT, or OFF_ACTION
+    get_next_action(DeviceName, ActionType, EventTs),
+    %% Check if the event timestamp is the latest 
+    %% encountered event for this adapter
+    check_if_latest(AdapterName, EventTs),
+    %% Reports this action to the action handler
+    _ is report_action(DeviceName, AdapterName, ActionType).
+
+%% Returns the next action from the given device
+%% Inputs: DeviceName. Outputs: ActionType, EventTs
+get_next_action(DeviceName, 'ON_ACTION', EventTs) :-
+    wait on_event(DeviceName, EventTs),
+    on_action_delay(DeviceName, DelayTs),
+    timeout(DelayTs).
+
+get_next_action(DeviceName, 'ON_ACTION_TIMEOUT', EventTs) :-
+    wait on_event(DeviceName, EventTs),
+    on_action_delay(DeviceName, DelayTs),
+    on_action_duration(DeviceName, DurationTs),
+    TimeToWait is DelayTs + DurationTs,
+    timeout(TimeToWait).
+  
+get_next_action(DeviceName, 'OFF_ACTION', EventTs) :-
+    wait off_event(DeviceName, EventTs),
+    off_action_delay(DeviceName, DelayTs),
+    timeout(DelayTs).
+
+%% Check if the event is the latest
+%% Inputs: AdapterName, EventTs. Outputs: None
+check_if_latest(AdapterName, EventTs) :-
+    %% Get the current latest event timestamp
+    get_current_latest(AdapterName, LastEventTs),
+    %% See if this timestamp is more than the old one
+    %% Assume latest even if the timestamp is the same.
+    %% This is useful for ON_ACTION_TIMEOUT
+    LastEventTs <= EventTs,
+    %% Update the latest, and report the match
+    set_current_latest(AdapterName, EventTs).
+  
+%% Returns the timestamp of the last event processed
+%% for this adapter. Returns 0 if no event is processed. 
+%% Inputs: AdapterName. Outputs: LastEventTs
+get_current_latest(AdapterName, LastEventTs) :-
+    last_event_ts(AdapterName, LastEventTs),
+  
+    %% Do not proceed to next rule if found
+    !.
+  
+%% The timestamp is 0 if not defined
+get_current_latest(AdapterName, 0).
+  
+%% Sets the given timestamp as the lastest timestamp
+%% Inputs: AdapterName, NewEventTs. Outputs: None
+set_current_latest(AdapterName, NewEventTs) :-
+    %% Remove all tuples with for this adapter
+    retract last_event_ts(AdapterName, _),
+    fail.
+
+set_current_latest(AdapterName, NewEventTs) :-
+    %% Add a tuple for this record
+    assert last_event_ts(AdapterName, NewEventTs).
+    

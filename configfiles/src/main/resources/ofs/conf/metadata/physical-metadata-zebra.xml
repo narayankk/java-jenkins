@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+<meta-data property-table="Physical">
+  <table name="device">
+
+    <entity type="ZebraPrinterZ4MDeviceNode" extends="RFDeviceNode">
+      <locator-option value="Zebra Printer Z4M DeviceNode">Zebra Printer Z4M DeviceNode</locator-option>
+
+      <label>Zebra Printer Z4M DeviceNode Configuration</label>
+      <description>Zebra Printer Z4M DeviceNode Configuration</description>
+      <property key="ReadTimeOut" is-mandatory="false">
+	<label>Read Time-Out</label>
+	<description>Read command time-out value. Integer between 0 and 120000; default 4000</description>
+	<type-definition>oat:ReadTimeoutMillis1</type-definition>
+	<select is-bound="false">
+	  <option value="4000" is-default="true">4000</option>
+	</select>
+      </property>
+    </entity>
+
+  </table>
+</meta-data>

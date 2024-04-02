@@ -1,0 +1,52 @@
+<!--<?xml version="1.0"?>-->
+
+<!--<!DOCTYPE dbcleanup-spec [-->
+<!ELEMENT dbcleanup-spec (table)*>
+<!ATTLIST dbcleanup-spec local-savant-id CDATA #IMPLIED>
+
+<!ELEMENT table (delete-conditions, cascade-delete?)>
+
+<!ATTLIST table
+	pk CDATA #REQUIRED
+	name CDATA #REQUIRED
+	cleanup-type CDATA #REQUIRED
+>
+
+<!ELEMENT delete-conditions (aged-timestamp?, isMigratable?, no-fk?, aged-object?, exists?)>
+<!ELEMENT aged-timestamp EMPTY>
+<!ATTLIST aged-timestamp column CDATA #REQUIRED>
+
+<!ELEMENT isMigratable (#PCDATA)>
+
+<!ELEMENT no-fk (FKTable+)>
+<!ATTLIST no-fk join-column CDATA #REQUIRED>
+
+<!ELEMENT FKTable (#PCDATA)>
+<!ATTLIST FKTable 
+	pk CDATA #REQUIRED
+	join-column CDATA #REQUIRED
+>
+<!ELEMENT aged-object EMPTY>
+<!ELEMENT exists (join+)>
+<!ELEMENT join (condition-to-satisfy+)>
+<!ATTLIST join 
+	table CDATA #REQUIRED
+	join_column CDATA #REQUIRED
+>
+
+<!ELEMENT condition-to-satisfy EMPTY>
+<!ATTLIST condition-to-satisfy
+	col-name CDATA #REQUIRED
+	col-type CDATA #REQUIRED
+	col-value CDATA #REQUIRED
+>	
+	
+<!ELEMENT cascade-delete (casc-table+)>
+<!ELEMENT casc-table (casc-table*)>
+
+<!ATTLIST casc-table
+	name CDATA #REQUIRED
+	pk CDATA #REQUIRED
+	parent CDATA #REQUIRED
+	fk-column CDATA #REQUIRED
+> 

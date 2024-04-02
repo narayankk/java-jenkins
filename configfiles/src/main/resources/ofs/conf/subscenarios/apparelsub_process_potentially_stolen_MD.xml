@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<scenario>
+    <property key="name">OATMV POE Process EPC</property>
+    <property key="description"></property>
+    <property key="scenario.type">SUB_SCENARIO</property>
+    <property key="sub_scenario">true</property>
+    <property key="parent_access">RW</property>
+  	<property key="namespace">poe_process_epc</property>
+    <property key="exits">DONE</property>
+    <property key="inputs">
+    epc,readerLocationEpc,siteId,siteEpc,epcStateFlag,processStartTime,processTS</property>
+    <property key="fragment.scenario.expected_outputs"></property>
+
+    <process>
+        <start name="Start">
+            <target exit="Exit Condition" name="StartAssociationProcess"></target>
+        </start>
+
+		<!-- Log EPC as Potentially Stolen -->
+		<activity name="StartAssociationProcess" resource="primitive:StartProcess">
+			<target exit="done" name="GetBLEpc"/>
+			<target exit="error" name="GetBLEpc"/>
+			<input class="java.lang.String" constant="true" name="processMasterCode" required="false">ITEM_EXIT</input>
+			<input class="java.lang.String" name="objectEpc" >${process.epc}</input>
+			<output class="java.lang.String" constant="false" name="processID">${process.processID}</output>
+		</activity>
+		<activity name="GetBLEpc" resource="class:com.oatsystems.solutions.apparel.primitives.GetLocationsForStateSite">
+			<target name="IsAlarmingEnabledForSite" exit="done"/>
+			<target name="IsAlarmingEnabledForSite" exit="error"/>     
+			<input name="itemState" class="java.lang.String">Exited</input>
+			<input name="siteId" class="java.lang.String">${process.siteId}</input>
+			<output name="blLocEpcs" class="java.util.List">${process.blocationList}</output>
+			<output name="rpLocEpcs" class="java.util.List">${process.rplocationList}</output>
+		</activity>	
+      <activity name="IsAlarmingEnabledForSite" resource="class:com.oatsystems.solutions.apparel.primitives.IsAlarmingEnabledForSite">
+			<target name="AssignContaneeListObj" exit="done"/>
+			<target name="AssignContaneeListObj" exit="error"/>     
+			<input name="siteId" class="java.lang.String">${process.siteId}</input>
+			<output name="alarmingStatusFlag" class="java.lang.String">${process.alarmingStatusFlag}</output>
+		</activity>				
+		<activity name="AssignContaneeListObj" resource="class:com.oatsystems.workflow.primitives.AssignContaneeListObj">
+			<target name="AssociateTagWithLocation" exit="done"/>
+			<target name="AssociateTagWithLocation" exit="error"/>     
+			<input name="epc" class="java.lang.String">${process.epc}</input>	
+			<input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>		
+			<output name="epcList" class="java.util.List">${process.epcList}</output>
+		</activity>		
+       		
+		<activity name="AssociateTagWithLocation" resource="class:com.oatsystems.workflow.primitives.AssociateEpcToLocationMDBatch">			
+			<!--<input name="epc" class="java.lang.String">${process.epc}</input>-->					
+			<target name="CloseAssociationProcess" exit="associated" />
+			<target name="CloseAssociationProcess" exit="error" />
+			<input name="epcList" class="java.util.List">${process.epcList}</input>		  
+			<input name="associationLocationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+			<input name="parentLocationEpc" class="java.lang.String">${process.blocationList}.get(0)</input>			
+			<input name="processId" class="java.lang.String">${process.processID}</input>
+			<input name="processMasterCode" class="java.lang.String">ITEM_EXIT</input>
+			<input name="processType" class="java.lang.String">ITEM_EXIT</input>
+			<input name="processStartTime" class="java.lang.String">${process.processStartTime}</input>
+            <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>			
+			<!-- <output name="invalidepcs" class="java.util.List">${process.invalidepcs}</output>	 -->	 	  
+         </activity>		
+		
+		<activity name="CloseAssociationProcess" resource="primitive:CloseProcess">
+			<target exit="done" name="DONE"></target>
+			<target exit="error" name="DONE"></target>
+			<input class="java.lang.String" constant="true" name="processData0" required="false">ITEM_EXIT</input>
+			<input class="java.lang.String" constant="true" name="processData1" required="false">sys</input>			
+			<input class="java.lang.String" constant="true" name="processData2" required="false">${process.processTS}</input>
+			<input class="java.lang.String" constant="true" name="processData3" required="false">${process.processTS}</input>
+			<input class="java.lang.String" constant="true" name="processData5" required="false">${process.blocationList}.get(0)</input>			
+			<input class="java.lang.String" constant="true" name="processData6" required="false">${process.siteEpc}</input>
+			<input class="java.lang.String" constant="false" name="processID" required="false">${process.processID}</input>
+			<output class="java.lang.String" constant="false" name="processID">${process.processID}</output>
+		</activity>
+		<end name="ERROR"></end> 
+		<end name="DONE"></end> 
+    </process>
+
+    <config></config>
+
+    <display></display>
+</scenario>        

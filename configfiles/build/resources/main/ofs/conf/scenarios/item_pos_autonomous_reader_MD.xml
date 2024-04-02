@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<scenario>
+    <property key="name">MV POS - Autonomous Reader with UI</property>
+    <property key="description">Autonomous reader reads EPCs, scenario marks them as sold</property>
+    <property key="scenario.type">OATAPPAREL_UIPOS</property>
+
+    <process>
+
+        <start name="Start">
+            <target exit="Exit Condition" name="CheckIsDeviceEnabled"></target>
+        </start>
+
+        <activity name="CheckIsDeviceEnabled" resource="class:com.oatsystems.workflow.primitives.CheckIsDeviceEnabled">
+            <target name="SetCfgVarproductLinkMethod" exit="enabled"/>
+            <target name="End" exit="disabled"/>
+            <target name="End" exit="error"/>
+            <input  name="readerLocationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+        </activity>
+
+        <activity name="SetCfgVarproductLinkMethod" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="SetActionSales" exit="done"/>
+            <target name="SetActionSales" exit="error"/>
+            <input name="value" class="java.lang.String">LINK_USING_ENCODING_SCHEME</input>
+            <output name="variable" class="java.lang.String">${process.productLinkMethod}</output>
+        </activity>
+
+        <activity name="SetActionSales" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="SetEncodeStatus" exit="done"/>
+            <target name="SetEncodeStatus" exit="error"/>
+            <input name="value" class="java.lang.String">SALES</input>
+            <output name="variable" class="java.lang.String">${process.action}</output>
+        </activity>
+        
+        <activity name="SetEncodeStatus" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="GetSiteIdForLocation" exit="done"/>
+            <target name="GetSiteIdForLocation" exit="error"/>
+            <input name="value" class="java.lang.String">STATUS</input>
+            <output name="variable" class="java.lang.String">${process.encodeStatus}</output>
+        </activity>
+        
+        <activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">
+            <target name="InjectTimeoutEvent" exit="done" />
+            <target name="InjectTimeoutEvent" exit="error" />
+            <input  name="locationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+            <output name="siteId" class="java.lang.String">${process.siteId}</output>
+            <output name="siteName" class="java.lang.String">${process.siteName}</output>
+        </activity>
+
+        <activity name="InjectTimeoutEvent" resource="class:com.oatsystems.workflow.primitives.InjectTimedEvent">
+            <target exit="done" name="WaitForEpcReads"></target>
+            <target exit="error" name="WaitForEpcReads"></target>
+            <input class="java.lang.String" constant="true" name="eventName" required="false">TIME_OUT</input>
+            <input class="java.lang.String" constant="false" name="timeoutInMillis" required="false">${process.maxReaderOnTime}</input>
+            <output class="java.lang.String" constant="false" name="eventID">${process.timeoutEventID}</output>
+        </activity>
+    
+        <wait name="WaitForEpcReads">    
+<!--
+            <event name="epc_ui_enter" target="IdentifyGarmentProduct">
+                <param name="epc" class="java.lang.String">${process.garmentEpc}</param>
+                <param class="java.util.Map" name="payload">${process.epcPayload}</param>
+                <property key="ui.invisibleWhenInactive">true</property>
+                <property key="ui.invisibleWhenWaitConditionFalse">true</property>
+                <property key="waitCondition">true</property>
+                <property key="ui.jsp">/workflow/floor_ui/event_tiles/enter_epc_encode_status.jsp</property>
+            </event>            
+-->
+            
+            <event deferred="false" name="TIME_OUT" target="ClearDisplayVars"></event>
+      
+            <event name="epc_add_read" target="IdentifyGarmentProduct">                
+                <filter resource="filter:EpcAddEventFilter">
+                <argument name="locationEpc" class="java.lang.String">${process.readerLocationEpc}</argument>
+                </filter>
+                <param class="java.lang.String" name="epc">${process.garmentEpc}</param>
+                <param class="java.lang.String" name="timestamp">${process.timestamp}</param>
+                <param class="java.util.Map" name="payload">${process.epcPayload}</param>
+            </event>
+        </wait>
+
+        <!-- Turn on Reader branch-->
+        <activity name="ClearDisplayVars" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">            
+            <target exit="done" name="ClearDisplayVars1"></target>
+            <target exit="error" name="ClearDisplayVars1"></target>
+            <target exit="skip" name="ClearDisplayVars1"></target>
+            <output class="java.lang.Object" constant="false" name="variable0">${process.epcList}</output>
+            <output class="java.lang.Object" constant="false" name="variable1">${process.itemMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable2">${process.productMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable3">${process.movementWindowList}</output>
+            <output class="java.lang.Object" constant="false" name="variable4">${process.movementWindowMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable5">${process.epcArray}</output>
+            <output class="java.lang.Object" constant="false" name="variable6">${process.skuCount}</output>
+        </activity>
+        
+        <activity name="ClearDisplayVars1" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">            
+            <target exit="done" name="WaitForEpcReads"></target>
+            <target exit="error" name="WaitForEpcReads"></target>
+            <target exit="skip" name="WaitForEpcReads"></target>
+            <output class="java.lang.Object" constant="false" name="variable0">${process.epcList1}</output>
+            <output class="java.lang.Object" constant="false" name="variable1">${process.itemMap1}</output>
+            <output class="java.lang.Object" constant="false" name="variable2">${process.productMap1}</output>
+            <output class="java.lang.Object" constant="false" name="variable3">${process.movementWindowList1}</output>
+            <output class="java.lang.Object" constant="false" name="variable4">${process.movementWindowMap1}</output>
+            <output class="java.lang.Object" constant="false" name="variable5">${process.epcArray1}</output>
+            <output class="java.lang.Object" constant="false" name="variable6">${process.skuCount1}</output>
+        </activity>
+
+
+        <!-- Process EPC branch -->
+        <call name="IdentifyGarmentProduct" resource="itemsub_recvidentifygarment.xml" namespace="rcigInSession">
+            <target exit="PRODUCTFOUND" name="CheckEpcPayloadExist"/>
+            <target exit="PRODUCTNOTFOUND" name="WaitForEpcReads"/>
+            <target exit="ERROR" name="WaitForEpcReads"/>
+            <input name="epc" class="java.lang.String">${process.garmentEpc}</input>
+            <input name="putawayLocationEpc" class="java.lang.String"></input>
+            <input name="productLinkMethod" class="java.lang.String">${process.productLinkMethod}</input>
+            <output name="productId" class="java.lang.String">${process.garmentProductId}</output>
+            <input name="productMaster" class="java.util.HashMap">${process.productMaster}</input>
+            <output name="productMaster" class="java.util.HashMap">${process.productMaster}</output>
+        </call>
+        
+        <decision name="CheckEpcPayloadExist">
+            <case condition="${process.epcPayload} ne null and ${process.epcPayload}.size() ne 0 and ${process.epcPayload}.get(${process.encodeStatus}) ne null" label="payload_exist" target="CheckTagEncodeStatus"></case>
+            <default label="payload_not_exist" target="AddItemToCollection"></default>
+        </decision>
+        
+        <decision name="CheckTagEncodeStatus">
+            <case condition="${process.epcPayload}.get(${process.encodeStatus}).equalsIgnoreCase('failure')" label="tag_encoding_failed" target="SetAttributesForLogTagEncodeStatus"></case>
+            <default label="tag_encoded_succcessfully" target="AddItemToCollection"></default>
+        </decision>
+    
+        <activity name="SetAttributesForLogTagEncodeStatus" resource="primitive:CreateListOfStrings">
+          <target name="LogTagEncodeStatus" exit="done" />
+          <target name="LogTagEncodeStatus" exit="error" />
+          <input name="attribute0" class="java.lang.String">${process.garmentEpc}</input>
+          <input name="attribute1" class="java.lang.String">${process.epcPayload}.get(${process.encodeStatus})</input>
+          <input name="attribute2" class="java.lang.String">${process.epcPayload}.get("ERROR_MSG")</input>
+          <input name="attribute3" class="java.lang.String">${process.timestamp}</input>
+          <output name="outputList" class="java.util.List">${process.processErrorAtr}</output>
+        </activity>
+    
+        <activity name="LogTagEncodeStatus" resource="primitive:LogProcessError">
+          <target name="AddItemToCollection" exit="done" />
+          <target name="AddItemToCollection" exit="error" />
+          <input name="errorCode" class="java.lang.String">ENCODE_FAIL_ITEM</input>
+          <input name="errorDesc" class="java.lang.String">"POS tag encode failed"</input>
+          <input name="locationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+          <input name="attributes" class="java.util.List">${process.processErrorAtr}</input>
+        </activity>
+        
+        <activity name="AddItemToCollection" resource="class:com.oatsystems.solutions.apparel.primitives.AddItemToCollection">
+            <target name="AddItemToDisplayCollection"     exit="done"/>
+            <target name="WaitForEpcReads"     exit="error"/>
+            <input name="epc" class="java.lang.String">${process.garmentEpc}</input>
+            <input name="productId" class="java.lang.String">${process.garmentProductId}</input>
+            <input name="movementBlockWindowSize" class="java.lang.String">10</input>
+            <input name="epcList" class="java.util.List">${process.epcList}</input>
+            <input name="itemMap" class="java.util.HashMap">${process.itemMap}</input>
+            <input name="productMap" class="java.util.HashMap">${process.productMap}</input>
+            <input name="movementWindowList" class="java.util.List">${process.movementWindowList}</input>
+            <input name="movementWindowMap" class="java.util.HashMap">${process.movementWindowMap}</input>
+            <output name="epcList" class="java.util.List">${process.epcList}</output>
+            <output name="itemMap" class="java.util.HashMap">${process.itemMap}</output>
+            <output name="productMap" class="java.util.HashMap">${process.productMap}</output>
+            <output name="movementWindowList" class="java.util.List">${process.movementWindowList}</output>
+            <output name="movementWindowMap" class="java.util.HashMap">${process.movementWindowMap}</output>
+            <output name="epcArray" class="[Ljava.lang.String;" >${process.epcArray}</output>
+            <output name="epcCount" class="java.lang.String" >${process.epcCount}</output>
+            <output name="skuCount" class="java.lang.String" >${process.skuCount}</output>
+        </activity>
+        
+        <activity name="AddItemToDisplayCollection" resource="class:com.oatsystems.solutions.apparel.primitives.AddItemToCollection">
+            <target name="SetProcessing"     exit="done"/>
+            <target name="CancelVars"     exit="error"/>
+            <input name="epc" class="java.lang.String">${process.garmentEpc}</input>
+            <input name="productId" class="java.lang.String">${process.garmentProductId}</input>
+            <input name="movementBlockWindowSize" class="java.lang.String">10</input>
+            <input name="epcList" class="java.util.List">${process.epcList1}</input>
+            <input name="itemMap" class="java.util.HashMap">${process.itemMap1}</input>
+            <input name="productMap" class="java.util.HashMap">${process.productMap1}</input>
+            <input name="movementWindowList" class="java.util.List">${process.movementWindowList1}</input>
+            <input name="movementWindowMap" class="java.util.HashMap">${process.movementWindowMap1}</input>
+            <output name="epcList" class="java.util.List">${process.epcList1}</output>
+            <output name="itemMap" class="java.util.HashMap">${process.itemMap1}</output>
+            <output name="productMap" class="java.util.HashMap">${process.productMap1}</output>
+            <output name="movementWindowList" class="java.util.List">${process.movementWindowList1}</output>
+            <output name="movementWindowMap" class="java.util.HashMap">${process.movementWindowMap1}</output>
+            <output name="epcArray" class="[Ljava.lang.String;" >${process.epcArray1}</output>
+            <output name="epcCount" class="java.lang.String" >${process.epcCount1}</output>
+            <output name="skuCount" class="java.lang.String" >${process.skuCount1}</output>
+        </activity>
+
+        <activity name="SetProcessing" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="LogEpcs" exit="done"/>
+            <target name="LogEpcs" exit="error"/>
+            <input name="value" class="java.lang.String">TRUE</input>
+            <output name="variable" class="java.lang.String">${process.processing}</output>
+        </activity>
+
+        <call name="LogEpcs" resource="item_pos_sub_process_MD.xml" namespace="logEpcsPos">
+            <target exit="DONE" name="SetFinishedProcessing"/>
+            <target exit="ERROR" name="SetFinishedProcessing"/>
+            <input name="epcArray" class="[Ljava.lang.String;">${process.epcArray}</input>
+            <input name="action" class="java.lang.String">${process.action}</input>
+            <input name="posRpEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+            <input name="soldReasonCodeId" class="java.lang.String">${process.soldReasonCodeId}</input>
+            <input name="siteId" class="java.lang.String">${process.siteId}</input>
+        </call>
+        
+        <activity name="SetFinishedProcessing" resource="class:com.oatsystems.workflow.primitives.SetVariableValue">
+            <target name="CancelVars" exit="done"/>
+            <target name="CancelVars" exit="error"/>
+            <input name="value" class="java.lang.String">FALSE</input>
+            <output name="variable" class="java.lang.String">${process.processing}</output>
+        </activity>
+
+        <activity name="CancelVars" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+            <target exit="done" name="CancelVars2"></target>
+            <target exit="error" name="CancelVars2"></target>
+            <target exit="skip" name="CancelVars2"></target>            
+            <output class="java.lang.Object" constant="false" name="variable0">${process.epcList}</output>
+            <output class="java.lang.Object" constant="false" name="variable1">${process.itemMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable2">${process.productMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable3">${process.movementWindowList}</output>
+            <output class="java.lang.Object" constant="false" name="variable4">${process.movementWindowMap}</output>
+            <output class="java.lang.Object" constant="false" name="variable5">${process.epcArray}</output>
+            <output class="java.lang.Object" constant="false" name="variable6">${process.skuCount}</output>
+            <output class="java.lang.Object" constant="false" name="variable7">${process.action}</output>            
+            <output class="java.lang.Object" constant="false" name="variable8">${process.epcArray1}</output>
+            <output class="java.lang.Object" constant="false" name="variable9">${process.skuCount1}</output>
+        </activity>
+        
+        <activity name="CancelVars2" resource="class:com.oatsystems.workflow.primitives.SetVariablesToNull">
+            <target exit="done" name="DeleteTimeoutEvent"></target>
+            <target exit="error" name="DeleteTimeoutEvent"></target>
+            <target exit="skip" name="DeleteTimeoutEvent"></target>            
+            <output class="java.lang.Object" constant="false" name="variable0">${process.epcPayload}</output>
+        </activity>
+        
+         <activity name="DeleteTimeoutEvent" resource="class:com.oatsystems.workflow.primitives.DeleteTimedEvent">
+            <target name="SetCfgVarproductLinkMethod"     exit="done"/>
+            <target name="SetCfgVarproductLinkMethod"     exit="error"/>
+            <input name="eventID" class="java.lang.String">${process.timeoutEventID}</input>
+        </activity>
+
+        <end name="End"></end>        
+    </process>
+    
+    <config>
+
+        <var class="java.lang.String" name="${process.readerLocationEpc}">
+            <property key="ui.group">Locations</property>
+            <property key="ui.label">RFID antenna readpoint location</property>
+            <property key="ui.list"><![CDATA[
+                <source="listsource:LocationWithDevicesListSource"/>
+            ]]></property>
+            <property key="ui.required">true</property>
+            <property key="doc">DEVICERFIDREADER</property>
+        </var>
+
+<!-- 
+        <var class="java.lang.String" name="${process.movementBlockWindowSize}">
+            <property key="ui.group">Display</property>
+            <property key="ui.label">For timeline view, garments received are displayed in blocks. Block size in minutes (Not really used in this application)</property>
+            <property key="ui.required">true</property>
+            <property key="ui.input"><![CDATA[
+            <textinput default="10" type="LongID"/>
+            ]]></property>
+        </var>
+ -->
+        <var class="java.lang.String" name="${process.soldReasonCodeId}">
+            <property key="ui.label">Sold Reason ID</property>
+            <property key="ui.group">Resason Codes</property>
+            <property key="ui.required">true</property>
+            <property key="ui.list"><![CDATA[
+                <source="class:com.oatsystems.raf.config.RetirementReasonIdListSource"/>
+            ]]></property>
+            <property key="doc">CONTAINEREPCREADASDETECTED</property>
+        </var>
+ 
+        <var class="java.lang.String" name="${process.maxReaderOnTime}">
+            <property key="doc">TIME_IN_MS</property>
+            <property key="ui.group">Display Config</property>
+            <property key="ui.input"><![CDATA[ 
+            <textinput default="10000" type="SmallerString"/>
+            ]]> </property>
+            <property key="ui.isconfigurable">true</property>
+            <property key="ui.label">Maximum Time in ms for automatically clearing the POS display screen</property>
+            <property key="ui.required">true</property>
+        </var>
+
+    </config>
+
+
+    <display>
+        <tile name="pos_main_ui">
+            <property key="ui.jsp">/workflow/floor_ui/display_tiles/app_pos_main_ui.jsp</property>
+        </tile>
+
+    </display>
+
+</scenario>
+

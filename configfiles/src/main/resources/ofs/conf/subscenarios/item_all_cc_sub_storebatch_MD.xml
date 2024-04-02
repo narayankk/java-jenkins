@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario>
+  <property key="name">item_cc - subscenario for association</property>
+  <property key="description">Associate a set of tags to the specified location.</property>
+  <property key="sub_scenario">true</property>
+  <property key="parent_access">R</property>
+  <property key="namespace">assn-sub</property>
+  <property key="exits">DONE,ERROR</property>
+  <property key="inputs">
+     tags,
+     readPointEpc,
+     ccDetailID,
+     processEndTime,msgSeqNum,processedMap,parentLocationEpc,filterExpression,isAuthoritative,streamingProcessID,processSubType,handheldID
+  </property>
+  <property key="outputs">failedEpcs,processedMap</property>
+  
+  <process>
+
+    <start name="Start">
+        <target exit="All Cases" name="InitialiseFailedEpcsList"></target>
+    </start>
+
+    <activity name="InitialiseFailedEpcsList" resource="primitive:SetVariablesToNull" >
+      <target name="GetSiteIdForLocation" exit="done" />
+      <target name="GetSiteIdForLocation" exit="skip" />
+      <target name="GetSiteIdForLocation" exit="error" />
+      <output name="variable0" class="java.util.Set">${process.failedEpcs}</output>
+       <output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+     </activity>
+   
+    <activity name="GetSiteIdForLocation" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocation">	 
+      <target name="IterateOnTagArray" exit="done" />	 
+      <target name="SetVariablesToNullOnError" exit="error" />	 
+      <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>	 
+      <output name="siteId" class="java.lang.String">${process.ccLocSiteId}</output>	 
+    </activity>	 
+ 	 
+ 	 
+     <!-- Stream operation -->
+     <activity name="IterateOnTagArray" resource="class:com.oatsystems.workflow.primitives.IterateOnObjectArrayInBatch">
+       <target name="BindNewEpcs" exit="continue" />
+       <target name="DecideOnSmartCCOrNot" exit="break" />
+       <target name="SetVariablesToNullOnError" exit="error" />
+       <input name="iterationRange" class="[Ljava.lang.Object;">${process.tags}</input>
+       <input name="currentStartIndex" class="java.lang.String">${process.currentIndex}</input>
+       <input name="batchSize" class="java.lang.String">1000</input>
+       <output name="currentEndIndex" class="java.lang.String">${process.currentIndex}</output>
+       <output name="currentValues" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+     </activity>
+
+     <decision name="DecideOnSmartCCOrNot">
+       <case condition="${process.processSubType} eq 'SMART_CC' or ${process.processSubType}.contains('ICC')" label="SMART CC" target="StoreSmartCCData"></case>
+       <default label="Not Smart CC" target="MarkMessageAsCompleted"></default>
+     </decision>
+
+    <activity name="BindNewEpcs" resource="class:com.oatsystems.solutions.apparel.primitives.BindItemsInBatchMD">
+      <target name="IterateOnTagArray" exit="done" />
+      <target name="IterateOnTagArray" exit="missingCriteria" />
+      <target name="MarkMessageAsCompleted" exit="smartCCDone" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+      <input name="processType" class="java.lang.String">${process.processType}</input>
+      <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+      <input  name="locationEpc" class="java.lang.String">${process.parentLocationEpc}</input>
+      <input  name="readPointEpc" class="java.lang.String">${process.readPointEpc}</input>
+      <input name="countedItems" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</input>
+      <input name="failedEpcs" class="java.util.Set">${process.failedEpcs}</input>
+      <input name="uniqueEpcs" class="java.util.Set">${process.uniqueEpcs}</input>
+      <input  name="filterExpression" constant="false" class="java.lang.String">${process.filterExpression}</input>
+      <input name="isAuthoritative" class="java.lang.String">${process.isAuthoritative}</input>
+      <input class="java.lang.String" name="streamingProcessID">${process.streamingProcessID}</input>
+      <input class="java.lang.String" name="hhID">${process.handheldID}</input>
+      <input name="msgSeqNum" class="java.lang.Long">${process.msgSeqNum}</input>
+      <input name="processEndTime" class="java.lang.String">${process.processEndTime}</input>
+      <output name="failedEpcs" class="java.util.Set">${process.failedEpcs}</output>
+      <output name="uniqueEpcs" class="java.util.Set">${process.uniqueEpcs}</output>
+      <output name="countedItems" class="[Lcom.oatsystems.workflow.objects.impl.ContaineeImpl;">${process.currBatch}</output>
+    </activity>
+
+    <activity name="StoreSmartCCData" resource="class:com.oatsystems.solutions.apparel.primitives.StoreSmartCCData">
+      <target name="MarkMessageAsCompleted" exit="done" />
+      <target name="SetVariablesToNullOnError" exit="error" />
+      <input  name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+      <input class="java.lang.String" name="hhID">${process.handheldID}</input>
+      <input name="processSubType" class="java.lang.String">${process.processSubType}</input>
+      <input name="uniqueEpcs" class="java.util.Set">${process.uniqueEpcs}</input>
+    </activity>
+
+    <activity name="MarkMessageAsCompleted" resource="class:com.oatsystems.solutions.apparel.primitives.MarkMessageAsCompleted">
+      <target name="SetVariablesToNull" exit="done" />
+      <input name="ccDetailId" class="java.lang.Long">${process.ccDetailID}</input>
+      <input name="msgSeqNum" class="java.lang.Long">${process.msgSeqNum}</input>
+      <input name="processedMap" class="java.util.Map">${process.processedMap}</input>
+      <output name="processedMap" class="java.util.Map">${process.processedMap}</output>
+    </activity>
+	 	
+    <activity name="SetVariablesToNull" resource="primitive:SetVariablesToNull">
+      <target name="DONE" exit="done" />
+      <target name="DONE" exit="skip" />
+      <target name="ERROR" exit="error" />
+      <output name="variable0" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currTag}</output>
+      <output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+      <output name="variable3" class="java.lang.Object">${process.parentLocationEpcForAssociation}</output>
+      <output name="variable4" class="java.lang.Object">${process.inferredParentLocationEpc}</output>
+      <output name="variable5" class="java.util.Collection">${process.expectedEpcs}</output>
+      <output name="variable6" class="java.lang.String">${process.childLocationCount}</output>
+    </activity>
+    
+    <activity name="SetVariablesToNullOnError" resource="primitive:SetVariablesToNull">
+      <target name="ERROR" exit="done" />
+      <target name="ERROR" exit="skip" />
+      <target name="ERROR" exit="error" />
+      <output name="variable0" class="com.oatsystems.workflow.objects.impl.ContaineeImpl">${process.currTag}</output>
+      <output name="variable1" class="java.lang.String">${process.currentIndex}</output>
+      <output name="variable3" class="java.lang.Object">${process.parentLocationEpcForAssociation}</output>
+      <output name="variable4" class="java.lang.Object">${process.inferredParentLocationEpc}</output>
+      <output name="variable5" class="java.util.Collection">${process.expectedEpcs}</output>
+      <output name="variable6" class="java.lang.String">${process.childLocationCount}</output>
+    </activity>
+    
+	
+    <end name="ERROR"></end>
+    <end name="DONE"></end>
+    
+    </process>
+
+    <config/>
+
+    <display/>
+</scenario>

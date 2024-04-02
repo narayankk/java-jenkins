@@ -1,0 +1,527 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+	<table name="dms_device">
+
+		<entity type="WiramaReader" extends="RFReader">
+			<locator-option value="Wirama Reader">Wirama Reader</locator-option>
+			<label>Wirama Reader Configuration</label>
+			<description>Wirama Reader Configuration</description>
+			<property key="number_of_antennas" is-mandatory="false" is-visible="false">
+				<label>Maximum number of antennas</label>
+				<description>Maximum number of antennas for a wirama reader</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="4" is-default="true">4</option>
+				</select>
+			</property>
+			<property key="ReaderNodeId" is-mandatory="true">
+				<label>Reader Node ID</label>
+				<description>Reader address. A hexadecimal number between 00 and FF.</description>
+				<type-definition>oat:ReaderNodeID</type-definition>
+				<select is-bound="false">
+					<option value="04" is-default="true">04</option>
+				</select>
+			</property>
+			<property key="WiramaScript" is-mandatory="false">
+				<label>Script to execute for each inventory cycle</label>
+				<description>Script to execute for each inventory cycle</description>
+				<type-definition>oat:String1000</type-definition>
+				<select is-bound="false">
+					<option value="$set InvList 0,$set InvOnce 1" is-default="true">$set InvList 0,$set InvOnce 1</option>
+				</select>
+			</property>
+			<property key="WiramaInitCommands" is-mandatory="false">
+				<label>Init commands for reader</label>
+				<description>List of init commands for the reader</description>
+				<type-definition>oat:String1000</type-definition>
+				<select is-bound="false">
+					<option value="set TxPower 1 100" is-default="true">set TxPower 1 100</option>
+				</select>
+			</property>
+			<property key="WiramaGen2Session" is-mandatory="false">
+				<label>Gen 2 Session</label>
+				<description>Gen 2 Session at which the reader intracts with the tags</description>
+				<type-definition>oat:WiramaGen2Session</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">0</option>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+				</select>
+			</property>
+			<property key="WiramaTimeBetweenCalibration" is-mandatory="false">
+				<label>Time between auto calibration</label>
+				<description>Time between auto calibration</description>
+				<type-definition>oat:WiramaTimeBetweenCalibration</type-definition>
+				<select is-bound="false">
+					<option value="600000" is-default="true">600000</option>
+				</select>
+			</property>
+			<property key="PowerLevel" is-mandatory="false">
+				<label>Power level</label>
+				<description>RF power level for the reader (in percentage)</description>
+				<type-definition>oat:Percentage</type-definition>
+				<select is-bound="false">
+					<option value="100" is-default="true">100%</option>
+				</select>
+			</property>
+			<property key="WiramaRFSpeed" is-mandatory="false">
+				<label>RF Rate</label>
+				<description>RF Rate</description>
+				<type-definition>oat:WiramaRFSpeed</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">0 - Very Slow</option>
+					<option value="1">1 - Slow</option>
+					<option value="2">2 - Medium</option>
+					<option value="3">3 - Fast</option>
+				</select>
+			</property>
+			<property key="WiramaCalThetaDif12" is-mandatory="false">
+				<label>Calibration 1</label>
+				<description>CalThetaDif12</description>
+				<type-definition>oat:WiramaCalTheta</type-definition>
+				<select is-bound="false">
+					<option value="0" is-default="true">0</option>
+				</select>
+			</property>
+			<property key="WiramaCalThetaDif34" is-mandatory="false">
+				<label>Calibration 2</label>
+				<description>CalThetaDif34</description>
+				<type-definition>oat:WiramaCalTheta</type-definition>
+				<select is-bound="false">
+					<option value="0" is-default="true">0</option>
+				</select>
+			</property>
+			
+			<!-- Input Ports -->
+			<property key="InputPorts" is-mandatory="false">
+				<label>Input Ports</label>
+				<description>GPIO Input Ports</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1,2,3,4" is-default="true">1,2,3,4</option>
+				</select>
+			</property>   
+			<property key="IONotificationPort" is-mandatory="true">
+				<label>IONotificationPort</label>
+				<description>The Digital Input Asynchronous Notification Port</description>
+				<type-definition>oat:Port</type-definition>
+				<select is-bound="false">
+					<option value="7238" is-default="true">7238</option>
+				</select>
+			</property>
+			<!-- Output Type -->
+			<property key="OutputType" is-mandatory="false">
+				<label>OutputType</label>
+				<description>Wirama Output Type</description>
+				<type-definition>oat:WiramaOutputType</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">Final</option>
+					<option value="1">Pulse</option>
+				</select>
+			</property>
+			
+			<!-- WiramaGPIOPulse -->
+     		<property key="WiramaGPIOPulse" is-mandatory="false">
+				<label>Output PulseWidth(ms)</label>
+				<description>output pulse duration, Default 1000 ms</description>
+				<type-definition>oat:WiramaPulseWidth</type-definition>
+				<select is-bound="false">
+					<option value="1000" is-default="true">1000</option>
+				</select>
+   		    </property>
+   		    
+   		    <property key="WiramaGPIOPulseCount" is-mandatory="false">
+				<label>Pulse count</label>
+				<description>Number of pulse generated for a single output command default value is 1</description>
+				<type-definition>oat:WiramaPulseCount</type-definition>
+				<select is-bound="false">
+					<option value="1" is-default="true">1</option>
+				</select>
+   		    </property>
+   		    
+			<!-- Output Ports -->			
+			<property key="OutputPorts" is-mandatory="false">
+				<label>Output Ports</label>
+				<description>GPIO Output Ports</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1,2,3,4" is-default="true">1,2,3,4</option>
+				</select>
+			</property>   
+			
+			<!-- Antenna Orientation 1 -->			
+			<property key="WiramaAntennaPair1" is-mandatory="false">
+				<label>Antenna Pair 1</label>
+				<description>First pair of antenna that needs to be combined</description>
+				<type-definition>oat:SmallString</type-definition>
+				<select is-bound="true">
+					<option value="12" is-default="true">12</option>
+					<option value="13">13</option>
+					<option value="14">14</option>
+					<option value="23">23</option>
+					<option value="24">24</option>
+					<option value="34">34</option>
+					<option value="21">21</option>
+					<option value="31">31</option>
+					<option value="41">41</option>
+					<option value="32">32</option>
+					<option value="42">42</option>
+					<option value="43">43</option>					
+				</select>
+			</property>   
+			
+			<!-- Antenna Orientation 2 -->			
+			<property key="WiramaAntennaPair2" is-mandatory="false">
+				<label>Antenna Pair 2</label>
+				<description>Second pair of antenna that needs to be combined</description>
+				<type-definition>oat:SmallString</type-definition>
+				<select is-bound="true">
+					<option value="12">12</option>
+					<option value="13">13</option>
+					<option value="14">14</option>
+					<option value="23">23</option>
+					<option value="24">24</option>
+					<option value="34" is-default="true">34</option>
+					<option value="21">21</option>
+					<option value="31">31</option>
+					<option value="41">41</option>
+					<option value="32">32</option>
+					<option value="42">42</option>
+					<option value="43">43</option>					
+				</select>
+			</property>   
+			
+     		<!-- 
+			 <property key="WiramaAutoCalibrate" is-mandatory="false">
+				<label>Auto Calibrate</label>
+				<description>Perform auto calibrate</description>
+				<type-definition>oat:SmallString</type-definition>
+				<select is-bound="true">
+					<option value="true" is-default="true">Yes</option>
+					<option value="false">No</option>
+				</select>
+			</property>
+			<property key="WiramaCalThetaDif14" is-mandatory="false">
+				<label>CalThetaDif14</label>
+				<description>CalThetaDif14</description>
+				<type-definition>oat:WiramaCalTheta</type-definition>
+				<select is-bound="false">
+					<option value="0" is-default="true">0</option>
+				</select>
+			</property>
+			<property key="WiramaCalThetaDif23" is-mandatory="false">
+				<label>CalThetaDif23</label>
+				<description>CalThetaDif23</description>
+				<type-definition>oat:WiramaCalTheta</type-definition>
+				<select is-bound="false">
+					<option value="0" is-default="true">0</option>
+				</select>
+			</property>
+			<property key="WiramaInvCount" is-mandatory="false">
+				<label>Inventory count</label>
+				<description>Number of Inventory read count per read cycle</description>
+				<type-definition>oat:WiramaInvCount</type-definition>
+				<select is-bound="false">
+					<option value="5" is-default="true">5</option>
+				</select>
+			</property>-->
+			<property key="ReadTimeOut" is-mandatory="false">
+				<label>Read Time-Out</label>
+				<description>Read command time-out value. Integer between 0 and 120000; default 2000</description>
+				<type-definition>oat:ReadTimeoutMillis1</type-definition>
+				<select is-bound="false">
+					<option value="2000" is-default="true">2000</option>
+				</select>
+			</property>
+			<property key="DefaultTimeOut" is-mandatory="false">
+				<label>Default Time-Out</label>
+				<description>Read command time-out value. Integer between 0 and 120000; default 2000</description>
+				<type-definition>oat:ReadTimeoutMillis1</type-definition>
+				<select is-bound="false">
+					<option value="2000" is-default="true">2000</option>
+				</select>
+			</property>
+
+		</entity>
+
+		<entity type="WiramaPoExReader" extends="RFReader">
+			<locator-option value="Wirama PoEx Reader">Wirama PoEx Reader</locator-option>
+			<label>Wirama Reader with OBF Configuration</label>
+			<description>Wirama Reader with OBF Configuration</description>
+			<property key="number_of_antennas" is-mandatory="false" is-visible="false">
+				<label>Maximum number of antennas</label>
+				<description>Maximum number of antennas for a Wirama Reader with OBF</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="1" is-default="true">1</option>
+				</select>
+			</property>
+			<!-- Input Ports -->
+			<property key="InputPorts" is-mandatory="false">
+				<label>Input Ports</label>
+				<description>GPIO Input Ports</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1,2,3,4" is-default="true">1,2,3,4</option>
+				</select>
+			</property>   
+			<property key="VirtualDeactivationSupport" is-mandatory="true" is-visible="false">
+				<label>Virtual Deactivation Support</label>
+				<description>Virtual Deactivation Support for RFID EAS</description>
+				<type-definition>oat:SmallString</type-definition>
+				<select is-bound="true">
+					<option value="true" is-default="true">Yes</option>
+					<option value="false">No</option>
+				</select>
+			</property>
+			<property key="CommandPort" is-mandatory="false">
+				<label>Command Port</label>
+				<description>Reader Command Port</description>
+				<type-definition>oat:Port</type-definition>
+				<select is-bound="false">
+					<option value="7237" is-default="true">7237</option>
+				</select>
+			</property>
+			<property key="AlarmNotificationPort" is-mandatory="false">
+				<label>Alarm Notification Port</label>
+				<description>Alarm Asynchronous Notification Port</description>
+				<type-definition>oat:Port</type-definition>
+				<select is-bound="false">
+					<option value="7240" is-default="true">7240</option>
+				</select>
+			</property>
+			<property key="WiramaAlarmPortPingInterval" is-mandatory="false">
+				<label>Alarm Port Ping Interval </label>
+				<description>Ping interval for alarm port 7240 (in seconds)</description>
+				<type-definition>oat:WiramaAlarmPortPingInterval</type-definition>
+				<select is-bound="false">
+					<option value="30" is-default="true">30</option>
+				</select>
+			</property>
+			<property key="WiramaAlarmStrategyClassname" is-mandatory="false">
+				<label>Wirama Alarm Strategy classname</label>
+				<description>Java class name implementing IWiramaAlarmStrategy</description>
+				<type-definition>oat:SmallString</type-definition>
+				<select is-bound="false">
+					<option value="com.oatsystems.dms.device.wirama.WiramaPoExAlarmStrategy" is-default="true">com.oatsystems.dms.device.wirama.WiramaPoExAlarmStrategy</option>
+				</select>
+			</property>
+			<property key="DefaultTimeOut" is-mandatory="false">
+				<label>Default Time-Out</label>
+				<description>Read command time-out value. Integer between 0 and 120000; default 2000</description>
+				<type-definition>oat:ReadTimeoutMillis1</type-definition>
+				<select is-bound="false">
+					<option value="2000" is-default="true">2000</option>
+				</select>
+			</property>
+
+		</entity>
+
+		<entity type="WiramaMonReader" extends="RFReader">
+			<locator-option value="Wirama Mon Reader">Wirama Monitoring Only Reader</locator-option>
+			<label>Wirama Monitoring Only Reader</label>
+			<description>Wirama Reader with OBF with only the monitoring feature</description>
+			<property key="number_of_antennas" is-mandatory="false" is-visible="false">
+				<label>Maximum number of antennas</label>
+				<description>Maximum number of antennas for a Wirama Reader with OBF</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="1" is-default="true">1</option>
+				</select>
+			</property>
+			<property key="Credential" is-mandatory="false">
+				<label>Credential</label>
+				<description>Credential to get detailed status from the device</description>
+				<type-definition>oat:SmallString</type-definition>
+			</property>
+			<property key="WebAccessPort" is-mandatory="false">
+				<label>Web access port</label>
+				<description>Port to connect to the device web application</description>
+				<type-definition>oat:Port</type-definition>
+			</property>
+
+			<property key="MonitoringPort" is-mandatory="false">
+				<label>Monitoring port</label>
+				<description>Port to use for monitoring the device</description>
+				<type-definition>oat:MonitorPort</type-definition>
+				<select is-bound="true">
+					<option value="0">Web port</option>
+					<option value="1" is-default="true">Command port</option>
+				</select>
+			</property>
+
+			<property key="DefaultTimeOut" is-mandatory="false">
+				<label>Default Time-Out</label>
+				<description>Read command time-out value. Integer between 0 and 120000; default 2000</description>
+				<type-definition>oat:ReadTimeoutMillis1</type-definition>
+				<select is-bound="false">
+					<option value="2000" is-default="true">2000</option>
+				</select>
+			</property>
+		</entity>
+		
+		<!--  Wirama reader for DC application -->
+		<entity type="WiramaTunnelReader" extends="RFReader">
+			<locator-option value="Wirama Tunnel Reader">Wirama Tunnel Reader</locator-option>
+			<label>Wirama Reader Configuration</label>
+			<description>Wirama Reader Configuration</description>
+			<property key="number_of_antennas" is-mandatory="false" is-visible="false">
+				<label>Maximum number of antennas</label>
+				<description>Maximum number of antennas for a wirama reader</description>
+				<type-definition>xsd:int</type-definition>
+				<select is-bound="true">
+					<option value="4" is-default="true">4</option>
+				</select>
+			</property>
+			<property key="ReaderNodeId" is-mandatory="true">
+				<label>Reader Node ID</label>
+				<description>Reader address. A hexadecimal number between 00 and FF.</description>
+				<type-definition>oat:ReaderNodeID</type-definition>
+				<select is-bound="false">
+					<option value="04" is-default="true">04</option>
+				</select>
+			</property>
+
+			<!-- Output Ports -->			
+			<property key="OutputPorts" is-mandatory="false">
+				<label>Output Ports</label>
+				<description>GPIO Output Ports</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1,2,3,4" is-default="true">1,2,3,4</option>
+				</select>
+			</property>   
+			
+			<property key="InvStartTrigger" is-mandatory="false">
+				<label>Inventory Start Trigger</label>
+				<description>Inventory Start Trigger</description>
+				<type-definition>oat:Trigger</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">No Trigger</option>
+					<option value="1" >Raising GPI 1</option>
+					<option value="2" >Raising GPI 2</option>
+					<option value="3" >Raising GPI 3</option>
+					<option value="4" >Raising GPI 4</option>
+					<option value="5" >Falling GPI 1</option>
+					<option value="6" >Falling GPI 2</option>
+					<option value="7" >Falling GPI 3</option>
+					<option value="8" >Falling GPI 4</option>
+				</select>
+			</property>
+			
+			
+			<property key="InvStopTrigger" is-mandatory="false">
+				<label>Inventory Stop Trigger</label>
+				<description>Inventory Stop Trigger</description>
+				<type-definition>oat:Trigger</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">No Trigger</option>
+					<option value="1" >Raising GPI 1</option>
+					<option value="2" >Raising GPI 2</option>
+					<option value="3" >Raising GPI 3</option>
+					<option value="4" >Raising GPI 4</option>
+					<option value="5" >Falling GPI 1</option>
+					<option value="6" >Falling GPI 2</option>
+					<option value="7" >Falling GPI 3</option>
+					<option value="8" >Falling GPI 4</option>
+				</select>
+			</property>
+			
+			<property key="BatchStartTrigger" is-mandatory="false">
+				<label>Batch Start Trigger</label>
+				<description>Batch Start Trigger</description>
+				<type-definition>oat:Trigger</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">No Trigger</option>
+					<option value="1" >Raising GPI 1</option>
+					<option value="2" >Raising GPI 2</option>
+					<option value="3" >Raising GPI 3</option>
+					<option value="4" >Raising GPI 4</option>
+					<option value="5" >Falling GPI 1</option>
+					<option value="6" >Falling GPI 2</option>
+					<option value="7" >Falling GPI 3</option>
+					<option value="8" >Falling GPI 4</option>
+				</select>
+			</property>
+			
+			
+			<property key="BatchStopTrigger" is-mandatory="false">
+				<label>Batch Stop Trigger</label>
+				<description>Batch Stop Trigger</description>
+				<type-definition>oat:Trigger</type-definition>
+				<select is-bound="true">
+					<option value="0" is-default="true">0</option>
+					<option value="1" >Raising GPI 1</option>
+					<option value="2" >Raising GPI 2</option>
+					<option value="3" >Raising GPI 3</option>
+					<option value="4" >Raising GPI 4</option>
+					<option value="5" >Falling GPI 1</option>
+					<option value="6" >Falling GPI 2</option>
+					<option value="7" >Falling GPI 3</option>
+					<option value="8" >Falling GPI 4</option>
+				</select>
+			</property>
+			
+			<!-- Input Ports -->			
+			<property key="InputPorts" is-mandatory="false">
+				<label>Input Ports</label>
+				<description>GPIO Input Ports</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1,2,3,4" is-default="true">1,2,3,4</option>
+				</select>
+			</property>   
+			
+			<property key="DeviceDebounceTime" is-mandatory="false">
+				<label>Device Debounce time</label>
+				<description>Device Debounce time. Number between 0 and 250; default 0</description>
+				<type-definition>oat:WiramaDeviceDebounceTime</type-definition>
+				<select is-bound="false">
+					<option value="0" is-default="true">0</option>
+				</select>
+			</property>	
+			
+			
+			<!-- Debounce Input Ports -->			
+			<property key="DebouncePorts" is-mandatory="false">
+				<label>Ports to debounce</label>
+				<description>Ports to debounce</description>
+				<type-definition>oat:RegExp</type-definition>
+				<select is-bound="false">
+					<option value="1,2,3,4" is-default="true">1,2,3,4</option>
+				</select>
+			</property> 
+			
+			<property key="DebounceTime" is-mandatory="false">
+				<label>Debounce time</label>
+				<description>Debounce time. Integer between 100 and 2000; default 500</description>
+				<type-definition>oat:WiramaDebounceTime</type-definition>
+				<select is-bound="false">
+					<option value="500" is-default="true">500</option>
+				</select>
+			</property>			
+			
+			<property key="HeartbeatInterval" is-mandatory="false">
+				<label>Heartbeat interval in sec</label>
+				<description>Heartbeat interval. Integer between 5 and 300; default 10</description>
+				<type-definition>oat:WiramaHeartbeatInterval</type-definition>
+				<select is-bound="false">
+					<option value="10" is-default="true">10</option>
+				</select>
+			</property>	
+						
+			<property key="DefaultTimeOut" is-mandatory="false">
+				<label>Default Time-Out</label>
+				<description>Read command time-out value. Integer between 0 and 120000; default 2000</description>
+				<type-definition>oat:ReadTimeoutMillis1</type-definition>
+				<select is-bound="false">
+					<option value="2000" is-default="true">2000</option>
+				</select>
+			</property>
+		</entity>		
+	</table>
+</meta-data>

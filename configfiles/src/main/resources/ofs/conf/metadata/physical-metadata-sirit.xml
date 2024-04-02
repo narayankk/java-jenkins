@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+<meta-data property-table="Physical">
+    <table name="device">
+        <entity type="SiritInfinity510ReaderDeviceNode" extends="RFDeviceNode">
+            <locator-option value="Sirit Infinity 510 Reader DeviceNode" is-default="true">Sirit Infinity 510 Reader DeviceNode</locator-option>
+            <label>Sirit Infinity 510 Reader Device Node Configuration</label>
+                <description>Sirit Infinity 510 Device Node Configuration</description>
+                <property key="AntennaId" is-mandatory="true">
+                    <label>Antenna ID</label>
+                    <description>Antenna number</description>
+                    <type-definition>xsd:int</type-definition>
+                    <select is-bound="true">
+                        <option value="1" is-default="true">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </property>
+
+                <property key="TimeThreshold" is-mandatory="false">
+                    <label>Time Threshold</label>
+                    <description>The time threshold should exceed 100 milliseconds</description>
+                    <type-definition>oat:TimeThreshold</type-definition>
+                </property>
+
+                <property key="LoopThreshold" is-mandatory="false">
+                    <label>Loop Threshold</label>
+                    <description>The loop threshold should exceed -1</description>
+                    <type-definition>oat:LoopThreshold</type-definition>
+                </property>
+
+                <property key="TagType" is-mandatory="false">
+                    <label>Tag Type</label>
+                    <description>Type of Tags used</description>
+                    <type-definition>oat:RegExp</type-definition>
+                    <select is-bound="false">
+                        <option value="0,1" is-default="true">0,1</option>
+                    </select>
+                </property>
+
+                <property key="Power" is-mandatory="false">
+                    <label>Power Level</label>
+                    <description>Power Level Of Antenna</description>
+                    <type-definition>oat:SiritPowerPercentage</type-definition>
+                    <select is-bound="false">
+                        <option value="0" is-default="true">0</option>
+                    </select>
+                </property>
+                
+                <property key="WritePower" is-mandatory="false">
+                    <label>Power Level for write/kill</label>
+                    <description>Power Level for write and kill</description>
+                    <type-definition>oat:SiritPowerPercentage</type-definition>
+                    <select is-bound="false">
+                        <option value="0" is-default="true">0</option>
+                    </select>
+                </property>
+        </entity>
+        <entity type="SiritInfinity510NotificationReaderDeviceNode" extends="RFDeviceNode">
+            <locator-option value="Sirit Infinity 510 Notification Reader DeviceNode" is-default="true">Sirit Infinity 510 Notification Reader DeviceNode</locator-option>
+            <label>Sirit Infinity 510 Reader Notification Device Node Configuration</label>
+                <description>Sirit Infinity 510 Notificaiotn Device Node Configuration</description>
+                <property key="AntennaId" is-mandatory="true">
+                    <label>Antenna ID</label>
+                    <description>Antenna number</description>
+                    <type-definition>xsd:int</type-definition>
+                    <select is-bound="true">
+                        <option value="1" is-default="true">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </property>
+
+                <property key="TimeThreshold" is-mandatory="false">
+                    <label>Time Threshold</label>
+                    <description>The time threshold should exceed 100 milliseconds</description>
+                    <type-definition>oat:TimeThreshold</type-definition>
+                     <select is-bound="false">
+	  					<option value="999999" is-default="true">999999</option>
+					</select>
+                </property>
+
+                <property key="LoopThreshold" is-mandatory="false">
+                    <label>Loop Threshold</label>
+                    <description>The loop threshold should exceed -1</description>
+                    <type-definition>oat:LoopThreshold</type-definition>
+                </property>
+
+                <property key="TagType" is-mandatory="false">
+                    <label>Tag Type</label>
+                    <description>Type of Tags used</description>
+                    <type-definition>oat:RegExp</type-definition>
+                    <select is-bound="false">
+                        <option value="0,1" is-default="true">0,1</option>
+                    </select>
+                </property>
+
+                <property key="Power" is-mandatory="false">
+                    <label>Power Level</label>
+                    <description>Power Level Of Antenna</description>
+                    <type-definition>oat:Percentage1</type-definition>
+                    <select is-bound="false">
+                        <option value="75" is-default="true">75</option>
+                    </select>
+                </property>
+        </entity>
+    </table>
+</meta-data>

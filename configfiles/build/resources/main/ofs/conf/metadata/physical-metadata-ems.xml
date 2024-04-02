@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+<meta-data property-table="Physical">
+  <table name="device">
+
+    <entity type="EMSLRP820DeviceNode" extends="RFDeviceNode">
+      <locator-option value="EMS LRP-820 DeviceNode">EMS LRP-820 DeviceNode</locator-option>
+
+      <label>EMS LRP-820 DeviceNode Configuration</label>
+      <description>EMS LRP-820 DeviceNode Configuration</description>
+      <property key="ReadTimeOut" is-mandatory="false">
+	<label>Read Time-Out</label>
+	<description>Read command time-out value. Integer between 0 and 120000; default 2000</description>
+	<type-definition>oat:ReadTimeoutMillis1</type-definition>
+	<select is-bound="false">
+	  <option value="2000" is-default="true">2000</option>
+	</select>
+      </property>
+      <property key="AnticollisionIndex" is-mandatory="false">
+	<label>Anticollision Index</label>
+	<description>I-Code1 Anti-collision index. Anti collision index - Max no of tags:  0 maps to 1 ( disabled ), 1 maps to 2-4, 2 maps to 4-8, 3 maps to 8-16, 4 maps to 16-32 5 maps to 32-64, 6 maps to 64-128, 7 maps to > 128 </description>
+	<type-definition>oat:ReaderNodeID</type-definition>
+	<select is-bound="false">
+	  <option value="00" is-default="true">00</option>
+	</select>
+      </property>
+      <property key="FamilyCode" is-mandatory="false">
+	<label>Family Code</label>
+	<description>Code1 Family code. If this is 0 then command is broad cast to all tags in the field. If non zero then only the tags with the specified family id will respond.</description>
+	<type-definition>oat:ReaderNodeID</type-definition>
+	<select is-bound="false">
+	  <option value="00" is-default="true">00</option>
+	</select>
+      </property>
+      <property key="TimeThreshold" is-mandatory="false">
+	<label>Time Threshold</label>
+	<description>The time threshold should exceed 100 milliseconds</description>
+	<type-definition>oat:TimeThreshold</type-definition>
+      </property>
+      <property key="LoopThreshold" is-mandatory="false">
+	<label>Loop Threshold</label>
+	<description>The loop threshold should exceed -1</description>
+	<type-definition>oat:LoopThreshold</type-definition>
+      </property>
+    </entity>
+
+  </table>
+</meta-data>

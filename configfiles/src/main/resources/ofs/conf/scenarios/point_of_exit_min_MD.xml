@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<scenario>
+  <property key="name">Point of Exit Scenario</property>
+  <property key="description">Log Epcs that are sent as stolen from the exit</property>
+  <process>
+    <start name="Start">
+		<target exit="Exit Condition" name="GetSiteIdOfRP"/>
+    </start>
+	
+	<activity name="GetSiteIdOfRP" resource="class:com.oatsystems.solutions.apparel.primitives.GetSiteIdForLocationFromSql">
+			<target name="WaitForEvents" exit="done"/>
+			<target name="End" exit="error"/>
+			<input name="locationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+			<output name="siteId" class="java.lang.String">${process.siteId}</output>
+			<output name="siteEpc" class="java.lang.String">${process.siteEpc}</output>
+	</activity>
+    
+    <wait name="WaitForEvents">
+        <event name="epc_add_read" target="CheckIsInventory">
+                <filter resource="filter:EpcAddEventFilter">
+                    <argument name="locationEpc" class="java.lang.String">${process.readerLocationEpc}</argument>
+                </filter>
+                <param class="java.lang.String" name="epc">${process.epc}</param>
+                <param class="java.lang.String" name="timestamp">${process.timestamp}</param>
+                <param class="java.util.Map" constant="false" name="payload">${process.payload}</param>
+       </event>
+       <event deferred="false" name="epc_enter_manual" target="CheckIsInventory">
+                <param class="java.lang.String" name="epc">${process.epc}</param>
+                <property key="ui.invisibleWhenInactive">true</property>
+                <property key="ui.invisibleWhenWaitConditionFalse">true</property>
+                <property key="ui.jsp">/workflow/floor_ui/event_tiles/enter_epc.jsp</property>
+                <property key="waitCondition">true</property>
+       </event>
+       <event name="epc_raw_read" target="CheckIsInventory">
+        <param class="java.lang.String" constant="false" name="epc">${process.epc}</param>
+        <param class="java.lang.String" constant="false" name="timestamp">${process.timestamp}</param>
+        <param class="java.util.Map" constant="false" name="payload">${process.payload}</param>
+        <filter resource="filter:EpcRawEventFilter">
+          <argument class="java.lang.String" constant="false" name="locationEpc">${process.readerLocationEpc}</argument>
+        </filter>
+      </event>
+      <event name="__timeout_event" target="ClearEpc">
+        <property key="timeout">${process.displayTime}</property> 
+      </event>
+    </wait>
+    
+	<!-- Clear UI display -->
+    <activity name="ClearEpc" resource="primitive:SetVariableToNull">
+      <target exit="done" name="ClearUiDisplay"></target>
+      <target exit="error" name="ClearUiDisplay"></target>
+      <target exit="skip" name="ClearUiDisplay"></target>
+      <input class="java.lang.String" constant="true" name="skip" required="false">FALSE</input>
+      <output class="java.lang.Object" constant="false" name="variable">${process.epc}</output>
+    </activity>
+
+    <activity name="ClearUiDisplay" resource="class:com.oatsystems.solutions.apparel.primitives.RetrieveEpcItemDataMD">
+      <target exit="done" name="WaitForEvents"></target>
+      <target exit="error" name="WaitForEvents"></target>
+      <target exit="maintenance" name="WaitForEvents"></target>
+      <input class="java.lang.String" constant="false" name="displayTime" required="false">${process.displayTime}</input>
+      <input class="java.lang.String" constant="false" name="epc" required="false">${process.epc}</input>
+      <input class="java.util.ArrayList" constant="false" name="itemList" required="false">${process.itemList}</input>
+      <input class="java.util.ArrayList" constant="false" name="pictureItemList" required="false">${process.pictureItemList}</input>
+      <input class="java.lang.String" constant="false" name="thresholdColorHigh" required="false">${process.thresholdColorHigh}</input>
+      <input class="java.lang.String" constant="false" name="thresholdColorLow" required="false">${process.thresholdColorLow}</input>
+      <input class="java.lang.String" constant="false" name="thresholdColorMedium" required="false">${process.thresholdColorMedium}</input>
+      <input class="java.lang.String" constant="false" name="thresholdValueHigh" required="false">${process.thresholdValueHigh}</input>
+      <input class="java.lang.String" constant="false" name="thresholdValueLow" required="false">${process.thresholdValueLow}</input>
+      <input class="java.lang.String" constant="false" name="thresholdValueMedium" required="false">${process.thresholdValueMedium}</input>
+      <output class="java.util.ArrayList" constant="false" name="itemList">${process.itemList}</output>
+      <output class="java.util.ArrayList" constant="false" name="pictureItemList">${process.pictureItemList}</output>
+    </activity>
+	
+	<activity name="CheckIsInventory" resource="class:com.oatsystems.solutions.apparel.primitives.CheckIsInventoryMD">
+	  <!--<target exit="done" name="DecideIfShowItems"/>
+	  <target exit="alarm" name="TriggerAlarm"/>-->
+	  <target exit="inInventory" name="TriggerAlarm"/>
+	  <target exit="inInventoryRetired" name="PopulatePOEHistoryWithoutAlarm"/>
+	  <target exit="notInInventory" name="PopulatePOEHistoryWithoutAlarm"/>
+	  <target exit="error" name="SetAttributesForLogInvalidEPC"/>
+	  <input class="java.lang.String" constant="false" name="epc" required="true">${process.epc}</input>
+	  <input class="java.lang.String" constant="false" name="siteId" required="true">${process.siteId}</input>
+	  <output class="java.lang.String" name="isInventory" required="false"> ${process.isInventory}</output>
+	  <output class="java.lang.String" name="epcStateFlag" required="false"> ${process.epcStateFlag}</output>
+	</activity> 
+
+
+	<decision name="DecideIfShowItems">
+	  <case condition="${process.showAllItems}" label="dont_show_item" target="DecideIfUpdateInventory"/>
+	  <default label="show_item" target="RetrieveEpcItemData"/>
+	</decision>
+	
+	<activity name="TriggerAlarm" resource="class:com.oatsystems.solutions.apparel.primitives.TriggerAlarm">
+	  <target exit="done" name="PopulatePOEHistoryWithAlarm"></target>
+	  <input name="epc" class="java.lang.String">${process.epc}</input>
+	</activity>
+	
+	<activity name="PopulatePOEHistoryWithAlarm" resource="class:com.oatsystems.solutions.apparel.primitives.PopulatePOEHistory">
+		<target  exit="done" name="RetrieveEpcItemData"/>
+		<target  exit="error" name="WaitForEvents" />
+		<input name="epc" class="java.lang.String">${process.epc}</input>
+		<input name="isAlarm" class="java.lang.String">true</input>
+		<input name="readerLocationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+		<input name="processStartTime" class="java.lang.String">${process.timestamp}</input>
+		<output name="processTS" class="java.lang.String">${process.processTS}</output>
+	</activity>
+	
+		<activity name="PopulatePOEHistoryWithoutAlarm" resource="class:com.oatsystems.solutions.apparel.primitives.PopulatePOEHistory">
+		<target  exit="done" name="DecideIfShowItems"/>
+		<target  exit="error" name="WaitForEvents" />
+		<input name="epc" class="java.lang.String">${process.epc}</input>
+		<input name="isAlarm" class="java.lang.String">false</input>
+		<input name="readerLocationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+		<input name="processStartTime" class="java.lang.String">${process.timestamp}</input>
+		<output name="processTS" class="java.lang.String">${process.processTS}</output>
+	</activity>
+
+	<!-- EPC read Branch -->
+	<!-- Update Display -->
+	<activity name="RetrieveEpcItemData" resource="class:com.oatsystems.solutions.apparel.primitives.RetrieveEpcItemDataMD">
+	  <target exit="done" name="DecideIfUpdateInventory"></target>
+	  <target exit="error" name="SetAttributesForLogInvalidEPC"></target>
+	  <target exit="maintenance" name="WaitForEvents"></target>
+	  <input class="java.lang.String" constant="false" name="displayTime" required="false">${process.displayTime}</input>
+	  <input class="java.lang.String" constant="false" name="epc" required="false">${process.epc}</input>
+	  <input class="java.util.ArrayList" constant="false" name="itemList" required="false">${process.itemList}</input>
+	  <input class="java.util.ArrayList" constant="false" name="pictureItemList" required="false">${process.pictureItemList}</input>
+	  <input class="java.lang.String" constant="false" name="thresholdColorHigh" required="false">${process.thresholdColorHigh}</input>
+	  <input class="java.lang.String" constant="false" name="thresholdColorLow" required="false">${process.thresholdColorLow}</input>
+	  <input class="java.lang.String" constant="false" name="thresholdColorMedium" required="false">${process.thresholdColorMedium}</input>
+	  <input class="java.lang.String" constant="false" name="thresholdValueHigh" required="false">${process.thresholdValueHigh}</input>
+	  <input class="java.lang.String" constant="false" name="thresholdValueLow" required="false">${process.thresholdValueLow}</input>
+	  <input class="java.lang.String" constant="false" name="thresholdValueMedium" required="false">${process.thresholdValueMedium}</input>
+	  <input class="java.lang.String"  constant="false" name="isInventory" required="true">${process.isInventory}</input>
+	  <input class="java.util.ArrayList" constant="false" name="missingItemList" required="false">${process.missingItemList}</input>
+	  <output class="java.util.ArrayList" constant="false" name="missingItemList" required="false">${process.missingItemList}</output>
+	  <output class="java.util.ArrayList" constant="false" name="itemList">${process.itemList}</output>
+	  <output class="java.util.ArrayList" constant="false" name="pictureItemList">${process.pictureItemList}</output>
+	</activity>
+	
+	<!--Logging Invalid EPC-->
+	<activity name="SetAttributesForLogInvalidEPC" resource="primitive:CreateListOfStrings">
+		<target name="LogInvalidEPC" exit="done" />
+		<target name="WaitForEvents" exit="error" />
+		<input name="attribute0" class="java.lang.String">${process.epc}</input>
+		<output name="outputList" class="java.util.List">${process.processErrorAtr}</output>
+	</activity>    
+	
+	<activity name="LogInvalidEPC" resource="primitive:LogProcessError">
+		<target name="SetVariablesToNull" exit="done"/>
+		<target name="SetVariablesToNull" exit="error"/>
+		<input name="errorCode" class="java.lang.String">UNKNOWN</input>
+		<input name="locationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+		<input name="errorDesc" class="java.lang.String">"An invalid EPC is encountered at POE."</input>
+		<input name="attributes" class="java.util.List">${process.processErrorAtr}</input>
+	</activity>
+
+	<!-- Update Inventory Branch -->
+	<decision name="DecideIfUpdateInventory">
+	  <case condition="${process.updateInventory}" label="remove_from_inv" target="UpdateInventory"></case>
+	 <default label="dont_remove_from_inv" target="WaitForEvents"></default>
+	</decision>
+
+	<call name="UpdateInventory" resource="apparelsub_process_potentially_stolen_MD.xml" namespace="UpdateInventoryPoe">
+		<target exit="DONE" name="SetVariablesToNull"/>
+		<target exit="ERROR" name="SetVariablesToNull"/>
+		<input name="epc" class="java.lang.String">${process.epc}</input>
+		<input name="readerLocationEpc" class="java.lang.String">${process.readerLocationEpc}</input>
+		<input name="siteId" class="java.lang.String" >${process.siteId}</input>
+		<input name="siteEpc" class="java.lang.String" >${process.siteEpc}</input>
+		<input name="epcStateFlag" class="java.lang.String"> ${process.epcStateFlag}</input>
+		<input name="processStartTime" class="java.lang.String"> ${process.timestamp}</input>
+		<input name="processTS" class="java.lang.String"> ${process.processTS}</input>
+	</call>
+	
+	<activity name="SetVariablesToNull" resource="primitive:SetVariablesToNull">
+      <target name="WaitForEvents" exit="done" />
+      <target name="WaitForEvents" exit="skip" />
+      <target name="WaitForEvents" exit="error" />
+      <output name="variable0" class="java.lang.Object">${process.epc}</output>
+      <output name="variable1" class="java.lang.Object">${process.processErrorAtr}</output>
+      <output name="variable2" class="java.lang.Object">${process.isInventory}</output>
+      <output name="variable3" class="java.lang.Object">${process.epcStateFlag}</output>
+    </activity>
+	
+	<end name="End"></end>
+  </process>
+  
+  
+  <config>
+    <var class="java.lang.String" name="${process.readerLocationEpc}">
+      <property key="doc">DEVICERFIDREADER</property>
+      <property key="ui.group">Define Devices</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">RFID antenna readpoint location</property>
+      <property key="ui.list"><![CDATA[   
+                <source="listsource:LocationWithDevicesListSource"/>
+               ]]></property>
+      <property key="ui.required">true</property>
+    </var>
+
+    <var class="java.lang.String" name="${process.displayTime}">
+      <property key="doc">TIME_IN_MS</property>
+      <property key="ui.group">Theft Display Parameters</property>
+      <property key="ui.input">
+      <![CDATA[ 
+         <textinput default="20000" type="SmallerString"/>
+	  ]]> </property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Time in ms Item should be listed on display</property>
+      <property key="ui.required">true</property>
+    </var>
+
+    <var class="java.lang.String" name="${process.thresholdValueHigh}">
+      <property key="doc">HIGH_VALUE</property>
+      <property key="ui.group">Theft Display Parameters</property>
+      <property key="ui.input">
+      <![CDATA[ 
+         <textinput default="100.00" type="SmallerString"/>
+      ]]> </property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Threshold Value for high priced Items</property>
+      <property key="ui.required">true</property>
+    </var>
+    
+    <var class="java.lang.String" name="${process.thresholdColorHigh}">
+      <property key="doc">HIGH_VALUE_COLOR</property>
+      <property key="ui.group">Theft Display Parameters</property>
+      <property key="ui.input">
+      <![CDATA[ 
+         <textinput default="red" type="SmallerString"/>
+      ]]> </property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Rendering Color for high priced Items</property>
+      <property key="ui.required">true</property>
+    </var>
+    
+    <var class="java.lang.String" name="${process.thresholdValueMedium}">
+      <property key="doc">MEDIUM_VALUE</property>
+      <property key="ui.group">Theft Display Parameters</property>
+      <property key="ui.input">
+      <![CDATA[ 
+         <textinput default="50.00" type="SmallerString"/>
+      ]]> </property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Threshold Value for medium priced Items</property>
+      <property key="ui.required">true</property>
+    </var>
+    
+    <var class="java.lang.String" name="${process.thresholdColorMedium}">
+      <property key="doc">MEDIUM_VALUE_COLOR</property>
+      <property key="ui.group">Theft Display Parameters</property>
+      <property key="ui.input">
+      <![CDATA[ 
+         <textinput default="orange" type="SmallerString"/>
+      ]]> </property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Rendering Color for medium priced Items</property>
+      <property key="ui.required">true</property>
+    </var>
+    
+    <var class="java.lang.String" name="${process.thresholdValueLow}">
+      <property key="doc">LOW_VALUE</property>
+      <property key="ui.group">Theft Display Parameters</property>
+      <property key="ui.input">
+      <![CDATA[ 
+         <textinput default="10.00" type="SmallerString"/>
+      ]]> </property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Threshold Value for low priced Items</property>
+      <property key="ui.required">true</property>
+    </var>
+    
+    <var class="java.lang.String" name="${process.thresholdColorLow}">
+      <property key="doc">LOW_VALUE_COLOR</property>
+      <property key="ui.group">Theft Display Parameters</property>
+      <property key="ui.input">
+      <![CDATA[ 
+         <textinput default="yellow" type="SmallerString"/>
+      ]]> </property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Rendering Color for low priced Items</property>
+      <property key="ui.required">true</property>
+    </var>
+    
+    <var class="java.lang.String" name="${process.updateInventory}">
+      <property key="doc">CONTAINEREPCREADASDETECTED</property>
+      <property key="ui.group">POE Alerting</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Update Inventory on POE alert?</property>
+      <property key="ui.list"><![CDATA[   
+                <option  value="FALSE">No</option>
+                <option SELECTED value="TRUE">Yes</option>
+               ]]></property>
+      <property key="ui.required">true</property>
+    </var>
+
+	<var class="java.lang.String" name="${process.showAllItems}">
+      <property key="doc">CONTAINEREPCREADASDETECTED</property>
+      <property key="ui.group">POE Alerting</property>
+      <property key="ui.isconfigurable">true</property>
+      <property key="ui.label">Show item details only on POE alert</property>
+      <property key="ui.list"><![CDATA[   
+                <option  SELECTED value="FALSE">No</option>
+                <option value="TRUE">Yes</option>
+               ]]></property>
+      <property key="ui.required">true</property>
+    </var>
+
+  </config>
+
+  <display>
+    <tile name="/workflow/floor_ui/display_tiles/exit_display.jsp">
+      <property key="ui.jsp">/workflow/floor_ui/display_tiles/exit_display.jsp</property>
+    </tile>
+  </display>
+</scenario>

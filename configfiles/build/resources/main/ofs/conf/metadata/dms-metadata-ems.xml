@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+
+<meta-data property-table="DMS">
+  <table name="dms_device">
+
+    <entity type="EMSLRP820" extends="RFReader">
+      <locator-option value="EMS LRP-820">EMS LRP-820</locator-option>
+
+      <label>EMS LRP-820</label>
+      <description>EMS LRP-820 Configuration</description>
+      <property key="number_of_antennas" is-mandatory="false" is-visible="false">
+	<label>Maximum number of antennas</label>
+	<description>Maximum number of antennas for an EMS reader</description>
+	<type-definition>xsd:int</type-definition>
+	<select is-bound="false">
+	  <option value="1" is-default="true">1</option>
+	</select>
+      </property>
+    </entity>
+
+  </table>
+</meta-data>

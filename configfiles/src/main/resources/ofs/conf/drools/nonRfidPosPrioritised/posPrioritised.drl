@@ -1,0 +1,87 @@
+package drools.nonRfidPosPrioritised;
+
+import com.oatsystems.service.apparel.data.drools.POSResultObject;
+import com.oatsystems.service.apparel.data.drools.FullInventory;
+import com.oatsystems.service.apparel.data.drools.InventoryUnit;
+import com.oatsystems.spring.service.apparel.data.pos.POSTxn;
+import com.oatsystems.service.apparel.data.drools.POSTxnInfo;
+import com.oatsystems.spring.service.apparel.data.pos.POSTxnType;
+import com.oatsystems.spring.service.apparel.data.postxnv1.POSSkus;
+import com.oatsystems.pojo.SkuLevel;
+import java.util.List;
+import java.util.Map;
+import java.lang.Math;
+import com.oatsystems.util.ModLog;
+
+
+rule "adjCount for POS SALE product priority" salience 11
+no-loop
+when
+$txnInfo : POSTxnInfo(getTxnType().equals(POSTxnType.SALE.toString()), $txnTime : getTxnTime())
+$pos : POSSkus($sku : getSkuValue(), $qty : qty > 0)
+$full : FullInventory($preferredLocSubtype: getPreferredLocSubtype(), $subLevelList : getSublevel() contains $sku, $invList : getInvList(), $productIdentifier : getProductIdentifier(), getInvList().get(0).getCcResetTime() < $txnTime)
+$inv : InventoryUnit(locationSubtype.equals($preferredLocSubtype), $adjInvCount : adjInvCount > 0, $businessLocation : getBusinessLocation(), getCcResetTime() < $txnTime) from $invList
+$posObject : POSResultObject( productIdentifier.equals( $productIdentifier ), businessLocation.equals( $businessLocation ) )
+then
+ModLog.debug("in Rule: adjCount for POS SALE");
+$posObject.setAdjCount($posObject.getAdjCount() + Math.min($adjInvCount, $qty));
+update($posObject);
+$pos.setQty(Math.max($qty - $adjInvCount, 0l));
+update($pos);
+end
+
+
+rule "adjCount for POS SALE" salience 10
+no-loop
+when
+$txnInfo : POSTxnInfo(getTxnType().equals(POSTxnType.SALE.toString()), $txnTime : getTxnTime())
+$pos : POSSkus($sku : getSkuValue(), $qty : qty > 0)
+$full : FullInventory($subLevelList : getSublevel() contains $sku, $invList : getInvList(), $productIdentifier : getProductIdentifier(), getInvList().get(0).getCcResetTime() < $txnTime)
+$inv : InventoryUnit($adjInvCount : adjInvCount > 0, $businessLocation : getBusinessLocation(), getCcResetTime() < $txnTime) from $invList
+$posObject : POSResultObject( productIdentifier.equals( $productIdentifier ), businessLocation.equals( $businessLocation ) )
+then
+ModLog.debug("in Rule: adjCount for POS SALE");
+$posObject.setAdjCount($posObject.getAdjCount() + Math.min($adjInvCount, $qty));
+update($posObject);
+$pos.setQty(Math.max($qty - $adjInvCount, 0l));
+update($pos);
+end
+
+
+rule "complete remaining POS in Backroom" salience 9
+no-loop
+when
+$txnInfo : POSTxnInfo(getTxnType().equals(POSTxnType.SALE.toString()), $txnTime : getTxnTime())
+$pos : POSSkus($sku : getSkuValue(), $qty : qty > 0, processed == false)
+$full : FullInventory($subLevelList : getSublevel() contains $sku, $invList : getInvList(), $productIdentifier : getProductIdentifier(), getInvList().get(0).getCcResetTime() < $txnTime)
+$inv : InventoryUnit($adjInvCount : adjInvCount, "Backroom".equals(locationSubtype), $businessLocation : getBusinessLocation(), getCcResetTime() < $txnTime) from $invList
+$posObject : POSResultObject( productIdentifier.equals( $productIdentifier ), businessLocation.equals( $businessLocation ) )
+then
+ModLog.debug("in Rule: complete remaining POS");
+$posObject.setAdjCount($posObject.getAdjCount() + $pos.getQty());
+update($posObject);
+$pos.setQty(0l);
+$pos.setProcessed(true);
+update($pos);
+end
+
+rule "complete remaining POS in Salesfloor if Backroom not configured" salience 8
+no-loop
+when
+$txnInfo : POSTxnInfo(getTxnType().equals(POSTxnType.SALE.toString()), $txnTime : getTxnTime())
+$pos : POSSkus($sku : getSkuValue(), $qty : qty > 0, processed == false)
+$full : FullInventory($subLevelList : getSublevel() contains $sku, $invList : getInvList(), $productIdentifier : getProductIdentifier(), getInvList().get(0).getCcResetTime() < $txnTime)
+$inv : InventoryUnit($adjInvCount : adjInvCount, "Sales Floor".equals(locationSubtype), $businessLocation : getBusinessLocation(), getCcResetTime() < $txnTime) from $invList
+$posObject : POSResultObject( productIdentifier.equals( $productIdentifier ), businessLocation.equals( $businessLocation ) )
+then
+ModLog.info("in Rule: complete remaining POS");
+$posObject.setAdjCount($posObject.getAdjCount() + $pos.getQty());
+update($posObject);
+$pos.setQty(0l);
+$pos.setProcessed(true);
+update($pos);
+end
+
+query "getObjectsOfPOSResultObject"
+    $result: POSResultObject()
+end

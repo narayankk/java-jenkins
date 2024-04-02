@@ -1,0 +1,621 @@
+%% This rule-set computes dock-door reads for full pallets and mixed pallets
+%%
+%% The session manager manages only one location due to the
+%% inefficiencies in dynamic relations in ARE. The ideal usage will
+%% involve setting up different association handlers for different
+%% locations.
+%%
+%% To handle locking of objects across locations, the object locking
+%% framework provided by the ObjectHierarchyManager should be used.
+%%
+%% The session manager handles the following inputs
+%%
+%% 1. Status input on the transit location's status
+%%      Every location can be assigned a status. Eg. no-motion, motion (or
+%%      in-motion, out-motion), blocked, etc.
+%%      These statuses will be assigned to locations handled by the session
+%%      manager.
+%%
+%% 2. Case and pallet read events: Both add and remove
+%%
+%%
+%% The session manager abstracts out the following queries:
+%%
+%% 1. The time for which status needs to be reported for any
+%%    session. The statuses will be reported since session
+%%    session start time - status_past_time
+%%
+%% 2. The fact that a read can be processed. If so, whether
+%%    it is a case or a pallet.
+%%
+%% 3. The fact that a pallet should run verification on its cases.
+%%    If so, the cases belonging to the pallet
+%%
+%% 4. The fact that a case read determines that the pallet is still in
+%%    transit. This is used for session starting and status reporting.
+%%
+%% 5. The fact that a session is terminated based on the pallet
+%%    contents, whenever a change happens.
+%%
+%% 6. The timeout for which the session waits after a pallet remove event
+%%    is detected, provided no more cases are read.
+%%
+%% 7. The timeout for which the session waits after a case remove event
+%%    is detected, provided other cases and pallets are not read.
+%%
+%%
+%% The session manager reports the following events:
+%%
+%% 1. A session started on a pallet
+%% 2. A change happened in the pallet contents during the session
+%% 3. A session terminated on a pallet, along with session details
+%% 4. A case add/remove happened in a zombie session
+%% 5. A case add/remove happened without a pallet parent
+%%
+%% The session manager provides the following queries:
+%% 1. List of active sessions
+%% 2. List of zombie sessions
+%% 3. Get the contents of a pallet along with case-level details
+%% 4. Get the counts of cases read and still-read by the session
+%% 5. Get the statuses encountered during a pallet session
+%% 6. Get the pallet read details
+
+:- include('general_utils.are').
+
+%% Of the form status_past_time(PastMillis). Should have exactly one record.
+:- dynamic('status_past_time/1').
+
+%% Of the form num_containers(NumContainer). Should have exactly one record.
+:- dynamic('num_containers/1').
+
+%% Of the form container(ContainerID, ContainerReadTs, OpenCount, ReadCount, TotCount)
+:- dynamic('container/5').
+
+%% Of the form session(ContainerID, FirstReadTs)
+:- dynamic('session/2').
+
+%% Of the form containee(ContaineeID, ContainerID, FirstReadTs, IsOpen)
+:- dynamic('containee/4').
+
+%% Of the form session_timeout(ContainerID, Timeout)
+:- dynamic('session_timeout/2').
+
+%% Of the form session_untimeout(ContainerID, Count)
+:- dynamic('session_untimeout/2').
+
+%% Of the form location_status(Status, LastActivationTime)
+:- dynamic('location_status/2').
+
+%% Of the form session_status(ContainerID, Status)
+:- dynamic('session_status/2').
+
+process :-
+        PastMillis is get_status_past_millis(),
+        assert status_past_time(PastMillis),
+        fail.
+
+process :-
+        assert num_containers(0),
+        fail.
+
+process :-
+        wait location_status_event(Status, Timestamp),
+        process_location_status(Status, Timestamp),
+        fail.
+
+
+process :-
+        wait container_add(ContainerID, Ts),
+        process_container_add(ContainerID, Ts),
+        fail.
+
+process :-
+        wait container_remove(ContainerID, Ts),
+        process_container_remove(ContainerID, Ts),
+        fail.
+
+process :-
+        wait containee_add(ContaineeID, Ts),
+        process_containee_add(ContaineeID, Ts),
+        fail.
+
+process :-
+        wait containee_remove(ContaineeID, Ts),
+        process_containee_remove(ContaineeID, Ts),
+        fail.
+
+process :-
+        process_sessions,
+        fail.
+
+process :-
+        wait shutdown(),
+        !.
+
+
+%% Sets the location status
+process_location_status(Status, Timestamp) :-
+        retract location_status(Status, _),
+        fail.
+
+process_location_status(Status, Timestamp) :-
+        assert location_status(Status, Timestamp),
+        fail.
+
+process_container_add(ContainerID, Ts) :-
+        setup_session(ContainerID, 'T', Ts),
+        set_container_read_ts(ContainerID, Ts),
+        fail.
+
+process_container_remove(ContainerID, Ts) :-
+        %% The session exists
+        session(ContainerID, _),
+        !,
+        Timeout is get_container_timeout(ContainerID),
+        timeout_session(ContainerID, Timeout),
+        fail.
+
+process_container_remove(ContainerID, Ts) :-
+        %% The session does not exists
+        _ is log_container_remove_without_session(ContainerID),
+        fail.
+
+process_containee_add(ContaineeID, Ts) :-
+        ContainerID is get_container(ContaineeID),
+        is_not_null(ContainerID),
+        ToLog is 'Processing containee add ' + ContaineeID + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        !,
+        CaseStartsSession is get_containee_starts_session(ContainerID, ContaineeID),
+        ToLog1 is 'Setting up session for conteinee add ' + ContaineeID + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog1),
+        setup_session(ContainerID, CaseStartsSession, Ts),
+        ToLog2 is 'Opening entry for conteinee add ' + ContaineeID + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog2),
+        open_containee_entry(ContaineeID, ContainerID, Ts),
+        fail.
+
+process_containee_add(ContaineeID, Ts) :-
+        %% There is no container
+        ToLog is 'Logging an orphan add on containee ' + ContaineeID,
+        _ is log_info(ToLog),
+        _ is log_orphan_containee_add(ContaineeID, Ts),
+        fail.
+
+process_containee_remove(ContaineeID, Ts) :-
+        ContainerID is get_container(ContaineeID),
+        is_not_null(ContainerID),
+        ToLog is 'Processing conteinee remove ' + ContaineeID + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        !,
+        close_containee_entry(ContaineeID, ContainerID),
+        Timeout is get_containee_timeout(ContainerID, ContaineeID),
+        CaseStartsSession is get_containee_starts_session(ContainerID, ContaineeID),
+        check_zombie_remove(ContaineeID, ContainerID, Ts),
+        CaseStartsSession = 'T',
+        timeout_session(ContainerID, Timeout),
+        fail.
+
+process_containee_remove(ContaineeID, Ts) :-
+        %% There is no container
+        ToLog is 'Logging an orphan remove on containee ' + ContaineeID,
+        _ is log_info(ToLog),
+        _ is log_orphan_containee_remove(ContaineeID, Ts),
+        fail.
+
+start_containee_session(ContaineeID, ContainerID, Ts, 'T') :-
+        !,
+        timeout_session(ContainerID, Timeout).
+
+start_containee_session(ContaineeID, Ts, _) :-
+        !.
+
+check_zombie_remove(ContaineeID, ContainerID, Ts) :-
+        %% Check if this is a zombie. If so warn
+        session(ContainerID, _),
+        !.
+        %% Not a zombie
+
+check_zombie_remove(ContaineeID, ContainerID, Ts) :-
+        %% A zombie
+        _ is log_zombie_containee_remove(ContaineeID, ContainerID, Ts).
+
+%% Sets up a session. Makes it active it 'T' is passed
+setup_session(ContainerID, _, _) :-
+        insert_container_and_containees(ContainerID),
+        fail.
+
+setup_session(ContainerID, 'T', _) :-
+        %% Another reason to startup the session
+        %% Untimeout the session
+        %% Timeouts will be set when the remove events happen on container or containees
+        untimeout_session(ContainerID),
+        fail.
+
+setup_session(ContainerID, 'T', Ts) :-
+        session(ContainerID, _),
+        %% The session exists
+        !.
+
+setup_session(ContainerID, 'T', Ts) :-
+        %% The session does not exist
+        assert session(ContainerID, Ts),
+        %% Send this notification
+        _ is log_session_start(ContainerID),
+        fail.
+
+setup_session(_, _, _).
+
+%% Insert the container and containees
+insert_container_and_containees(ContainerID) :-
+        container(ContainerID, _, _, _, _),
+        %% The container exists.
+        !,
+        fail.
+
+insert_container_and_containees(ContainerID) :-
+        %% The container does not exists.
+        assert container(ContainerID, 0, 0, 0, 0),
+        increment_num_containers,
+
+        %% Get all the contained items
+        ContaineeID is get_containee(ContainerID),
+        %% Make entries for these. Some of these may exist.
+        ToLog is 'Adding an entry for containee ' + ContaineeID + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        add_containee_entry(ContaineeID, ContainerID),
+        fail.
+
+
+%% Times out a session if possible. This works like a semaphore
+timeout_session(ContainerID, Timeout) :-
+        CurTime is get_current_millis(),
+        AbsTime is CurTime + Timeout,
+        timeout_session_abstime(ContainerID, AbsTime).
+
+timeout_session_abstime(ContainerID, AbsTime) :-
+        %% Got a session untimeout entry. Remove it or decrement it.
+        retract session_untimeout(ContainerID, Count),
+        NewCount is Count - 1,
+        NewCount > 0,
+        ToLog is 'Reducing untimeouts from ' + NewCount + ' to ' + Count + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        assert session_untimeout(ContainerID, NewCount),
+        fail.
+
+timeout_session_abstime(ContainerID, AbsTime) :-
+        %% There is a session timeout. Check if this indicates a longer wait.
+        session_timeout(ContainerID, OldTime),
+        !,
+        AbsTime > OldTime,
+        ToLog is 'Increasing timeout from ' + OldTime + ' to ' + AbsTime + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        retract session_timeout(ContainerID, _),
+        assert session_timeout(ContainerID, AbsTime),
+        fail.
+
+timeout_session_abstime(ContainerID, AbsTime) :-
+        %% Set up the session timeout
+        ToLog is 'Setting timeout to ' + AbsTime + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        assert session_timeout(ContainerID, AbsTime),
+        fail.
+
+timeout_session_abstime(_, _).
+
+untimeout_session(ContainerID) :-
+        %% If there is an entry, increment it
+        retract session_untimeout(ContainerID, OldCount),
+        !,
+        NewCount is OldCount + 1,
+        assert session_untimeout(ContainerID, NewCount).
+
+untimeout_session(ContainerID) :-
+        %% Otherwise, set it to 1
+        assert session_untimeout(ContainerID, 1).
+
+
+%% Adds a containee to the given container. Also increments the container count
+add_containee_entry(ContaineeID, ContainerID) :-
+        %% Add only if there is no entry for the containee. Assume that only one container holds the containee
+        containee(ContaineeID, ContainerID, _, _),
+        !.
+
+add_containee_entry(ContaineeID, ContainerID) :-
+        %% Add to the tot count
+        increment_tot_count(ContainerID),
+        fail.
+
+add_containee_entry(ContaineeID, ContainerID) :-
+        %% Add the containee entry
+        ToLog is 'Adding a new entry for containee with ID ' + ContaineeID + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        assert containee(ContaineeID, ContainerID, 0, 'F').
+
+increment_tot_count(ContainerID) :-
+        %% Find it and change it. It will be present
+        ToLog is 'Incrementing total count for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        retract container(ContainerID, ContainerReadTs, OpenCount, ReadCount, OldTotCount),
+        NewTotCount is OldTotCount + 1,
+        assert container(ContainerID, ContainerReadTs, OpenCount, ReadCount, NewTotCount).
+
+increment_read_count(ContainerID) :-
+        %% Find it and change it. It will be present
+        retract container(ContainerID, ContainerReadTs, OpenCount, OldReadCount, TotCount),
+        NewReadCount is OldReadCount + 1,
+        assert container(ContainerID, ContainerReadTs, OpenCount, NewReadCount, TotCount).
+
+increment_open_count(ContainerID) :-
+        %% Find it and change it. It will be present
+        retract container(ContainerID, ContainerReadTs, OldOpenCount, ReadCount, TotCount),
+        NewOpenCount is OldOpenCount + 1,
+        assert container(ContainerID, ContainerReadTs, NewOpenCount, ReadCount, TotCount).
+
+decrement_open_count(ContainerID) :-
+        %% Find it and change it. It will be present
+        retract container(ContainerID, ContainerReadTs, OldOpenCount, ReadCount, TotCount),
+        NewOpenCount is OldOpenCount - 1,
+        assert container(ContainerID, ContainerReadTs, NewOpenCount, ReadCount, TotCount).
+
+reset_open_count(ContainerID) :-
+        %% Find it and set it to 0. It will be present
+        retract container(ContainerID, ContainerReadTs, OldOpenCount, ReadCount, TotCount),
+        NewOpenCount = 0,
+        assert container(ContainerID, ContainerReadTs, NewOpenCount, ReadCount, TotCount).
+
+increment_num_containers :-
+        retract num_containers(OldNumContainers),
+        NewNumContainers is OldNumContainers + 1,
+        assert num_containers(NewNumContainers).
+
+decrement_num_containers :-
+        retract num_containers(OldNumContainers),
+        NewNumContainers is OldNumContainers - 1,
+        assert num_containers(NewNumContainers).
+
+set_container_read_ts(ContainerID, Ts) :-
+        %% Find it and change it. It will be present
+        retract container(ContainerID, 0, OpenCount, ReadCount, TotCount),
+        assert container(ContainerID, Ts, OpenCount, ReadCount, TotCount),
+        fail.
+
+set_container_read_ts(_, _).
+
+
+open_containee_entry(ContaineeID, ContainerID, Ts) :-
+        %% Add the entry
+        add_containee_entry(ContaineeID, ContainerID),
+        fail.
+
+open_containee_entry(ContaineeID, ContainerID, Ts) :-
+        containee(ContaineeID, ContainerID, _, 'T'),
+        ToLog is 'Found duplicate add events on containee ID ' + ContaineeID + ' for container with ID ' + ContainerID,
+        !,
+        %% Do not proceed
+        _ is log_error(ToLog),
+        fail.
+
+
+open_containee_entry(ContaineeID, ContainerID, Ts) :-
+        %% Change the timestamp only if it a new record.
+        %% Duplicate open entries will cause errors during removal
+        retract containee(ContaineeID, ContainerID, OldTs, 'F'),
+        %% Increment the open count
+        increment_open_count(ContainerID),
+        %% The containee timestamp is updated only if it zero
+        get_first_non_zero_value(NewTs, OldTs, Ts),
+        %% Proceed only if the containee is not read
+        assert containee(ContaineeID, ContainerID, NewTs, 'T'),
+        %% Increment the read count only if it is a new record
+        OldTs = 0,
+        increment_read_count(ContainerID),
+        fail.
+
+open_containee_entry(_, _, _).
+
+%% Returns the first non-zero parameter
+get_first_non_zero_value(X, X, _) :- X > 0, !.
+get_first_non_zero_value(X, _, X).
+
+
+close_containee_entry(ContaineeID, ContainerID) :-
+        retract containee(ContaineeID, ContainerID, FirstReadTs, 'T'),
+        !,
+        %% Everything is OK
+        decrement_open_count(ContainerID),
+        assert containee(ContaineeID, ContainerID, FirstReadTs, 'F').
+
+close_containee_entry(ContaineeID, ContainerID) :-
+        %% There is an exception
+        _ is log_err_missing_open_entry(ContaineeID, ContainerID),
+        %% Do not proceed
+        fail.
+
+
+%% Close and timeout sessions
+process_sessions :-
+        wait session(ContainerID, _),
+        ToPrint1 is 'Processing session on container with ID ' + ContainerID,
+        _ is log_info(ToPrint1),
+
+        process_session(ContainerID),
+        %% Close the session entry
+
+        ToLog is 'Done with session on container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+
+        _ is log_session_complete(ContainerID),
+        retract session(ContainerID, _),
+        cleanup_session_on_term(ContainerID),
+        fail.
+
+process_session(ContainerID) :-
+        %% Look to set up the session status
+        ToLog is 'Removed statuses for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        retract session_status(Container, _),
+        fail.
+
+process_session(ContainerID) :-
+        %% Now activate valid statuses
+        location_status(Status, LastActivationTime),
+        CurTime is get_current_millis(),
+        status_past_time(StatusPastMillis),
+        LastActivationTime > CurTime - StatusPastMillis,
+        ToLog is 'Added past status ' + Status + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        assert session_status(ContainerID, Status),
+        fail.
+
+process_session(ContainerID) :-
+        %% Now wait for any new statuses during the session
+        wait location_status(Status, _),
+        insert_session_status(ContainerID, Status),
+        fail.
+
+process_session(ContainerID) :-
+        %% Keep checking if the session needs to be terminated
+        %% on any changes to counts. Say if the pallet was read
+        wait container(ContainerID, ContainerReadTs, OpenCount, ReadCount, TotCount),
+        is_non_zero(PalletRead, ContainerReadTs),
+        ToLog is 'Checking for termination for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        IsTerminated is check_termination(ContainerID, PalletRead, OpenCount, ReadCount, TotCount),
+        %% If the session is supposed to be terminated
+        IsTerminated = 'T',
+        %% The session is over.
+        !.
+
+process_session(ContainerID) :-
+        wait session_timeout(ContainerID, AbsTime),
+        %% TODO: Check this... get_abs_timeout_millis(AbsTime, ContainerID),
+        ToLog is 'Scheduled timeout out Container ' + ContainerID + ' at ' + AbsTime,
+        _ is log_info(ToLog),
+        wait_till(AbsTime),
+        %% Check if the timeout is still valid
+        ToLog1 is 'Timing out Container ' + ContainerID + ' at ' + AbsTime,
+        _ is log_info(ToLog1),
+        get_abs_timeout_millis(AbsTime, ContainerID),
+        ToLog2 is 'Successful timeout on container ' + ContainerID + ' at ' + AbsTime,
+        _ is log_info(ToLog2),
+        %% The session is over.
+        !.
+
+insert_session_status(ContainerID, Status) :-
+        session_status(ContainerID, Status),
+        %% The status exists
+        !,
+        fail.
+
+insert_session_status(ContainerID, Status) :-
+        ToLog is 'Added status ' + Status + ' for container with ID ' + ContainerID,
+        _ is log_info(ToLog),
+        assert session_status(ContainerID, Status),
+        fail.
+
+
+is_non_zero('F', 0) :-
+        !.
+
+is_non_zero('T', _).
+
+
+get_abs_timeout_millis(AbsTime, ContainerID) :-
+        session_untimeout(ContainerID, _),
+        !,
+        fail.
+
+get_abs_timeout_millis(AbsTime, ContainerID) :-
+        session_timeout(ContainerID, AbsTime).
+
+
+%% Delete useless sessions, once cases get to 0.
+cleanup_session_on_term(ContainerID) :-
+        %% Wait till open count is 0
+        wait container(ContainerID, _, 0, _, _),
+        ToLog is 'Session on container ' + ContainerID + ' has been cleaned-up',
+        _ is log_info(ToLog),
+        !,
+        cleanup_session(ContainerID).
+
+cleanup_session(ContainerID) :-
+        retract containee(_, ContainerID, _, _),
+        fail.
+
+cleanup_session(ContainerID) :-
+        retract session_timeout(ContainerID, _),
+        fail.
+
+cleanup_session(ContainerID) :-
+        retract session_untimeout(ContainerID, _),
+        fail.
+
+cleanup_session(ContainerID) :-
+        retract session_status(ContainerID, _),
+        fail.
+
+cleanup_session(ContainerID) :-
+        retract session(ContainerID, _),
+        fail.
+
+cleanup_session(ContainerID) :-
+        retract container(ContainerID, _, _, _, _),
+        %% If there is a match... there should be one
+        decrement_num_containers.
+
+%%%%%%%%%%%%%%%%%%%% Update methods
+
+%% Should be called if any disassociation happens. Explicity cleans
+%% up the container.
+active_container_disassociated(ContainerID, Error) :-
+        Error = '',
+        container(ContainerID, ContainerReadTs, OldOpenCount, ReadCount, TotCount),
+        %% A cut to indicate common processing
+        !,
+        %% Set the open count to 0. This triggers a cleanup
+        reset_open_count(ContainerID).
+
+active_container_disassociated(ContinerID, Error) :-
+        Error = 'Container is inactive'.
+
+%%%%%%%%%%%%%%%%%%%% Query methods
+query_num_containers(NumContainers) :-
+        num_containers(NumContainers).
+
+query_active_session(ContainerID) :-
+        session(ContainerID, _).
+
+query_zombie_session(ContainerID) :-
+        container(ContainerID, _, OpenCount, _, _),
+        %% If this is not true, the session will be removed immediately
+        OpenCount > 0,
+        no_session(ContainerID).
+
+no_session(ContainerID) :-
+        session(ContainerID),
+        !,
+        fail.
+
+no_session(_).
+
+
+query_container(ContainerID, ContainerReadTs, OpenCount, ReadCount, TotCount) :-
+        container(ContainerID, ContainerReadTs, OpenCount, ReadCount, TotCount).
+
+query_containee(ContaineeID, ContainerID, FirstRead, IsOpen) :-
+        containee(ContaineeID, ContainerID, FirstRead, IsOpen).
+
+query_session_status(ContainerID, Status) :-
+        session_status(ContainerID, Status).
+
+%% Does not return a record if there is no timeout
+%% Returns the expected closing time - current time
+%% May be negative if termination is overdue
+query_session_timeout(ContainerID, Timeout) :-
+        get_abs_timeout_millis(AbsTime, ContainerID),
+        CurTime is get_current_millis(),
+        Timeout is AbsTime - CurTime.
+
+query_location_status(Status, LastActivationTime) :-
+        location_status(Status, LastActivationTime).

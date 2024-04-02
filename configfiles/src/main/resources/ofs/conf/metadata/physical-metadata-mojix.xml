@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE grammar SYSTEM "props-metadata.dtd">
+<meta-data property-table="Physical">
+  <table name="device">
+    <entity type="RTLSDirectionalDeviceNode" extends="DeviceNode" locator-value="RTLSDirectionalDeviceNode">
+      <label>Mojix</label>
+      <description>Mojix</description>
+      <property key="Zone" is-mandatory="true">
+        <label>Mojix Zone</label>
+        <description>Mojix InterrogationSpace</description>
+        <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="CoverageArea" is-mandatory="false">
+        <label>Mojix zone</label>
+        <description>Mojix Zone</description>
+        <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="Direction" is-mandatory="false">
+         <label>Direction</label>
+         <description>Direction</description>
+         <type-definition>xsd:string</type-definition>
+      </property>
+      <property key="TimeThreshold" is-mandatory="false">
+        <label>Time Threshold (ms)</label>
+        <description>The time threshold should exceed 100 milliseconds</description>
+        <type-definition>oat:TimeThreshold</type-definition>
+        <select is-bound="false">
+          <option value="2000" is-default="true">2000</option>
+        </select>
+      </property>
+    </entity>
+  </table>
+</meta-data	>  
+      

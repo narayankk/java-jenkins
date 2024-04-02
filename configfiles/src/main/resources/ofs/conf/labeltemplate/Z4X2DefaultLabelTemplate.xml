@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+ $Source: /usr/local/cvs/ofs/install/src/dist/conf/labeltemplate/Z4X2DefaultLabelTemplate.xml,v $
+ $Revision: 1.2 $
+ $State: Exp $
+-->
+<template name="Z4X2DefaultLabelTemplate">
+    <variables>
+        <variable name="CONTACT" defaultValue="OATSystems"/>
+        <variable name="EPCCODE" defaultValue="1234565789"/>
+    </variables>
+    <printcode>                                      
+    <![CDATA[^XA^RS,,,2,N^FS^WT0,3,1,0,1,n^FD{TAG_EPC_ZPL}^FS^RT0,0,1,1,3,1,0^FS^HV0^FS^XZ
+^XA^MCY^FS~JSN^SZ2^MMT^MTT^LT0^MD0~TA000^PR5^PON^PMN^CI0^LRN
+^FO10,48^GB748,342,3^FS
+^FO254,249^A0N,40,98^FD{CONTACT}^FS
+^FO225,308^A0N,43,98^FH_^FD{EPCCODE}^FS
+^FO89,311^A0N,42,51^FDEPC: ^FS
+^FO64,248^A0N,42,51^FDContact: ^FS
+^FO66,105^A0N,90,98^FDOAT Systems^FS
+^PQ1,0,0,N^MCN^XZ]]>
+    </printcode>
+</template>
+
